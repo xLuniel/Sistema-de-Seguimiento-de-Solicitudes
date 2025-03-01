@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sistema de Seguimiento de Solicitudes", "Sistema de Seguimiento de Solicitudes\Sistema de Seguimiento de Solicitudes.csproj", "{639336E0-2E50-4592-8A64-3F247FDBDDE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{639336E0-2E50-4592-8A64-3F247FDBDDE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{639336E0-2E50-4592-8A64-3F247FDBDDE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{639336E0-2E50-4592-8A64-3F247FDBDDE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{639336E0-2E50-4592-8A64-3F247FDBDDE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0371B0BD-3FD9-4033-B3BB-F64AA9AEBD5C}
+	EndGlobalSection
+EndGlobal

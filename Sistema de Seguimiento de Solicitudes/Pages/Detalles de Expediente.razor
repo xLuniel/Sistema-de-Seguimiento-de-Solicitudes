@@ -1,0 +1,93 @@
+﻿@page "/detalle-expediente/{id}"
+
+@using Sistema_de_Seguimiento_de_Solicitudes.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Detalles de Expediente @Expediente.Folio</h3>
+
+@if (Expediente != null)
+{
+    <table class="table">
+        <tr><th>ID</th><td>@Expediente.Id</td></tr>
+        <tr><th>Folio</th><td>@Expediente.Folio</td></tr>
+        <tr><th>Mes de Admisión</th><td>@Expediente.MesAdmision</td></tr>
+        <tr><th>Tipo de Solicitud</th><td>@Expediente.TipoSolicitud</td></tr>
+        <tr><th>Tipo de Derecho</th><td>@Expediente.TipoDerecho</td></tr>
+        <tr><th>Fecha de Inicio del Trámite</th><td>@Expediente.FechaInicioTramite.ToShortDateString()</td></tr>
+        <tr><th>Fecha Límite de Respuesta (10 días hábiles)</th><td>@Expediente.FechaLimiteRespuesta10.ToShortDateString()</td></tr>
+        <tr><th>Ampliación</th><td>@Expediente.Ampliacion</td></tr>
+        <tr><th>Fecha Límite de Respuesta (20 días hábiles)</th><td>@Expediente.FechaLimiteRespuesta20.ToShortDateString()</td></tr>
+        <tr><th>Estatus</th><td>@Expediente.Estatus</td></tr>
+        <tr><th>Fecha de Respuesta</th><td>@Expediente.FechaRespuesta.ToShortDateString()</td></tr>
+        <tr><th>Promedio de Días de Respuesta</th><td>@Expediente.PromedioDiasRespuesta</td></tr>
+        <tr><th>Prevención</th><td>@Expediente.Prevention</td></tr>
+        <tr><th>Subsana Prevención y Reinicio del Trámite</th><td>@Expediente.SubsanaPrevencion</td></tr>
+        <tr><th>Fecha Límite para Prevención (10 días hábiles)</th><td>@Expediente.FechaLimitePrevencion.ToShortDateString()</td></tr>
+        <tr><th>Cómo fue Recibida/Registrada en la PNT</th><td>@Expediente.RecibidaRegistrada</td></tr>
+        <tr><th>Modalidad de Entrega</th><td>@Expediente.ModalidadEntrega</td></tr>
+        <tr><th>Nombre</th><td>@Expediente.Nombre</td></tr>
+        <tr><th>Correo Electrónico</th><td>@Expediente.CorreoElectronico</td></tr>
+        <tr><th>Contenido de la Solicitud</th><td>@Expediente.ContenidoSolicitud</td></tr>
+        <tr><th>Área que Posee la Información</th><td>@Expediente.AreaInformacion</td></tr>
+        <tr><th>Materia</th><td>@Expediente.Materia</td></tr>
+        <tr><th>Ciudad</th><td>@Expediente.Ciudad</td></tr>
+        <tr><th>Temática</th><td>@Expediente.Tematica</td></tr>
+        <tr><th>Temática Específica</th><td>@Expediente.TematicaEspecifica</td></tr>
+        <tr><th>Sentido de Respuesta</th><td>@Expediente.SentidoRespuesta</td></tr>
+        <tr><th>Precisión del Sentido de Respuesta</th><td>@Expediente.PrecisionSentidoRespuesta</td></tr>
+        <tr><th>Cobro</th><td>@Expediente.Cobro</td></tr>
+        <tr><th>Recurso de Revisión</th><td>@Expediente.RecursoRevision</td></tr>
+        <tr><th>Datos del Recurso de Revisión</th><td>@Expediente.DatosRecursoRevision</td></tr>
+        <tr><th>Nota</th><td>@Expediente.Nota</td></tr>
+    </table>
+}
+else
+{
+    <p>Cargando detalles...</p>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private Expediente Expediente { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Aquí cargarías el expediente desde una fuente, por ejemplo, un API o una base de datos.
+        Expediente = new Expediente
+            {
+                Id = id, // Usar el id recibido para cargar los detalles
+                Folio = "F001",
+                MesAdmision = "Enero",
+                TipoSolicitud = "Solicitud A",
+                TipoDerecho = "Derecho 1",
+                FechaInicioTramite = DateTime.Now.AddDays(-10),
+                FechaLimiteRespuesta10 = DateTime.Now.AddDays(10),
+                Ampliacion = "No",
+                FechaLimiteRespuesta20 = DateTime.Now.AddDays(20),
+                Estatus = "En proceso",
+                FechaRespuesta = DateTime.Now.AddDays(-5),
+                PromedioDiasRespuesta = 5,
+                Prevention = "No",
+                SubsanaPrevencion = "No",
+                FechaLimitePrevencion = DateTime.Now.AddDays(5),
+                RecibidaRegistrada = "En la PNT",
+                ModalidadEntrega = "Correo",
+                Nombre = "Juan Perez",
+                CorreoElectronico = "juan@correo.com",
+                ContenidoSolicitud = "Solicito información",
+                AreaInformacion = "Transparencia",
+                Materia = "Derecho",
+                Ciudad = "Tijuana",
+                Tematica = "Acceso a la información",
+                TematicaEspecifica = "Datos personales",
+                SentidoRespuesta = "Positiva",
+                PrecisionSentidoRespuesta = "Exacta",
+                Cobro = "Ninguno",
+                RecursoRevision = "No",
+                DatosRecursoRevision = "N/A",
+                Nota = "Ninguna"
+            };
+    }
+}
