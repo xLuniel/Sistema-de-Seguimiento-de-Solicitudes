@@ -1,82 +1,205 @@
-﻿@page "/detalle-expediente/{id}"
+﻿@page "/indice-expedientes/detalles/{id:int}"
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
-<h3>Detalles de Expediente @Expediente.Folio</h3>
+<div class="container mt-4">
+    <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
 
-@if (Expediente != null)
-{
-    <table class="table">
-        <tr><th>ID</th><td>@Expediente.Id</td></tr>
-        <tr><th>Folio</th><td>@Expediente.Folio</td></tr>
-        <tr><th>Mes de Admisión</th><td>@Expediente.MesAdmision</td></tr>
-        <tr><th>Tipo de Solicitud</th><td>@Expediente.TipoSolicitud</td></tr>
-        <tr><th>Tipo de Derecho</th><td>@Expediente.TipoDerecho</td></tr>
-        <tr><th>Fecha de Inicio del Trámite</th><td>@Expediente.FechaInicioTramite.ToShortDateString()</td></tr>
-        <tr><th>Fecha Límite de Respuesta (10 días hábiles)</th><td>@Expediente.FechaLimiteRespuesta10.ToShortDateString()</td></tr>
-        <tr><th>Ampliación</th><td>@Expediente.Ampliacion</td></tr>
-        <tr><th>Fecha Límite de Respuesta (20 días hábiles)</th><td>@Expediente.FechaLimiteRespuesta20.ToShortDateString()</td></tr>
-        <tr><th>Estatus</th><td>@Expediente.Estatus</td></tr>
-        <tr><th>Fecha de Respuesta</th><td>@Expediente.FechaRespuesta.ToShortDateString()</td></tr>
-        <tr><th>Promedio de Días de Respuesta</th><td>@Expediente.PromedioDiasRespuesta</td></tr>
-        <tr><th>Prevención</th><td>@Expediente.Prevention</td></tr>
-        <tr><th>Subsana Prevención y Reinicio del Trámite</th><td>@Expediente.SubsanaPrevencion</td></tr>
-        <tr><th>Fecha Límite para Prevención (10 días hábiles)</th><td>@Expediente.FechaLimitePrevencion.ToShortDateString()</td></tr>
-        <tr><th>Cómo fue Recibida/Registrada en la PNT</th><td>@Expediente.RecibidaRegistrada</td></tr>
-        <tr><th>Modalidad de Entrega</th><td>@Expediente.ModalidadEntrega</td></tr>
-        <tr><th>Nombre</th><td>@Expediente.Nombre</td></tr>
-        <tr><th>Correo Electrónico</th><td>@Expediente.CorreoElectronico</td></tr>
-        <tr><th>Contenido de la Solicitud</th><td>@Expediente.ContenidoSolicitud</td></tr>
-        <tr><th>Área que Posee la Información</th><td>@Expediente.AreaInformacion</td></tr>
-        <tr><th>Materia</th><td>@Expediente.Materia</td></tr>
-        <tr><th>Ciudad</th><td>@Expediente.Ciudad</td></tr>
-        <tr><th>Temática</th><td>@Expediente.Tematica</td></tr>
-        <tr><th>Temática Específica</th><td>@Expediente.TematicaEspecifica</td></tr>
-        <tr><th>Sentido de Respuesta</th><td>@Expediente.SentidoRespuesta</td></tr>
-        <tr><th>Precisión del Sentido de Respuesta</th><td>@Expediente.PrecisionSentidoRespuesta</td></tr>
-        <tr><th>Cobro</th><td>@Expediente.Cobro</td></tr>
-        <tr><th>Recurso de Revisión</th><td>@Expediente.RecursoRevision</td></tr>
-        <tr><th>Datos del Recurso de Revisión</th><td>@Expediente.DatosRecursoRevision</td></tr>
-        <tr><th>Nota</th><td>@Expediente.Nota</td></tr>
-    </table>
-}
-else
-{
-    <p>Cargando detalles...</p>
-}
+    @if (Expediente != null)
+    {
+        <EditForm Model="@Expediente" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>ID</th>
+                                <td>@Expediente.Id</td>
+                            </tr>
+                            <tr>
+                                <th>Folio</th>
+                                <td>@Expediente.Folio</td>
+                            </tr>
+                            <tr>
+                                <th>Mes de Admisión</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.MesAdmision" /></td>
+                            </tr>
+                            <tr>
+                                <th>Tipo de Solicitud</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.TipoSolicitud" /></td>
+                            </tr>
+                            <tr>
+                                <th>Tipo de Derecho</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.TipoDerecho" /></td>
+                            </tr>
+                            <tr>
+                                <th>Fecha de Inicio del Trámite</th>
+                                <td>@Expediente.FechaInicioTramite</td>
+                            </tr>
+                            <tr>
+                                <th>Fecha Límite de Respuesta (10 días hábiles)</th>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta10" /></td>
+                            </tr>
+                            <tr>
+                                <th>Ampliación</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Ampliacion" /></td>
+                            </tr>
+                            <tr>
+                                <th>Fecha Límite de Respuesta (20 días hábiles)</th>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta20" /></td>
+                            </tr>
+                            <tr>
+                                <th>Estatus</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Estatus" /></td>
+                            </tr>
+                            <tr>
+                                <th>Fecha de Respuesta</th>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaRespuesta" /></td>
+                            </tr>
+                            <tr>
+                                <th>Promedio de Días de Respuesta</th>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.PromedioDiasRespuesta" /></td>
+                            </tr>
+                            <tr>
+                                <th>Prevención</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Prevention" /></td>
+                            </tr>
+                            <tr>
+                                <th>Subsana Prevención y Reinicio del Trámite</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.SubsanaPrevencion" /></td>
+                            </tr>
+                            <tr>
+                                <th>Fecha Límite para Prevención (10 días hábiles)</th>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimitePrevencion" /></td>
+                            </tr>
+                            <tr>
+                                <th>Cómo fue Recibida/Registrada en la PNT</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.RecibidaRegistrada" /></td>
+                            </tr>
+                            <tr>
+                                <th>Como desea recibir la respuesta la persona solicitante</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante" /></td>
+                            </tr>
+                            <tr>
+                                <th>Nombre</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Nombre" /></td>
+                            </tr>
+                            <tr>
+                                <th>Correo Electrónico</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Contenido de la Solicitud</th>
+                                <td>
+                                    <textarea class="form-control" rows="10">@Expediente.ContenidoSolicitud</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Área que Posee la Información</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.AreaInformacion" /></td>
+                            </tr>
+                            <tr>
+                                <th>Materia</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Materia" /></td>
+                            </tr>
+                            <tr>
+                                <th>Ciudad</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Ciudad" /></td>
+                            </tr>
+                            <tr>
+                                <th>Temática</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Tematica" /></td>
+                            </tr>
+                            <tr>
+                                <th>Temática Específica</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.TematicaEspecifica" /></td>
+                            </tr>
+                            <tr>
+                                <th>Sentido de Respuesta</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.SentidoRespuesta" /></td>
+                            </tr>
+                            <tr>
+                                <th>Precisión del Sentido de Respuesta</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.PrecisionSentidoRespuesta" /></td>
+                            </tr>
+                            <tr>
+                                <th>Modalidad de Entrega</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
+                            </tr>
+                            <tr>
+                                <th>Cobro</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Cobro" /></td>
+                            </tr>
+                            <tr>
+                                <th>Recurso de Revisión</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.RecursoRevision" /></td>
+                            </tr>
+                            <tr>
+                                <th>Datos del Recurso de Revisión</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.DatosRecursoRevision" /></td>
+                            </tr>
+                            <tr>
+                                <th>Nota</th>
+                                <td><InputTextArea class="form-control" @bind-Value="Expediente.Nota" rows="4" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </EditForm>
+    }
+    else
+    {
+        <p class="text-center text-muted">Cargando detalles...</p>
+    }
+</div>
 
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int Id { get; set; }
     private Expediente Expediente { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine($"Cargando expediente con ID: {Id}");
         // Aquí cargarías el expediente desde una fuente, por ejemplo, un API o una base de datos.
         Expediente = new Expediente
             {
-                Id = id, // Usar el id recibido para cargar los detalles
+                Id = Id, // Usar el id recibido para cargar los detalles
                 Folio = "F001",
                 MesAdmision = "Enero",
                 TipoSolicitud = "Solicitud A",
                 TipoDerecho = "Derecho 1",
-                FechaInicioTramite = DateTime.Now.AddDays(-10),
-                FechaLimiteRespuesta10 = DateTime.Now.AddDays(10),
+                FechaInicioTramite = DateTime.Now,
+                FechaLimiteRespuesta10 = DateTime.Now,
                 Ampliacion = "No",
-                FechaLimiteRespuesta20 = DateTime.Now.AddDays(20),
+                FechaLimiteRespuesta20 = DateTime.Now,
                 Estatus = "En proceso",
-                FechaRespuesta = DateTime.Now.AddDays(-5),
+                FechaRespuesta = DateTime.Now,
                 PromedioDiasRespuesta = 5,
                 Prevention = "No",
                 SubsanaPrevencion = "No",
-                FechaLimitePrevencion = DateTime.Now.AddDays(5),
+                FechaLimitePrevencion = DateTime.Now,
                 RecibidaRegistrada = "En la PNT",
                 ModalidadEntrega = "Correo",
+                ComoDeseaRecibirRespuestaPersonaSolicitante = "Electrónico a través del sistema de solicitudes de acceso a la información de la PNT",
                 Nombre = "Juan Perez",
                 CorreoElectronico = "juan@correo.com",
-                ContenidoSolicitud = "Solicito información",
+                ContenidoSolicitud = "Durante el año 2023: Durante cuántos pagos y de que fechas, se les pago inferior al mínimo a los auxiliares administrativos de confianza nivel 02.Porque no se realizó la aportación a issstecali de los auxiliares administrativos de confianza nivel 02, como dice la ley.Porque la remuneración catorcenal fue variable para los auxiliares administrativos de confianza nivel 02,si el trabajo realizado fue el mismo durante todo el año. (las cantidades pagadas fueron diferentes).Cuál es el fundamento legal que utilizan para que los pagos fueran variables, si el trabajo y horario era el mismo.Cual es el motivo por el que a veces si y a veces No se les regresaba el impuesto a los auxiliares administrativos de confianza nivel 02.En cuantos pagos(catorcenas) no se les realizo la devolución del impuesto y de que fechas son. (Si bien es cierto la devolución o deposito comentan que lo realiza issstecali, es Poder Judicial quien envia el comprobante de nomina para firma) Nombre del despacho contable que fue contratado para realizar o apoyar en la nomina y pago de impuestos del poder judicial.",
                 AreaInformacion = "Transparencia",
                 Materia = "Derecho",
                 Ciudad = "Tijuana",
@@ -89,5 +212,11 @@ else
                 DatosRecursoRevision = "N/A",
                 Nota = "Ninguna"
             };
+    }
+
+    private void HandleValidSubmit()
+    {
+        // Lógica para guardar los cambios en la base de datos o API
+        Console.WriteLine("Expediente guardado exitosamente.");
     }
 }
