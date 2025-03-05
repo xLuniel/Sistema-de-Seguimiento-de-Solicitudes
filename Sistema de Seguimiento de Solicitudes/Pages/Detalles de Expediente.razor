@@ -8,7 +8,7 @@
     <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
 
     @if (Expediente != null)
-    {
+    { 
         <EditForm Model="@Expediente" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />

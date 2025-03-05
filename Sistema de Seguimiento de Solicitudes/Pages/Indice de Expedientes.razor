@@ -7,7 +7,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
-<!-- SSSS -->
+<!-- SSSSSS -->
 
 <h3>Índice de Expedientes</h3>
 
@@ -257,18 +257,18 @@
         public DateTime FechaInicioTramite { get; set; }
         public string Estatus { get; set; }
         public string ContenidoSolicitud { get; set; }
-    }
+    } 
 }
-
+ 
 @if (MostrarMensajeError)
 {
     <div class="alerta flotante">
         @MensajeError
     </div>
 }
+ 
+    <style>
 
-<style>
-    
     /* Etapas */
     .etapas {
         display: flex;
@@ -318,9 +318,9 @@
         width: auto;
     }
 
-    .btn-eliminar:hover {
-        text-decoration: underline;
-    }
+        .btn-eliminar:hover {
+            text-decoration: underline;
+        }
 
     /* Modal */
     .modal {
@@ -345,9 +345,9 @@
         border-radius: 10px;
     }
 
-    .modal-contenido button {
-        margin: 5px;
-    }
+        .modal-contenido button {
+            margin: 5px;
+        }
 
     /* Alerta Flotante */
     .alerta.flotante {
@@ -396,12 +396,12 @@
         font-weight: bold;
     }
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
     /*Tabla*/
     .table-responsive {
@@ -414,12 +414,12 @@
         border-collapse: collapse;
     }
 
-    .table th, .table td {
-        padding: 8px;
-        border: 1px solid #ddd;
-        text-align: left;
-        white-space: nowrap;
-    }
+        .table th, .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
 
     /* Truncar el texto con "..." */
     .truncate {
@@ -441,7 +441,7 @@
     input, textarea, button {
         width: auto;
         padding: 5px;
-        margin: 8px 0;        
+        margin: 8px 0;
         box-sizing: border-box;
         border-radius: 5px;
     }
@@ -454,11 +454,11 @@
         transition: background-color 0.3s;
     }
 
-    button:hover {
-        background-color: #0056b3;
-    }
+        button:hover {
+            background-color: #0056b3;
+        }
 
-        /* Estilos para el botón Agregar Expediente */
+    /* Estilos para el botón Agregar Expediente */
     .btn-agregar {
         width: 100%;
         padding: 10px;
@@ -475,11 +475,11 @@
         transition: background-color 0.3s ease-in-out;
     }
 
-    .btn-agregar:hover {
-        background-color: #0a5c0a;
-    }
+        .btn-agregar:hover {
+            background-color: #0a5c0a;
+        }
 
-    .navbar-toggler{
+    .navbar-toggler {
         width: 20%;
         padding: 10px;
         margin: 10px 0;
@@ -496,4 +496,3 @@
     }
 
 </style>
-

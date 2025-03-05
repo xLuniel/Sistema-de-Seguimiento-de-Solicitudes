@@ -1,5 +1,5 @@
 ﻿namespace Sistema_de_Seguimiento_de_Solicitudes.Models
-{
+{ 
     public class Expediente
     {
         public int Id { get; set; }
