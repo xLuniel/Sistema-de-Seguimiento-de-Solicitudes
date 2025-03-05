@@ -27,6 +27,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
+app.UseCors("PermitirBlazor"); // Habilitar CORS
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

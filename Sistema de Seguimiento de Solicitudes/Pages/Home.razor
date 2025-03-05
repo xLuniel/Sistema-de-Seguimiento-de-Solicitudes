@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using MudBlazor
+@inject HttpClient Http
 
 <PageTitle>Home</PageTitle>
 
@@ -8,23 +9,23 @@
 
 <!--
 <MudGrid Class="mt-3" Justify="Justify.Center">
-    <MudItem xs="4" >
-        <MudPaper Class="p-3 text-center bg-danger text-white">
-            <h5>@solicitudesRojas Solicitudes</h5>
-        </MudPaper>
-    </MudItem>
+<MudItem xs="4" >
+<MudPaper Class="p-3 text-center bg-danger text-white">
+<h5>@solicitudesRojas Solicitudes</h5>
+</MudPaper>
+</MudItem>
 
-    <MudItem xs="4">
-        <MudPaper Class="p-3 text-center bg-warning text-dark">
-            <h5>@solicitudesAmarillas Solicitudes</h5>
-        </MudPaper>
-    </MudItem>
+<MudItem xs="4">
+<MudPaper Class="p-3 text-center bg-warning text-dark">
+<h5>@solicitudesAmarillas Solicitudes</h5>
+</MudPaper>
+</MudItem>
 
-    <MudItem xs="4">
-        <MudPaper Class="p-3 text-center bg-success text-white">
-            <h5>@solicitudesVerdes Solicitudes</h5>
-        </MudPaper>
-    </MudItem>
+<MudItem xs="4">
+<MudPaper Class="p-3 text-center bg-success text-white">
+<h5>@solicitudesVerdes Solicitudes</h5>
+</MudPaper>
+</MudItem>
 </MudGrid>
 -->
 
@@ -44,6 +45,27 @@
         </div>
     </div>
 </div>
+
+<!--Testeo API-->
+
+@code {
+    private string mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            mensaje = await Http.GetStringAsync("https://localhost:7123/weatherforecast");
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error" + ex.Message;
+        }
+    }
+}
+
+<p>@mensaje</p>
+
 
 <style>
     .dashboard-container {
