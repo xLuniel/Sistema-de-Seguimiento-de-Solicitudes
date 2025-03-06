@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using SolicitudesShared;
 
 namespace SolicitudesAPI.Models;
 
@@ -42,4 +43,6 @@ public partial class SistemaSolicitudesContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+public DbSet<SolicitudesShared.TestExpedienteDTO> TestExpedienteDTO { get; set; } = default!;
 }

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sistema de Seguimiento de S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolicitudesAPI", "SolicitudesAPI\SolicitudesAPI.csproj", "{7998BE9F-63EE-4858-9BC4-C42C5B8E104D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolicitudesShared", "SolicitudesShared\SolicitudesShared.csproj", "{9C740DDC-7DAD-4639-A2A5-A5672221A042}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7998BE9F-63EE-4858-9BC4-C42C5B8E104D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7998BE9F-63EE-4858-9BC4-C42C5B8E104D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7998BE9F-63EE-4858-9BC4-C42C5B8E104D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C740DDC-7DAD-4639-A2A5-A5672221A042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C740DDC-7DAD-4639-A2A5-A5672221A042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C740DDC-7DAD-4639-A2A5-A5672221A042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C740DDC-7DAD-4639-A2A5-A5672221A042}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
