@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SolicitudesShared
 {
-    internal class ResponseAPI<T>
+    public class ResponseAPI<T>
     {
         public bool Exito { get; set; }
         public string? Mensaje { get; set; }
