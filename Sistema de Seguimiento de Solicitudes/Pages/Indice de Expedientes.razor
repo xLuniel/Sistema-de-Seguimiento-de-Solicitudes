@@ -1,8 +1,13 @@
 ﻿@page "/indice-expedientes"
 
+<link href="css/app.css" rel="stylesheet" />
+
 @using System.Collections.Generic
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<!-- SSSSSS -->
 
 <h3>Índice de Expedientes</h3>
 
@@ -17,12 +22,12 @@
 </div>
 
 <!-- Botón para agregar nuevo expediente -->
-<button @onclick="MostrarFormulario">Agregar Expediente</button>
+<button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button>
 
-<!-- Modal de formulario de creación de expediente -->
+<!-- Modal de formulario para creación de expediente -->
 @if (MostrarFormularioModal)
 {
-    <div class="modal" style="display: block;">
+    <div class="modal" style="display: block;" >
         <div class="modal-contenido">
             <h4>Nuevo Expediente</h4>
             <EditForm Model="NuevoExpediente" OnValidSubmit="GuardarExpediente">
@@ -32,21 +37,20 @@
                 <div>
                     <label for="Folio">Folio</label>
                     <InputText id="Folio" @bind-Value="NuevoExpediente.Folio" />
-                </div>
 
-                <div>
                     <label for="Nombre">Nombre</label>
                     <InputText id="Nombre" @bind-Value="NuevoExpediente.Nombre" />
-                </div>
-
-                <div>
+                
                     <label for="FechaInicioTramite">Fecha de Inicio</label>
                     <InputDate id="FechaInicioTramite" @bind-Value="NuevoExpediente.FechaInicioTramite" />
+                
+                    <label for="Estatus">Estatus</label>
+                    <InputText id="Estatus" @bind-Value="NuevoExpediente.Estatus" />
                 </div>
 
                 <div>
-                    <label for="Estatus">Estatus</label>
-                    <InputText id="Estatus" @bind-Value="NuevoExpediente.Estatus" />
+                    <label for="ContenidoSolicitud">Contenido de la Solicitud</label>
+                    <InputTextArea id="ContenidoSolicitud" @bind-Value="NuevoExpediente.ContenidoSolicitud" rows="4" style="width: 100%;" />
                 </div>
 
                 <button type="submit">Guardar</button>
@@ -60,40 +64,63 @@
 <div class="modal" style="display: @(MostrarModal ? "block" : "none")">
     <div class="modal-contenido">
         <h4>¿Estás seguro de que deseas eliminar este expediente?</h4>
-        <p>ID: @IdEliminar</p>
+        <h2>ID: @IdEliminar</h2>
         <button @onclick="ConfirmarEliminacion">Eliminar</button>
         <button @onclick="CancelarEliminacion">Cancelar</button>
     </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Acciones</th>
-            <th>ID</th>
-            <th>FOLIO</th>
-            <th>NOMBRE</th>
-            <th>FECHA DE INICIO</th>
-            <th>ESTATUS</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var expediente in ExpedientesFiltrados)
-        {
+<div class="table-responsive">
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
-                    <button @onclick="() => EliminarExpediente(expediente.Id)" class="btn-eliminar">Eliminar</button>
-                </td>
-                <td>@expediente.Id</td>
-                <td>@expediente.Folio</td>
-                <td>@expediente.Nombre</td>
-                <td>@expediente.FechaInicioTramite.ToString("dd/MM/yyyy")</td>
-                <td>@expediente.Estatus</td>
+                <th>ACCIONES</th>
+                <th>ID</th>
+                <th>FOLIO</th>
+                <th>NOMBRE</th>
+                <th>FECHA DE INICIO</th>
+                <th>ESTATUS</th>
+                <th>CONTENIDO DE LA SOLICITUD</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var expediente in ExpedientesFiltrados)
+            {
+                <tr>
+                    <td>
+                        <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
+                        <button @onclick="() => EliminarExpediente(expediente.Id)" class="btn-eliminar">Eliminar</button>
+                    </td>
+                    <td>@expediente.Id</td>
+                    <td>@expediente.Folio</td>
+                    <td>@expediente.Nombre</td>
+                    <td>@expediente.FechaInicioTramite.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@expediente.Estatus</td>
+                    <td>
+                        <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
+                        <span class="truncate">
+                            @expediente.ContenidoSolicitud
+                        </span>
+                        @if (expediente.ContenidoSolicitud.Length > 300)
+                        {
+                            <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Modal para ver el contenido completo de la solicitud -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" @onclick="CloseModal">&times;</span>
+        <h2>Contenido de la Solicitud</h2>
+        <p>@modalContenido</p> <!-- Mostrar el contenido completo de la solicitud -->
+    </div>
+</div>
 
 @code {
     private string Filtro { get; set; } = "";
@@ -102,6 +129,10 @@
     private bool MostrarModal { get; set; } = false;
     private bool MostrarFormularioModal { get; set; } = false;
     private int IdEliminar { get; set; }
+    private string MensajeError { get; set; } = "";
+    private bool MostrarMensajeError { get; set; } = false;
+    private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
+
 
     private Expediente NuevoExpediente { get; set; } = new();
 
@@ -110,8 +141,8 @@
         // Simulación de carga de datos (puedes hacer una petición HTTP en su lugar)
         Expedientes = new List<Expediente>
         {
-            new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "En proceso" },
-            new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "Finalizado" }
+            new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now, Estatus = "En proceso", ContenidoSolicitud = "Durante el año 2023: Durante cuántos pagos y de que fechas, se les pago inferior al mínimo a los auxiliares administrativos de confianza nivel 02. Porque no se realizó la aportación a issstecali de los auxiliares administrativos de confianza nivel 02, como dice la ley. Porque la remuneración catorcenal fue variable para los auxiliares administrativos de confianza nivel 02, si el trabajo realizado fue el mismo durante todo el año. (las cantidades pagadas fueron diferentes). Cuál es el fundamento legal que utilizan para que los pagos fueran variables, si el trabajo y horario era el mismo. Cuál es el motivo por el que a veces si y a veces No se les regresaba el impuesto a los auxiliares administrativos de confianza nivel 02. En cuantos pagos (catorcenas) no se les realizo la devolución del impuesto y de que fechas son. (Si bien es cierto la devolución o deposito comentan que lo realiza issstecali, es Poder Judicial quien envia el comprobante de nomina para firma) Nombre del despacho contable que fue contratado para realizar o apoyar en la nomina y pago de impuestos del poder judicial."},
+            new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now, Estatus = "Finalizado", ContenidoSolicitud = "Solicito conocer el número de personas MENORES DE EDAD sentenciadas por los delitos de FEMINICIDIO y/o homicidio doloso en contra de mujeres, así como TENTATIVA DE FEMINICIDIO y/o tentativa de homicidio doloso contra mujeres, del 1 de enero de 2013 al 25 de enero de 2024. Desglosar información por año de registro, sexo y edad del agresor, estatus legal, delito, tipo de agresiones, tipo de arma utilizada en la comisión del delito, sexo y edad de la víctima, relación víctima-victimario, sentencia (especificar si condenatoria o absolutoria) Datos complementarios: EN CASO DE NO TENER LA INFORMACIÓN AL NIVEL DE DESGLOSE SOLICITADO, SE LE PIDE AL SUJETO OBLIGADO ENTREGAR TODA LA INFORMACIÓN Y DATOS DISPONIBLES ACORDE AL PRINCIPIO DE MÁXIMA PUBLICIDAD DE LA LEY GENERAL DE TRANSPARENCIA Y ACCESO A LA INFORMACIÓN."}
         };
         ExpedientesFiltrados = new List<Expediente>(Expedientes);
     }
@@ -127,7 +158,7 @@
     private void VerDetalle(int id)
     {
         // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
-        Navigation.NavigateTo($"/detalle-expediente/{id}");
+        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
     }
 
     private void EliminarExpediente(int id)
@@ -164,10 +195,58 @@
 
     private void GuardarExpediente()
     {
-        // Aquí se puede agregar la lógica para almacenar el expediente, por ejemplo, enviarlo a una base de datos
+        // Verificar si el Folio o el Nombre ya existen en la lista
+        if (Expedientes.Any(e => e.Folio == NuevoExpediente.Folio))
+        {
+            MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
+            return; // Detener la ejecución si el folio está duplicado
+        }
+
+        if (Expedientes.Any(e => e.Nombre == NuevoExpediente.Nombre))
+        {
+            MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
+            return; // Detener la ejecución si el nombre está duplicado
+        }
+
+        // Asignacion de ID unico
+        NuevoExpediente.Id = Expedientes.Count > 0 ? Expedientes.Max(e => e.Id) + 1 : 1;
+
+        // Agregar el nuevo expediente a la lista
         Expedientes.Add(NuevoExpediente);
         ExpedientesFiltrados = new List<Expediente>(Expedientes);
+
+        // Cerrar formulario
         MostrarFormularioModal = false;
+
+        // Limpiar objeto para el próximo registro
+        NuevoExpediente = new Expediente();
+
+    }
+
+    private void MostrarAlerta(string mensaje)
+    {
+        MensajeError = mensaje;
+        MostrarMensajeError = true;
+
+        // Ocultar el mensaje después de 3 segundos
+        Task.Delay(4000).ContinueWith(_ =>
+        {
+            MostrarMensajeError = false;
+            StateHasChanged();
+        });
+    }
+
+    // Función para abrir el modal con el contenido
+    private async Task OpenModal(string contenido)
+    {
+        modalContenido = contenido;
+        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';"); // Mostrar el modal
+    }
+
+    // Función para cerrar el modal
+    private async Task CloseModal()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';"); // Ocultar el modal
     }
 
     private class Expediente
@@ -177,22 +256,35 @@
         public string Nombre { get; set; }
         public DateTime FechaInicioTramite { get; set; }
         public string Estatus { get; set; }
-    }
+        public string ContenidoSolicitud { get; set; }
+    } 
 }
+ 
+@if (MostrarMensajeError)
+{
+    <div class="alerta flotante">
+        @MensajeError
+    </div>
+}
+ 
+    <style>
 
-<style>
+    /* Etapas */
     .etapas {
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         margin-bottom: 20px;
+        flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas más pequeñas */
     }
 
     .etapa {
+        flex: 1 1 30%;
         padding: 10px;
         font-weight: bold;
         color: white;
         text-align: center;
         border-radius: 5px;
+        margin: 5px;
         flex-grow: 1;
     }
 
@@ -209,38 +301,198 @@
         color: black;
     }
 
+    /* Limitar ancho de la columna del contenido de la solicitud */
+    .contenido-solicitud {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Boton Eliminar */
     .btn-eliminar {
         background: transparent;
         border: none;
         color: red;
         font-size: 16px;
-        cursor: pointer;
+        width: auto;
     }
 
         .btn-eliminar:hover {
             text-decoration: underline;
         }
 
+    /* Modal */
     .modal {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
+
         justify-content: center;
         align-items: center;
     }
 
     .modal-contenido {
-        background-color: white;
+        width: 90%;
+        max-width: 70%;
+        margin: 0 auto;
         padding: 20px;
-        border-radius: 5px;
-        text-align: center;
+        background: white;
+        border-radius: 10px;
     }
 
         .modal-contenido button {
             margin: 5px;
         }
+
+    /* Alerta Flotante */
+    .alerta.flotante {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background-color: #ffcccc;
+        color: #900;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        animation: fadeInOut 3s;
+        z-index: 9999;
+    }
+
+    /* Modal para ver el contenido completo de la solicitud */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow: auto;
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+    }
+
+    .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    /*Tabla*/
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+    /* Truncar el texto con "..." */
+    .truncate {
+        display: inline-block;
+        width: 600px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Estilo del botón Ver más */
+    .ver-mas {
+        color: blue;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    /* Estilos para los formularios y botones */
+    input, textarea, button {
+        width: auto;
+        padding: 5px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    /* Estilos para el botón Agregar Expediente */
+    .btn-agregar {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #008000;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        display: block; /* Asegura que se mantenga en su propia línea */
+        transition: background-color 0.3s ease-in-out;
+    }
+
+        .btn-agregar:hover {
+            background-color: #0a5c0a;
+        }
+
+    .navbar-toggler {
+        width: 20%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: 007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        display: block; /* Asegura que se mantenga en su propia línea */
+        transition: background-color 0.3s ease-in-out;
+    }
+
 </style>
