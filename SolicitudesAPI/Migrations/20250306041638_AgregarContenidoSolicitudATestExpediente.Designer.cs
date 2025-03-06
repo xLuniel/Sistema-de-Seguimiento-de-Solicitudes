@@ -12,8 +12,8 @@ using SolicitudesAPI.Models;
 namespace SolicitudesAPI.Migrations
 {
     [DbContext(typeof(SistemaSolicitudesContext))]
-    [Migration("20250306013200_TestMigration")]
-    partial class TestMigration
+    [Migration("20250306041638_AgregarContenidoSolicitudATestExpediente")]
+    partial class AgregarContenidoSolicitudATestExpediente
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace SolicitudesAPI.Migrations
                         .HasColumnName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContenidoSolicitud")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Estado")
                         .HasMaxLength(50)

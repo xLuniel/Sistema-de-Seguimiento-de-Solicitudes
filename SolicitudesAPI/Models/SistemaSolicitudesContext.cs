@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using SolicitudesShared;
 
@@ -37,6 +38,8 @@ public partial class SistemaSolicitudesContext : DbContext
             entity.Property(e => e.NombreSolicitante)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.ContenidoSolicitud)
+                .HasColumnType("nvarchar(4000)");
         });
 
         OnModelCreatingPartial(modelBuilder);

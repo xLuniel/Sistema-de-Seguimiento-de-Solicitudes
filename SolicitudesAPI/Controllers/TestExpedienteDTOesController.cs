@@ -34,7 +34,8 @@ namespace SolicitudesAPI.Controllers
                 Folio = e.Folio,
                 NombreSolicitante = e.NombreSolicitante,
                 FechaInicio = e.FechaInicio,
-                Estado = e.Estado
+                Estado = e.Estado,
+                ContenidoSolicitud = e.ContenidoSolicitud
             }).ToList());
         }
 
@@ -54,7 +55,8 @@ namespace SolicitudesAPI.Controllers
                 Folio = expediente.Folio,
                 NombreSolicitante = expediente.NombreSolicitante,
                 FechaInicio = expediente.FechaInicio,
-                Estado = expediente.Estado
+                Estado = expediente.Estado,
+                ContenidoSolicitud = expediente.ContenidoSolicitud
             };
         }
 
@@ -74,6 +76,7 @@ namespace SolicitudesAPI.Controllers
             expediente.NombreSolicitante = expedienteDTO.NombreSolicitante;
             expediente.FechaInicio = expedienteDTO.FechaInicio;
             expediente.Estado = expedienteDTO.Estado;
+            expediente.ContenidoSolicitud = expedienteDTO.ContenidoSolicitud;
 
             _context.Update(expediente);
 
@@ -101,7 +104,8 @@ namespace SolicitudesAPI.Controllers
                 Folio = expedienteDTO.Folio,
                 NombreSolicitante = expedienteDTO.NombreSolicitante,
                 FechaInicio = expedienteDTO.FechaInicio,
-                Estado = expedienteDTO.Estado
+                Estado = expedienteDTO.Estado,
+                ContenidoSolicitud = expedienteDTO.ContenidoSolicitud
             };
 
             _context.TestExpedientes.Add(expediente);

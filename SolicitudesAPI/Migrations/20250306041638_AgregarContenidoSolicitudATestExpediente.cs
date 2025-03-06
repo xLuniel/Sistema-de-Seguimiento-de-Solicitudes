@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SolicitudesAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class TestMigration : Migration
+    public partial class AgregarContenidoSolicitudATestExpediente : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,8 @@ namespace SolicitudesAPI.Migrations
                     Folio = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     NombreSolicitante = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     FechaInicio = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Estado = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true)
+                    Estado = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
+                    ContenidoSolicitud = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

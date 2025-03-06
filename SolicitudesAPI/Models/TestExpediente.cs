@@ -14,4 +14,6 @@ public partial class TestExpediente
     public DateTime? FechaInicio { get; set; }
 
     public string? Estado { get; set; }
+
+    public string? ContenidoSolicitud { get; set; }
 }
