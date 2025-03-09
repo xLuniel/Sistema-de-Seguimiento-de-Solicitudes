@@ -17,13 +17,13 @@ public partial class SistemaSolicitudesContext : DbContext
     {
     }
 
-    public virtual DbSet<TestExpediente> TestExpedientes { get; set; }
+    public virtual DbSet<Expediente> Expedientes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TestExpediente>(entity =>
+        modelBuilder.Entity<Expediente>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Solicitu__3214EC27AA69A3A2");
 
@@ -47,5 +47,5 @@ public partial class SistemaSolicitudesContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-public DbSet<SolicitudesShared.TestExpedienteDTO> TestExpedienteDTO { get; set; } = default!;
+public DbSet<SolicitudesShared.ExpedienteDTO> ExpedienteDTO { get; set; } = default!;
 }

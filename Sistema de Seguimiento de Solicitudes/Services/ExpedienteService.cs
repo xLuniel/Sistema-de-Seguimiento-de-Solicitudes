@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 
 namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 {
-    public class ExpedienteService : ITestExpedienteService
+    public class ExpedienteService : IExpedienteService
     {
         private readonly HttpClient _http;
 
@@ -12,9 +12,9 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             _http = http;
         }
 
-        public async Task<List<TestExpedienteDTO>> Lista()
+        public async Task<List<ExpedienteDTO>> Lista()
         {
-            var response = await _http.GetFromJsonAsync<ResponseAPI<List<TestExpedienteDTO>>>("/api/TestExpedientes/Lista​");
+            var response = await _http.GetFromJsonAsync<ResponseAPI<List<ExpedienteDTO>>>("/api/Expedientes/Lista​");
 
             if (response!.Exito)
             {
@@ -24,9 +24,9 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception(response.Mensaje);
         }
 
-        public async Task<TestExpedienteDTO> Obtener(int id)
+        public async Task<ExpedienteDTO> Obtener(int id)
         {
-            var response = await _http.GetFromJsonAsync<ResponseAPI<TestExpedienteDTO>>($"/api/TestExpedientes/single/{id}​");
+            var response = await _http.GetFromJsonAsync<ResponseAPI<ExpedienteDTO>>($"/api/Expedientes/single/{id}​");
 
             if (response!.Exito)
             {
@@ -35,9 +35,9 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             else
                 throw new Exception(response.Mensaje);
         }
-        public async Task<int> Actualizar(TestExpedienteDTO testExpediente)
+        public async Task<int> Actualizar(ExpedienteDTO Expediente)
         {
-            var result = await _http.PutAsJsonAsync($"/api/TestExpedientes/Editar/{testExpediente.Id}", testExpediente);
+            var result = await _http.PutAsJsonAsync($"/api/Expedientes/Editar/{Expediente.Id}", Expediente);
             var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
             if (response!.Exito)
@@ -48,9 +48,9 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception(response.Mensaje);
         }
 
-        public async Task<int> Crear(TestExpedienteDTO testExpediente)
+        public async Task<int> Crear(ExpedienteDTO Expediente)
         {
-            var result = await _http.PostAsJsonAsync("/api/TestExpedientes/add​", testExpediente);
+            var result = await _http.PostAsJsonAsync("/api/Expedientes/add​", Expediente);
             var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
             if (response!.Exito)
@@ -63,7 +63,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 
         public async Task<bool> Eliminar(int id)
         {
-            var result = await _http.DeleteAsync($"/api/TestExpedientes/Editar/{id}");
+            var result = await _http.DeleteAsync($"/api/Expedientes/Editar/{id}");
             var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
             if (response!.Exito)

@@ -10,25 +10,25 @@ namespace SolicitudesAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestExpedientesController : ControllerBase
+    public class ExpedientesController : ControllerBase
     {
         private readonly SistemaSolicitudesContext _context;
 
-        public TestExpedientesController(SistemaSolicitudesContext context)
+        public ExpedientesController(SistemaSolicitudesContext context)
         {
             _context = context;
         }
 
-        // GET: api/TestExpedientes/Lista
+        // GET: api/Expedientes/Lista
         [HttpGet("Lista")]
-        public async Task<ActionResult<IEnumerable<TestExpedienteDTO>>> GetTestExpedientes()
+        public async Task<ActionResult<IEnumerable<ExpedienteDTO>>> GetExpedientes()
         {
-            var expedientes = await _context.TestExpedientes.AsNoTracking().ToListAsync();
+            var expedientes = await _context.Expedientes.AsNoTracking().ToListAsync();
 
             if (expedientes.Count == 0)
                 return NotFound();
 
-            return Ok(expedientes.Select(e => new TestExpedienteDTO
+            return Ok(expedientes.Select(e => new ExpedienteDTO
             {
                 Id = e.Id,
                 Folio = e.Folio,
@@ -39,17 +39,17 @@ namespace SolicitudesAPI.Controllers
             }).ToList());
         }
 
-        // GET: api/TestExpedientes/single/5
+        // GET: api/Expedientes/single/5
         [HttpGet("single/{id}")]
-        public async Task<ActionResult<TestExpedienteDTO>> GetTestExpediente(int id)
+        public async Task<ActionResult<ExpedienteDTO>> GetExpediente(int id)
         {
-            var expediente = await _context.TestExpedientes.AsNoTracking()
+            var expediente = await _context.Expedientes.AsNoTracking()
                                     .FirstOrDefaultAsync(e => e.Id == id);
 
             if (expediente == null)
                 return NotFound();
 
-            return new TestExpedienteDTO
+            return new ExpedienteDTO
             {
                 Id = expediente.Id,
                 Folio = expediente.Folio,
@@ -60,14 +60,14 @@ namespace SolicitudesAPI.Controllers
             };
         }
 
-        // PUT: api/TestExpedientes/5
+        // PUT: api/Expedientes/5
         [HttpPut("Editar/{id}")]
-        public async Task<IActionResult> PutTestExpediente(int id, TestExpedienteDTO expedienteDTO)
+        public async Task<IActionResult> PutExpediente(int id, ExpedienteDTO expedienteDTO)
         {
             if (id != expedienteDTO.Id)
                 return BadRequest();
 
-            var expediente = await _context.TestExpedientes.FindAsync(id);
+            var expediente = await _context.Expedientes.FindAsync(id);
             if (expediente == null)
                 return NotFound();
 
@@ -86,7 +86,7 @@ namespace SolicitudesAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TestExpedienteExists(id))
+                if (!ExpedienteExists(id))
                     return NotFound();
                 else
                     throw;
@@ -95,11 +95,11 @@ namespace SolicitudesAPI.Controllers
             return Ok(expediente);
         }
 
-        // POST: api/TestExpedientes/add
+        // POST: api/Expedientes/add
         [HttpPost("add")]
-        public async Task<ActionResult<TestExpedienteDTO>> PostTestExpediente(TestExpedienteDTO expedienteDTO)
+        public async Task<ActionResult<ExpedienteDTO>> PostExpediente(ExpedienteDTO expedienteDTO)
         {
-            var expediente = new TestExpediente
+            var expediente = new Expediente
             {
                 Folio = expedienteDTO.Folio,
                 NombreSolicitante = expedienteDTO.NombreSolicitante,
@@ -108,31 +108,31 @@ namespace SolicitudesAPI.Controllers
                 ContenidoSolicitud = expedienteDTO.ContenidoSolicitud
             };
 
-            _context.TestExpedientes.Add(expediente);
+            _context.Expedientes.Add(expediente);
             await _context.SaveChangesAsync();
 
             expedienteDTO.Id = expediente.Id;
 
-            return CreatedAtAction(nameof(GetTestExpediente), new { id = expediente.Id }, expedienteDTO);
+            return CreatedAtAction(nameof(GetExpediente), new { id = expediente.Id }, expedienteDTO);
         }
 
-        // DELETE: api/TestExpedientes/5
+        // DELETE: api/Expedientes/5
         [HttpDelete("Eliminar/{id}")]
-        public async Task<IActionResult> DeleteTestExpediente(int id)
+        public async Task<IActionResult> DeleteExpediente(int id)
         {
-            var expediente = await _context.TestExpedientes.FindAsync(id);
+            var expediente = await _context.Expedientes.FindAsync(id);
             if (expediente == null)
                 return NotFound();
 
-            _context.TestExpedientes.Remove(expediente);
+            _context.Expedientes.Remove(expediente);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TestExpedienteExists(int id)
+        private bool ExpedienteExists(int id)
         {
-            return _context.TestExpedientes.Any(e => e.Id == id);
+            return _context.Expedientes.Any(e => e.Id == id);
         }
     }
 }

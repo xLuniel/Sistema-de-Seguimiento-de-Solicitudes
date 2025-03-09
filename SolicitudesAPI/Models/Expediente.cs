@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SolicitudesAPI.Models;
 
-public partial class TestExpediente
+public partial class Expediente
 {
     public int Id { get; set; }
 

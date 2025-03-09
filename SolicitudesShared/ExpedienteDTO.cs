@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SolicitudesShared
 {
-    public class TestExpedienteDTO
+    public class ExpedienteDTO
     {
         public int Id { get; set; }
 
