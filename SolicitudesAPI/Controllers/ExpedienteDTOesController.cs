@@ -106,6 +106,8 @@ namespace SolicitudesAPI.Controllers
                 FechaInicio = expedienteDTO.FechaInicio,
                 Estado = expedienteDTO.Estado,
                 ContenidoSolicitud = expedienteDTO.ContenidoSolicitud
+
+                // Agrega los demás campos de la tabla Expediente
             };
 
             _context.Expedientes.Add(expediente);
