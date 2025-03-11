@@ -3,16 +3,21 @@
 <link href="css/app.css" rel="stylesheet" />
 
 @using System.Collections.Generic
+@using SolicitudesShared
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+
+@inject IExpedienteService ExpedienteService
 
 <!-- SSSSSS -->
 
 <h3>Índice de Expedientes</h3>
 
-<input @bind="Filtro" placeholder="Buscar expediente..." />
-<button @onclick="FiltrarExpedientes">Buscar</button>
+@* <input @bind="Filtro" placeholder="Buscar expediente..." />
+<button @onclick="FiltrarExpedientes">Buscar</button> *@
 
 <!-- Barra de Etapas -->
 <div class="etapas">
@@ -22,10 +27,10 @@
 </div>
 
 <!-- Botón para agregar nuevo expediente -->
-<button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button>
+@* <button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> *@
 
 <!-- Modal de formulario para creación de expediente -->
-@if (MostrarFormularioModal)
+@* @if (MostrarFormularioModal)
 {
     <div class="modal" style="display: block;" >
         <div class="modal-contenido">
@@ -68,7 +73,7 @@
         <button @onclick="ConfirmarEliminacion">Eliminar</button>
         <button @onclick="CancelarEliminacion">Cancelar</button>
     </div>
-</div>
+</div> *@
 
 <div class="table-responsive">
     <table class="table">
@@ -84,29 +89,31 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var expediente in ExpedientesFiltrados)
-            {
-                <tr>
-                    <td>
-                        <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
-                        <button @onclick="() => EliminarExpediente(expediente.Id)" class="btn-eliminar">Eliminar</button>
-                    </td>
-                    <td>@expediente.Id</td>
-                    <td>@expediente.Folio</td>
-                    <td>@expediente.Nombre</td>
-                    <td>@expediente.FechaInicioTramite.Date.ToString("dd/MM/yyyy")</td>
-                    <td>@expediente.Estatus</td>
-                    <td>
-                        <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
-                        <span class="truncate">
-                            @expediente.ContenidoSolicitud
-                        </span>
-                        @if (expediente.ContenidoSolicitud.Length > 300)
-                        {
-                            <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
-                        }
-                    </td>
-                </tr>
+			@if (listaExpedientes != null){
+                @foreach (var expediente in listaExpedientes) // ExpedientesFiltrados
+                {
+                    <tr>
+                        <td>
+                            @*@<button @onclick="() => VerDetalle(expediente.Id)">Ver</button>*@
+                            @* <button @onclick="() => EliminarExpediente(expediente.Id)" class="btn-eliminar">Eliminar</button> *@
+                        </td>
+                        <td>@expediente.Id</td>
+                        <td>@expediente.Folio</td>
+                        <td>@expediente.NombreSolicitante</td>
+                        <td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@expediente.Estado</td>
+                        <td>
+                            <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
+                            <span class="truncate">
+                                @expediente.ContenidoSolicitud
+                            </span>
+                            @if (expediente.ContenidoSolicitud?.Length > 300)
+                            {
+                                <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -120,151 +127,158 @@
         <h2>Contenido de la Solicitud</h2>
         <p>@modalContenido</p> <!-- Mostrar el contenido completo de la solicitud -->
     </div>
-</div>
+</div> 
 
 @code {
-    private string Filtro { get; set; } = "";
-    private List<Expediente> Expedientes { get; set; } = new();
-    private List<Expediente> ExpedientesFiltrados { get; set; } = new();
-    private bool MostrarModal { get; set; } = false;
-    private bool MostrarFormularioModal { get; set; } = false;
-    private int IdEliminar { get; set; }
-    private string MensajeError { get; set; } = "";
-    private bool MostrarMensajeError { get; set; } = false;
+     private string Filtro { get; set; } = "";
+    // private List<Expediente> Expedientes { get; set; } = new();
+     
+    // private bool MostrarModal { get; set; } = false;
+    // private bool MostrarFormularioModal { get; set; } = false;
+    // private int IdEliminar { get; set; }
+    // private string MensajeError { get; set; } = "";
+    // private bool MostrarMensajeError { get; set; } = false;
     private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
 
+	List<ExpedienteDTO>? listaExpedientes = null;
+    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
 
-    private Expediente NuevoExpediente { get; set; } = new();
+    // private Expediente NuevoExpediente { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         // Simulación de carga de datos (puedes hacer una petición HTTP en su lugar)
-        Expedientes = new List<Expediente>
-        {
-            new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now, Estatus = "En proceso", ContenidoSolicitud = "Durante el año 2023: Durante cuántos pagos y de que fechas, se les pago inferior al mínimo a los auxiliares administrativos de confianza nivel 02. Porque no se realizó la aportación a issstecali de los auxiliares administrativos de confianza nivel 02, como dice la ley. Porque la remuneración catorcenal fue variable para los auxiliares administrativos de confianza nivel 02, si el trabajo realizado fue el mismo durante todo el año. (las cantidades pagadas fueron diferentes). Cuál es el fundamento legal que utilizan para que los pagos fueran variables, si el trabajo y horario era el mismo. Cuál es el motivo por el que a veces si y a veces No se les regresaba el impuesto a los auxiliares administrativos de confianza nivel 02. En cuantos pagos (catorcenas) no se les realizo la devolución del impuesto y de que fechas son. (Si bien es cierto la devolución o deposito comentan que lo realiza issstecali, es Poder Judicial quien envia el comprobante de nomina para firma) Nombre del despacho contable que fue contratado para realizar o apoyar en la nomina y pago de impuestos del poder judicial."},
-            new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now, Estatus = "Finalizado", ContenidoSolicitud = "Solicito conocer el número de personas MENORES DE EDAD sentenciadas por los delitos de FEMINICIDIO y/o homicidio doloso en contra de mujeres, así como TENTATIVA DE FEMINICIDIO y/o tentativa de homicidio doloso contra mujeres, del 1 de enero de 2013 al 25 de enero de 2024. Desglosar información por año de registro, sexo y edad del agresor, estatus legal, delito, tipo de agresiones, tipo de arma utilizada en la comisión del delito, sexo y edad de la víctima, relación víctima-victimario, sentencia (especificar si condenatoria o absolutoria) Datos complementarios: EN CASO DE NO TENER LA INFORMACIÓN AL NIVEL DE DESGLOSE SOLICITADO, SE LE PIDE AL SUJETO OBLIGADO ENTREGAR TODA LA INFORMACIÓN Y DATOS DISPONIBLES ACORDE AL PRINCIPIO DE MÁXIMA PUBLICIDAD DE LA LEY GENERAL DE TRANSPARENCIA Y ACCESO A LA INFORMACIÓN."}
-        };
-        ExpedientesFiltrados = new List<Expediente>(Expedientes);
-    }
+        // Expedientes = new List<Expediente>
+        // {
+        //     new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now, Estatus = "En proceso", ContenidoSolicitud = "Durante el año 2023: Durante cuántos pagos y de que fechas, se les pago inferior al mínimo a los auxiliares administrativos de confianza nivel 02. Porque no se realizó la aportación a issstecali de los auxiliares administrativos de confianza nivel 02, como dice la ley. Porque la remuneración catorcenal fue variable para los auxiliares administrativos de confianza nivel 02, si el trabajo realizado fue el mismo durante todo el año. (las cantidades pagadas fueron diferentes). Cuál es el fundamento legal que utilizan para que los pagos fueran variables, si el trabajo y horario era el mismo. Cuál es el motivo por el que a veces si y a veces No se les regresaba el impuesto a los auxiliares administrativos de confianza nivel 02. En cuantos pagos (catorcenas) no se les realizo la devolución del impuesto y de que fechas son. (Si bien es cierto la devolución o deposito comentan que lo realiza issstecali, es Poder Judicial quien envia el comprobante de nomina para firma) Nombre del despacho contable que fue contratado para realizar o apoyar en la nomina y pago de impuestos del poder judicial."},
+        //     new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now, Estatus = "Finalizado", ContenidoSolicitud = "Solicito conocer el número de personas MENORES DE EDAD sentenciadas por los delitos de FEMINICIDIO y/o homicidio doloso en contra de mujeres, así como TENTATIVA DE FEMINICIDIO y/o tentativa de homicidio doloso contra mujeres, del 1 de enero de 2013 al 25 de enero de 2024. Desglosar información por año de registro, sexo y edad del agresor, estatus legal, delito, tipo de agresiones, tipo de arma utilizada en la comisión del delito, sexo y edad de la víctima, relación víctima-victimario, sentencia (especificar si condenatoria o absolutoria) Datos complementarios: EN CASO DE NO TENER LA INFORMACIÓN AL NIVEL DE DESGLOSE SOLICITADO, SE LE PIDE AL SUJETO OBLIGADO ENTREGAR TODA LA INFORMACIÓN Y DATOS DISPONIBLES ACORDE AL PRINCIPIO DE MÁXIMA PUBLICIDAD DE LA LEY GENERAL DE TRANSPARENCIA Y ACCESO A LA INFORMACIÓN."}
+        // };
+        // ExpedientesFiltrados = new List<Expediente>(Expedientes);
 
-    private void FiltrarExpedientes()
-    {
-        ExpedientesFiltrados = Expedientes
-            .Where(e => e.Nombre.Contains(Filtro, StringComparison.OrdinalIgnoreCase) ||
-                        e.Id.ToString().Contains(Filtro))
-            .ToList();
-    }
-
-    private void VerDetalle(int id)
-    {
-        // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
-        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
-    }
-
-    private void EliminarExpediente(int id)
-    {
-        IdEliminar = id;
-        MostrarModal = true;
-    }
-
-    private void ConfirmarEliminacion()
-    {
-        var expediente = Expedientes.FirstOrDefault(e => e.Id == IdEliminar);
-        if (expediente != null)
-        {
-            Expedientes.Remove(expediente);
-            ExpedientesFiltrados = new List<Expediente>(Expedientes);
-            MostrarModal = false;
-        }
-    }
-
-    private void CancelarEliminacion()
-    {
-        MostrarModal = false;
-    }
-
-    private void MostrarFormulario()
-    {
-        MostrarFormularioModal = true;
-    }
-
-    private void CerrarFormulario()
-    {
-        MostrarFormularioModal = false;
-    }
-
-    private void GuardarExpediente()
-    {
-        // Verificar si el Folio o el Nombre ya existen en la lista
-        if (Expedientes.Any(e => e.Folio == NuevoExpediente.Folio))
-        {
-            MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
-            return; // Detener la ejecución si el folio está duplicado
-        }
-
-        if (Expedientes.Any(e => e.Nombre == NuevoExpediente.Nombre))
-        {
-            MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
-            return; // Detener la ejecución si el nombre está duplicado
-        }
-
-        // Asignacion de ID unico
-        NuevoExpediente.Id = Expedientes.Count > 0 ? Expedientes.Max(e => e.Id) + 1 : 1;
-
-        // Agregar el nuevo expediente a la lista
-        Expedientes.Add(NuevoExpediente);
-        ExpedientesFiltrados = new List<Expediente>(Expedientes);
-
-        // Cerrar formulario
-        MostrarFormularioModal = false;
-
-        // Limpiar objeto para el próximo registro
-        NuevoExpediente = new Expediente();
+		listaExpedientes = await ExpedienteService.Lista();
 
     }
 
-    private void MostrarAlerta(string mensaje)
-    {
-        MensajeError = mensaje;
-        MostrarMensajeError = true;
+    // private void FiltrarExpedientes()
+    // {
+    //     ExpedientesFiltrados = listaExpedientes
+    //         .Where(e => e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase) ||
+    //                     e.Id.ToString().Contains(Filtro))
+    //         .ToList();
+    // }
 
-        // Ocultar el mensaje después de 3 segundos
-        Task.Delay(4000).ContinueWith(_ =>
-        {
-            MostrarMensajeError = false;
-            StateHasChanged();
-        });
-    }
+//     private void VerDetalle(int id)
+//     {
+//         // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
+//         Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
+//     }
 
-    // Función para abrir el modal con el contenido
+    // private void EliminarExpediente(int id)
+    // {
+    //     IdEliminar = id;
+    //     MostrarModal = true;
+    // }
+
+    // private void ConfirmarEliminacion()
+    // {
+    //     var expediente = Expedientes.FirstOrDefault(e => e.Id == IdEliminar);
+    //     if (expediente != null)
+    //     {
+    //         Expedientes.Remove(expediente);
+    //         ExpedientesFiltrados = new List<Expediente>(Expedientes);
+    //         MostrarModal = false;
+    //     }
+    // }
+
+    // private void CancelarEliminacion()
+    // {
+    //     MostrarModal = false;
+    // }
+
+//     private void MostrarFormulario()
+//     {
+//         MostrarFormularioModal = true;
+//     }
+
+//     private void CerrarFormulario()
+//     {
+//         MostrarFormularioModal = false;
+//     }
+
+//     private void GuardarExpediente()
+//     {
+//         // Verificar si el Folio o el Nombre ya existen en la lista
+//         if (Expedientes.Any(e => e.Folio == NuevoExpediente.Folio))
+//         {
+//             MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
+//             return; // Detener la ejecución si el folio está duplicado
+//         }
+
+//         if (Expedientes.Any(e => e.Nombre == NuevoExpediente.Nombre))
+//         {
+//             MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
+//             return; // Detener la ejecución si el nombre está duplicado
+//         }
+
+//         // Asignacion de ID unico
+//         NuevoExpediente.Id = Expedientes.Count > 0 ? Expedientes.Max(e => e.Id) + 1 : 1;
+
+//         // Agregar el nuevo expediente a la lista
+//         Expedientes.Add(NuevoExpediente);
+//         ExpedientesFiltrados = new List<Expediente>(Expedientes);
+
+//         // Cerrar formulario
+//         MostrarFormularioModal = false;
+
+//         // Limpiar objeto para el próximo registro
+//         NuevoExpediente = new Expediente();
+
+//     }
+
+//     private void MostrarAlerta(string mensaje)
+//     {
+//         MensajeError = mensaje;
+//         MostrarMensajeError = true;
+
+//         // Ocultar el mensaje después de 3 segundos
+//         Task.Delay(4000).ContinueWith(_ =>
+//         {
+//             MostrarMensajeError = false;
+//             StateHasChanged();
+//         });
+//     }
+
+//     // Función para abrir el modal con el contenido
     private async Task OpenModal(string contenido)
     {
         modalContenido = contenido;
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';"); // Mostrar el modal
     }
 
-    // Función para cerrar el modal
+//     // Función para cerrar el modal
     private async Task CloseModal()
     {
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';"); // Ocultar el modal
     }
 
-    private class Expediente
-    {
-        public int Id { get; set; }
-        public string Folio { get; set; }
-        public string Nombre { get; set; }
-        public DateTime FechaInicioTramite { get; set; }
-        public string Estatus { get; set; }
-        public string ContenidoSolicitud { get; set; }
-    } 
-}
+//     private class Expediente
+//     {
+//         public int Id { get; set; }
+//         public string Folio { get; set; }
+//         public string Nombre { get; set; }
+//         public DateTime FechaInicioTramite { get; set; }
+//         public string Estatus { get; set; }
+//         public string ContenidoSolicitud { get; set; }
+//     } 
+// }
  
-@if (MostrarMensajeError)
-{
-    <div class="alerta flotante">
-        @MensajeError
-    </div>
+// @if (MostrarMensajeError)
+// {
+//     <div class="alerta flotante">
+//         @MensajeError
+//     </div>
+// }
+
 }
  
     <style>
