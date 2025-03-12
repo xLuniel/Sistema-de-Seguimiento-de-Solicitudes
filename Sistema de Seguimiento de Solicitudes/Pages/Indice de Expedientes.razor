@@ -16,8 +16,8 @@
 
 <h3>Índice de Expedientes</h3>
 
-@* <input @bind="Filtro" placeholder="Buscar expediente..." />
-<button @onclick="FiltrarExpedientes">Buscar</button> *@
+ <input @bind="Filtro" placeholder="Buscar expediente..." />
+<button @onclick="FiltrarExpedientes">Buscar</button> 
 
 <!-- Barra de Etapas -->
 <div class="etapas">
@@ -27,7 +27,7 @@
 </div>
 
 <!-- Botón para agregar nuevo expediente -->
-@* <button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> *@
+ <button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> 
 
 <!-- Modal de formulario para creación de expediente -->
 @* @if (MostrarFormularioModal)
@@ -63,10 +63,10 @@
             </EditForm>
         </div>
     </div>
-}
+} *@
 
 <!-- Modal de confirmación -->
-<div class="modal" style="display: @(MostrarModal ? "block" : "none")">
+@* <div class="modal" style="display: @(MostrarModal ? "block" : "none")">
     <div class="modal-contenido">
         <h4>¿Estás seguro de que deseas eliminar este expediente?</h4>
         <h2>ID: @IdEliminar</h2>
@@ -131,13 +131,13 @@
 
 @code {
      private string Filtro { get; set; } = "";
-    // private List<Expediente> Expedientes { get; set; } = new();
+     //private List<Expediente> Expedientes { get; set; } = new();
      
-    // private bool MostrarModal { get; set; } = false;
-    // private bool MostrarFormularioModal { get; set; } = false;
-    // private int IdEliminar { get; set; }
-    // private string MensajeError { get; set; } = "";
-    // private bool MostrarMensajeError { get; set; } = false;
+     private bool MostrarModal { get; set; } = false;
+     private bool MostrarFormularioModal { get; set; } = false;
+    private int IdEliminar { get; set; }
+    private string MensajeError { get; set; } = "";
+    private bool MostrarMensajeError { get; set; } = false;
     private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
 
 	List<ExpedienteDTO>? listaExpedientes = null;
@@ -159,25 +159,25 @@
 
     }
 
-    // private void FiltrarExpedientes()
-    // {
-    //     ExpedientesFiltrados = listaExpedientes
-    //         .Where(e => e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase) ||
-    //                     e.Id.ToString().Contains(Filtro))
-    //         .ToList();
-    // }
+    private void FiltrarExpedientes()
+    {
+        ExpedientesFiltrados = listaExpedientes
+            .Where(e => e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase) ||
+                        e.Id.ToString().Contains(Filtro))
+            .ToList();
+    }
 
-//     private void VerDetalle(int id)
-//     {
-//         // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
-//         Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
-//     }
+    private void VerDetalle(int id)
+    {
+        // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
+        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
+    }
 
-    // private void EliminarExpediente(int id)
-    // {
-    //     IdEliminar = id;
-    //     MostrarModal = true;
-    // }
+    private void EliminarExpediente(int id)
+    {
+        IdEliminar = id;
+        MostrarModal = true;
+    }
 
     // private void ConfirmarEliminacion()
     // {
@@ -190,20 +190,20 @@
     //     }
     // }
 
-    // private void CancelarEliminacion()
-    // {
-    //     MostrarModal = false;
-    // }
+    private void CancelarEliminacion()
+    {
+        MostrarModal = false;
+    }
 
-//     private void MostrarFormulario()
-//     {
-//         MostrarFormularioModal = true;
-//     }
+    private void MostrarFormulario()
+    {
+        MostrarFormularioModal = true;
+    }
 
-//     private void CerrarFormulario()
-//     {
-//         MostrarFormularioModal = false;
-//     }
+    private void CerrarFormulario()
+    {
+        MostrarFormularioModal = false;
+    }
 
 //     private void GuardarExpediente()
 //     {

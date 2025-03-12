@@ -30,7 +30,7 @@
 					<td>@expediente.Id</td>
 					<td>@expediente.Folio</td>
 					<td>@expediente.NombreSolicitante</td>
-					@* <td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td> *@
+					<td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td> 
 					<td>@expediente.Estado</td>
 					<td>
 						<button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
