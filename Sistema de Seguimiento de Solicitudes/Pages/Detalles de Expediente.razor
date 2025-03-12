@@ -1,4 +1,4 @@
-﻿@page "/indice-expedientes/detalles/{id:int}"
+﻿@page "/indice-expedientes/detalles/{id:int}/{folio}"
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @inject HttpClient Http
@@ -195,16 +195,20 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    [Parameter]
+    public string Folio { get; set; }
+
     private Expediente Expediente { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine($"Cargando expediente con ID: {Id}");
+        Console.WriteLine($"Cargando expediente con ID: {Id} y Folio: {Folio}");
         // Aquí cargarías el expediente desde una fuente, por ejemplo, un API o una base de datos.
         Expediente = new Expediente
             {
                 Id = Id, // Usar el id recibido para cargar los detalles
-                Folio = "F001",
+                Folio = Folio,
                 MesAdmision = "Enero",
                 TipoSolicitud = "Solicitud A",
                 TipoDerecho = "Derecho 1",

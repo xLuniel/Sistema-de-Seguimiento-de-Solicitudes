@@ -136,6 +136,12 @@
 
     private Expediente NuevoExpediente { get; set; } = new();
 
+    protected override void OnInitialized()
+    {
+        // Establecer la fecha de inicio a la fecha actual Formulario
+        NuevoExpediente.FechaInicioTramite = DateTime.Now;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         // Simulación de carga de datos (puedes hacer una petición HTTP en su lugar)
@@ -175,8 +181,12 @@
 
     private void VerDetalle(int id)
     {
-        // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
-        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
+        var expediente = Expedientes.FirstOrDefault(e => e.Id == id);
+        if (expediente != null)
+        {
+            // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
+            Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+        }
     }
 
     private void EliminarExpediente(int id)
@@ -453,6 +463,8 @@
         color: blue;
         cursor: pointer;
         font-size: 0.9em;
+        font-weight: bold; /* Para hacer el texto más visible */
+        text-decoration: underline; /* Agregar subrayado para destacar el enlace */
     }
 
     /* Estilos para los formularios y botones */

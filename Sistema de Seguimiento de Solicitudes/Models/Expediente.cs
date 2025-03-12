@@ -34,5 +34,16 @@
         public string RecursoRevision { get; set; }
         public string DatosRecursoRevision { get; set; }
         public string Nota { get; set; }
+
+        // Constructor
+        public Expediente()
+        {
+            // Inicializar con la fecha y hora actual
+            FechaInicioTramite = DateTime.Now;
+            FechaLimiteRespuesta10 = DateTime.Now;
+            FechaLimiteRespuesta20 = DateTime.Now;
+            FechaRespuesta = DateTime.Now;
+            FechaLimitePrevencion = DateTime.Now;
+        }
     }
 }
