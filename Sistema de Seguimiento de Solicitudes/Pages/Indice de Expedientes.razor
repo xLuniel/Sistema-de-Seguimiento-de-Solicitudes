@@ -186,7 +186,7 @@
             new Expediente { Id = 19, Folio = "F019", Nombre = "Julia Ortega", FechaInicioTramite = DateTime.Now.AddDays(-3), Estatus = "En proceso", ContenidoSolicitud = "Solicito el listado de programas de capacitación aprobados para el año 2024." },
             new Expediente { Id = 20, Folio = "F020", Nombre = "Martín González", FechaInicioTramite = DateTime.Now.AddDays(-12), Estatus = "Pendiente", ContenidoSolicitud = "Requiero el informe de cumplimiento de objetivos institucionales en el ejercicio fiscal 2023." }
 };
-        ExpedientesFiltrados = new List<Expediente>(Expedientes);
+        ExpedientesFiltrados = new List<ExpedienteDTO>(Expedientes);
     }
 
     private void FiltrarExpedientes()
