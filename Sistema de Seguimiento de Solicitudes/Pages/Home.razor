@@ -129,7 +129,7 @@
         new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso" },
         new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Finalizado" },
         new Expediente { Id = 3, Folio = "F003", Nombre = "Carlos Gómez", FechaInicioTramite = DateTime.Now.AddDays(-1), Estatus = "En revisión" },
-        new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-30), Estatus = "En espera" },
+        new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "En espera" },
         new Expediente { Id = 5, Folio = "F005", Nombre = "Jorge Amador", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "Inicio" },
         new Expediente { Id = 6, Folio = "F006", Nombre = "Pedro Martínez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso" },
         new Expediente { Id = 7, Folio = "F007", Nombre = "Luis Fernández", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Pendiente" },
@@ -196,9 +196,6 @@
         return (fechaVencimiento - DateTime.Now).Days;
     }
 
-
-
-
     private void ToggleVisibility(int index)
     {
         isVisible[index] = !isVisible[index];
@@ -206,8 +203,13 @@
 
     private void RedirigirADetalles(int id)
     {
-        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}");
+        var expediente = ExpedientesFiltrados.FirstOrDefault(e => e.Id == id);
+        if (expediente != null)
+        {
+            Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+        }
     }
+
 
        // Clase para expediente
     private class Expediente
@@ -219,7 +221,6 @@
         public string Estatus { get; set; }
     }
 }
-
 
 <style>
     .mud-text {

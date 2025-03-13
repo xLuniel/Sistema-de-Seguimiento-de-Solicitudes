@@ -8,7 +8,7 @@
     <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
 
     @if (Expediente != null)
-    { 
+    {
         <EditForm Model="@Expediente" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -28,7 +28,14 @@
                             </tr>
                             <tr>
                                 <th>Mes de Admisión</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.MesAdmision" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision">
+                                        @foreach (var mes in MesesAdmision)
+                                        {
+                                            <option value="@mes">@mes</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Tipo de Solicitud</th>
@@ -56,7 +63,14 @@
                             </tr>
                             <tr>
                                 <th>Estatus</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Estatus" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Estatus">
+                                        @foreach (var estatus in Estatuses)
+                                        {
+                                            <option value="@estatus">@estatus</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Fecha de Respuesta</th>
@@ -133,7 +147,14 @@
                             </tr>
                             <tr>
                                 <th>Ciudad</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Ciudad" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Ciudad">
+                                        @foreach (var ciudad in Ciudades)
+                                        {
+                                            <option value="@ciudad">@ciudad</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Temática</th>
@@ -164,7 +185,14 @@
                             </tr>
                             <tr>
                                 <th>Cobro</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Cobro" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Cobro">
+                                        @foreach (var cobro in Cobros)
+                                        {
+                                            <option value="@cobro">@cobro</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Recurso de Revisión</th>
@@ -203,11 +231,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Simulando la carga del expediente (deberías sustituirlo por una llamada a la API)
         Console.WriteLine($"Cargando expediente con ID: {Id} y Folio: {Folio}");
-        // Aquí cargarías el expediente desde una fuente, por ejemplo, un API o una base de datos.
         Expediente = new Expediente
             {
-                Id = Id, // Usar el id recibido para cargar los detalles
+                Id = Id,
                 Folio = Folio,
                 MesAdmision = "Enero",
                 TipoSolicitud = "Solicitud A",
@@ -224,10 +252,10 @@
                 FechaLimitePrevencion = DateTime.Now,
                 RecibidaRegistrada = "En la PNT",
                 ModalidadEntrega = "Correo",
-                ComoDeseaRecibirRespuestaPersonaSolicitante = "Electrónico a través del sistema de solicitudes de acceso a la información de la PNT",
+                ComoDeseaRecibirRespuestaPersonaSolicitante = "Electrónico",
                 Nombre = "Juan Perez",
                 CorreoElectronico = "juan@correo.com",
-                ContenidoSolicitud = "Durante el año 2023: Durante cuántos pagos y de que fechas, se les pago inferior al mínimo a los auxiliares administrativos de confianza nivel 02.Porque no se realizó la aportación a issstecali de los auxiliares administrativos de confianza nivel 02, como dice la ley.Porque la remuneración catorcenal fue variable para los auxiliares administrativos de confianza nivel 02,si el trabajo realizado fue el mismo durante todo el año. (las cantidades pagadas fueron diferentes).Cuál es el fundamento legal que utilizan para que los pagos fueran variables, si el trabajo y horario era el mismo.Cual es el motivo por el que a veces si y a veces No se les regresaba el impuesto a los auxiliares administrativos de confianza nivel 02.En cuantos pagos(catorcenas) no se les realizo la devolución del impuesto y de que fechas son. (Si bien es cierto la devolución o deposito comentan que lo realiza issstecali, es Poder Judicial quien envia el comprobante de nomina para firma) Nombre del despacho contable que fue contratado para realizar o apoyar en la nomina y pago de impuestos del poder judicial.",
+                ContenidoSolicitud = "Contenido de ejemplo...",
                 AreaInformacion = "Transparencia",
                 Materia = "Derecho",
                 Ciudad = "Tijuana",
@@ -242,12 +270,50 @@
             };
     }
 
-    private void HandleValidSubmit()
+    private List<string> MesesAdmision = new()
     {
-        // Lógica para guardar los cambios en la base de datos o API
-        Console.WriteLine("Expediente guardado exitosamente.");
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    };
+
+    private List<string> Estatuses = new()
+    {
+        "En proceso", "Pendiente", "Terminado"
+    };
+
+    private List<string> Ciudades = new()
+    {
+        "Tijuana", "Mexicali", "Ensenada", "Rosarito", "Tecate"
+    };
+
+    private List<string> Cobros = new()
+    {
+        "Ninguno", "Si"
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/expedientes/{Expediente.Id}", Expediente);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/indice-expedientes");
+            }
+            else
+            {
+                Console.WriteLine("Error al guardar los cambios.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
+
 
 <style>
     table, tr {
@@ -255,7 +321,6 @@
     }
     div {
         max-width: 100%;
-        overflow: hidden;
     }
 
     th, td {
@@ -267,6 +332,5 @@
         -webkit-line-clamp: 2; /* Máximo 2 líneas */
         white-space: normal; /* Permite saltos de línea */
     }
-
 
 </style>

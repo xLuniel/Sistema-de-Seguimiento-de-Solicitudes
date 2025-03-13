@@ -96,15 +96,16 @@
                     <td>@expediente.Nombre</td>
                     <td>@expediente.FechaInicioTramite.Date.ToString("dd/MM/yyyy")</td>
                     <td>@expediente.Estatus</td>
+
+                    <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
                     <td>
-                        <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
-                        <span class="truncate">
-                            @expediente.ContenidoSolicitud
-                        </span>
-                        @if (expediente.ContenidoSolicitud.Length > 300)
-                        {
-                            <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
-                        }
+                        <div class="contenido-solicitud">
+                            <span class="truncate">@expediente.ContenidoSolicitud</span>
+                            @if (expediente.ContenidoSolicitud.Length > 150)
+                            {
+                                <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
+                            }
+                        </div>
                     </td>
                 </tr>
             }
@@ -150,7 +151,7 @@
             new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso", ContenidoSolicitud = "Solicito información sobre el proceso de contratación de personal para el año 2023, incluyendo los criterios de selección y las fechas de evaluación." },
             new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Finalizado", ContenidoSolicitud = "Requiero una copia certificada de la resolución emitida en el expediente número 456/2023, con todos los anexos correspondientes." },
             new Expediente { Id = 3, Folio = "F003", Nombre = "Carlos Gómez", FechaInicioTramite = DateTime.Now.AddDays(-1), Estatus = "En revisión", ContenidoSolicitud = "Solicito aclaración sobre las diferencias en el cálculo de impuestos en la nómina de los últimos tres meses." },
-            new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-30), Estatus = "En espera", ContenidoSolicitud = "Solicito información sobre los procedimientos internos para la selección de proveedores de servicios." },
+            new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "En espera", ContenidoSolicitud = "Solicito información sobre los procedimientos internos para la selección de proveedores de servicios." },
             new Expediente { Id = 5, Folio = "F005", Nombre = "Jorge Amador", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "Inicio", ContenidoSolicitud = "Requiero el detalle de las fechas y montos de pagos realizados a contratistas en el año 2022." },
             new Expediente { Id = 6, Folio = "F006", Nombre = "Pedro Martínez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso", ContenidoSolicitud = "Solicito una revisión de la clasificación de los bienes inmuebles registrados en el inventario institucional." },
             new Expediente { Id = 7, Folio = "F007", Nombre = "Luis Fernández", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Pendiente", ContenidoSolicitud = "Pido información sobre el proceso de evaluación de desempeño aplicado en el segundo semestre de 2023." },
@@ -331,8 +332,10 @@
 
     /* Limitar ancho de la columna del contenido de la solicitud */
     .contenido-solicitud {
-        max-width: 200px;
+        max-width: 50%;
         white-space: nowrap;
+        display: flex;
+        align-items: center;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -452,20 +455,26 @@
     /* Truncar el texto con "..." */
     .truncate {
         display: inline-block;
-        width: 600px;
+        max-width: 80%;
         white-space: nowrap;
-        overflow: hidden;
+        vertical-align: middle;
         text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     /* Estilo del botón Ver más */
     .ver-mas {
         color: blue;
+        max-width: 150px;
         cursor: pointer;
-        font-size: 0.9em;
-        font-weight: bold; /* Para hacer el texto más visible */
-        text-decoration: underline; /* Agregar subrayado para destacar el enlace */
+        font-weight: bold;
+        text-decoration: underline;
+        display: inline-block;
+        z-index: 10;
+        position: relative;
+        text-overflow: ellipsis;
     }
+
 
     /* Estilos para los formularios y botones */
     input, textarea, button {
