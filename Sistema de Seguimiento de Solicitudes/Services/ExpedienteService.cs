@@ -1,5 +1,7 @@
 ﻿using SolicitudesShared;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 
 namespace Sistema_de_Seguimiento_de_Solicitudes.Services
@@ -49,10 +51,11 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception(response.Mensaje);
         }
 
-        public async Task<int> Crear(ExpedienteDTO Expediente)
+        public async Task<int> Crear(ExpedienteDTO NuevoExpediente)
         {
-            var result = await _http.PostAsJsonAsync("api/Expedientes/Crear​", Expediente);
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+            var result = await _http.PostAsJsonAsync("api/Expedientes/Crear", NuevoExpediente);
+             var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+
 
             if (response!.Exito)
             {
@@ -60,6 +63,9 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             }
             else
                 throw new Exception(response.Mensaje);
+
+
+
         }
 
         public async Task<bool> Eliminar(int id)
