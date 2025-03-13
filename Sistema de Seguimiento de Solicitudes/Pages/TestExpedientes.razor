@@ -1,0 +1,94 @@
+﻿@page "/TestExpedientes"
+
+@using SolicitudesShared
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using CurrieTechnologies.Razor.SweetAlert2
+
+@inject IExpedienteService ExpedienteService
+@inject SweetAlertService Swal
+
+
+<h3>TestExpedientes</h3>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>FOLIO</th>
+			<th>NOMBRE</th>
+			<th>FECHA DE INICIO</th>
+			<th>ESTATUS</th>
+			<th></th>
+		</tr>	
+	</thead>
+	<tbody>
+	@if (listaExpedientes != null)
+		{
+			foreach (var expediente in listaExpedientes)
+			{
+				<tr>
+					<td>@expediente.Id</td>
+					<td>@expediente.Folio</td>
+					<td>@expediente.NombreSolicitante</td>
+					<td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td> 
+					<td>@expediente.Estado</td>
+					<td>
+						<button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
+							<i class="oi oi-trash"></i>
+						</button>
+					</td>
+				</tr>
+			}
+		}
+		</tbody>
+</table>
+
+@code {
+
+	List<ExpedienteDTO>? listaExpedientes = null;
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		listaExpedientes = await ExpedienteService.Lista();
+	}
+
+	private async Task Eliminar(int id)
+	{
+		var resultado = await Swal.FireAsync(new SweetAlertOptions
+			{
+				Title = "¿Estás seguro?",
+				Text = "¡No podrás revertir esto!",
+				Icon = SweetAlertIcon.Warning,
+				ShowCancelButton = true,
+				ConfirmButtonText = "Sí, bórralo",
+				CancelButtonText = "Cancelar",
+			});
+
+		if (resultado.IsConfirmed)
+		{
+			var eliminado = await ExpedienteService.Eliminar(id);
+
+			if (eliminado)
+			{
+				await Swal.FireAsync(new SweetAlertOptions
+					{
+						Title = "¡Eliminado!",
+						Text = "El expediente ha sido eliminado.",
+						Icon = SweetAlertIcon.Success,
+					});
+				listaExpedientes = await ExpedienteService.Lista();
+			}
+			else
+			{
+				await Swal.FireAsync(new SweetAlertOptions
+					{
+						Title = "¡Error!",
+						Text = "Ha ocurrido un error al intentar eliminar el expediente.",
+						Icon = SweetAlertIcon.Error,
+					});
+			}
+		}
+	}
+
+}

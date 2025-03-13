@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SolicitudesAPI.Models;
 
-public partial class Expediente
+public partial class ExpedienteDto
 {
     public int Id { get; set; }
 
@@ -15,7 +15,7 @@ public partial class Expediente
 
     public string? TipoDerecho { get; set; }
 
-    public string? NombreSolicitante { get; set; }
+    public string NombreSolicitante { get; set; } = null!;
 
     public DateTime? FechaInicio { get; set; }
 

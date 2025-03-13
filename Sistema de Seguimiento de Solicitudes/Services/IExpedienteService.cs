@@ -10,7 +10,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 
         Task<int> Crear(ExpedienteDTO Expediente);
 
-        Task<int> Actualizar(ExpedienteDTO Expediente);
+        Task<int> Editar(ExpedienteDTO Expediente);
 
         Task<bool> Eliminar(int id);
     }

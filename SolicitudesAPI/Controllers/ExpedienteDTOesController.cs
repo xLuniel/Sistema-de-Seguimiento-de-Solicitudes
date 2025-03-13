@@ -21,9 +21,38 @@ namespace SolicitudesAPI.Controllers
 
         // GET: api/Expedientes/Lista
         [HttpGet("Lista")]
-        public async Task<ActionResult<IEnumerable<ExpedienteDTO>>> GetExpedientes()
+        public async Task<ActionResult> Lista()
         {
-            var expedientes = await _context.Expedientes.AsNoTracking().ToListAsync();
+            var responseApi = new ResponseAPI<List<ExpedienteDTO>>();
+            var listaExpedienteDTO = new List<ExpedienteDTO>();
+
+            try
+            {
+                foreach (var expediente in await _context.Expedientes.ToListAsync())
+                {
+                    listaExpedienteDTO.Add(new ExpedienteDTO
+                    {
+                        Id = expediente.Id,
+                        Folio = expediente.Folio,
+                        NombreSolicitante = expediente.NombreSolicitante,
+                        FechaInicio = expediente.FechaInicio,
+                        Estado = expediente.Estado,
+                        ContenidoSolicitud = expediente.ContenidoSolicitud
+                    });
+                }
+
+                responseApi.Exito = true;
+                responseApi.Data = listaExpedienteDTO;
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+
+            /*var expedientes = await _context.Expedientes.AsNoTracking().ToListAsync();
 
             if (expedientes.Count == 0)
                 return NotFound();
@@ -36,103 +65,176 @@ namespace SolicitudesAPI.Controllers
                 FechaInicio = e.FechaInicio,
                 Estado = e.Estado,
                 ContenidoSolicitud = e.ContenidoSolicitud
-            }).ToList());
+            }).ToList());*/
         }
 
         // GET: api/Expedientes/single/5
-        [HttpGet("single/{id}")]
-        public async Task<ActionResult<ExpedienteDTO>> GetExpediente(int id)
+        [HttpGet("Buscar/{id}")]
+        public async Task<ActionResult> Buscar(int id)
         {
-            var expediente = await _context.Expedientes.AsNoTracking()
-                                    .FirstOrDefaultAsync(e => e.Id == id);
+            var responseApi = new ResponseAPI<ExpedienteDTO>();
+            var ExpedienteDTO = new ExpedienteDTO();
 
-            if (expediente == null)
-                return NotFound();
-
-            return new ExpedienteDTO
+            try
             {
-                Id = expediente.Id,
-                Folio = expediente.Folio,
-                NombreSolicitante = expediente.NombreSolicitante,
-                FechaInicio = expediente.FechaInicio,
-                Estado = expediente.Estado,
-                ContenidoSolicitud = expediente.ContenidoSolicitud
-            };
+                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id); 
+
+                if (dbExpediente != null)
+                {
+                    ExpedienteDTO = new ExpedienteDTO
+                    {
+                        Id = dbExpediente.Id,
+                        Folio = dbExpediente.Folio,
+                        NombreSolicitante = dbExpediente.NombreSolicitante,
+                        FechaInicio = dbExpediente.FechaInicio,
+                        Estado = dbExpediente.Estado,
+                        ContenidoSolicitud = dbExpediente.ContenidoSolicitud
+                    };
+
+                    responseApi.Exito = true;
+                    responseApi.Data = ExpedienteDTO;
+                }
+                else
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se encontró el expediente";
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+
+            
         }
 
         // PUT: api/Expedientes/5
         [HttpPut("Editar/{id}")]
-        public async Task<IActionResult> PutExpediente(int id, ExpedienteDTO expedienteDTO)
+        public async Task<ActionResult> Editar(ExpedienteDTO expediente, int id)
         {
-            if (id != expedienteDTO.Id)
-                return BadRequest();
-
-            var expediente = await _context.Expedientes.FindAsync(id);
-            if (expediente == null)
-                return NotFound();
-
-            // Actualizar valores
-            expediente.Folio = expedienteDTO.Folio;
-            expediente.NombreSolicitante = expedienteDTO.NombreSolicitante;
-            expediente.FechaInicio = expedienteDTO.FechaInicio;
-            expediente.Estado = expedienteDTO.Estado;
-            expediente.ContenidoSolicitud = expedienteDTO.ContenidoSolicitud;
-
-            _context.Update(expediente);
+            var responseApi = new ResponseAPI<int>();
 
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ExpedienteExists(id))
-                    return NotFound();
+                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
+
+                
+
+                if (dbExpediente != null)
+                {
+                    dbExpediente.Folio = expediente.Folio;
+                    dbExpediente.NombreSolicitante = expediente.NombreSolicitante; 
+                    dbExpediente.FechaInicio = expediente.FechaInicio;
+                    dbExpediente.Estado = expediente.Estado;
+                    dbExpediente.ContenidoSolicitud = expediente.ContenidoSolicitud;
+                    
+
+                    _context.Expedientes.Update(dbExpediente);
+                    await _context.SaveChangesAsync();
+
+                    responseApi.Exito = true;
+                    responseApi.Data = dbExpediente.Id; // posiblemente cree error al querer guardar sin proporcionar el id
+                
+                }
                 else
-                    throw;
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se pudo encontrar el expediente";
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
             }
 
-            return Ok(expediente);
+            return Ok(responseApi);
+
+
         }
 
         // POST: api/Expedientes/add
-        [HttpPost("add")]
-        public async Task<ActionResult<ExpedienteDTO>> PostExpediente(ExpedienteDTO expedienteDTO)
+        [HttpPost("Crear")]
+        public async Task<ActionResult> Crear(ExpedienteDTO expediente)
         {
-            var expediente = new Expediente
+            var responseApi = new ResponseAPI<int>();
+
+            try
             {
-                Folio = expedienteDTO.Folio,
-                NombreSolicitante = expedienteDTO.NombreSolicitante,
-                FechaInicio = expedienteDTO.FechaInicio,
-                Estado = expedienteDTO.Estado,
-                ContenidoSolicitud = expedienteDTO.ContenidoSolicitud
-            };
+                var dbExpediente = new Expediente
+                {
+                    Folio = expediente.Folio,
+                    NombreSolicitante = expediente.NombreSolicitante,
+                    FechaInicio = expediente.FechaInicio,
+                    Estado = expediente.Estado,
+                    ContenidoSolicitud = expediente.ContenidoSolicitud
+                };
 
-            _context.Expedientes.Add(expediente);
-            await _context.SaveChangesAsync();
+                _context.Expedientes.Add(dbExpediente);
+                await _context.SaveChangesAsync();
 
-            expedienteDTO.Id = expediente.Id;
+                if(dbExpediente.Id != 0)
+                {
+                    responseApi.Exito = true;
+                    responseApi.Data = dbExpediente.Id; // posiblemente cree error al querer guardar sin proporcionar el id
+                }
+                else
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se pudo crear el expediente";
+                }
 
-            return CreatedAtAction(nameof(GetExpediente), new { id = expediente.Id }, expedienteDTO);
+
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+
+
         }
 
         // DELETE: api/Expedientes/5
         [HttpDelete("Eliminar/{id}")]
-        public async Task<IActionResult> DeleteExpediente(int id)
+        public async Task<IActionResult> Eliminar(int id)
         {
-            var expediente = await _context.Expedientes.FindAsync(id);
-            if (expediente == null)
-                return NotFound();
+            var responseApi = new ResponseAPI<int>();
 
-            _context.Expedientes.Remove(expediente);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
 
-            return NoContent();
-        }
+                if (dbExpediente != null)
+                {
+                    _context.Expedientes.Remove(dbExpediente);
+                    await _context.SaveChangesAsync();
 
-        private bool ExpedienteExists(int id)
-        {
-            return _context.Expedientes.Any(e => e.Id == id);
+                    responseApi.Exito = true;
+                }
+                else
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se pudo encontrar el expediente";
+                }
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+
         }
     }
 }
