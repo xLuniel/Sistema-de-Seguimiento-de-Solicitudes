@@ -35,7 +35,7 @@ namespace SolicitudesAPI.Controllers
                         Id = expediente.Id,
                         Folio = expediente.Folio,
                         NombreSolicitante = expediente.NombreSolicitante,
-                        FechaInicio = expediente.FechaInicio,
+                        FechaInicio = (DateTime)expediente.FechaInicio,
                         Estado = expediente.Estado,
                         ContenidoSolicitud = expediente.ContenidoSolicitud
                     });
@@ -86,7 +86,7 @@ namespace SolicitudesAPI.Controllers
                         Id = dbExpediente.Id,
                         Folio = dbExpediente.Folio,
                         NombreSolicitante = dbExpediente.NombreSolicitante,
-                        FechaInicio = dbExpediente.FechaInicio,
+                        FechaInicio = (DateTime)dbExpediente.FechaInicio,
                         Estado = dbExpediente.Estado,
                         ContenidoSolicitud = dbExpediente.ContenidoSolicitud
                     };

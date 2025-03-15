@@ -67,21 +67,11 @@
     </div>
 }  
 
-<!-- Modal de confirmación -->
-<div class="modal" style="display: @(MostrarModal ? "block" : "none")">
-    <div class="modal-contenido">
-        <h4>¿Estás seguro de que deseas eliminar este expediente?</h4>
-        <h2>ID: @IdEliminar</h2>
-        <button @onclick="ConfirmarEliminacion">Eliminar</button>
-        <button @onclick="CancelarEliminacion">Cancelar</button>
-    </div>
-</div> 
-
 <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
-                <th>ACCIONES</th>
+                <th>DETALLES</th>
                 <th>ID</th>
                 <th>FOLIO</th>
                 <th>NOMBRE</th>
@@ -97,12 +87,11 @@
                     <tr>
                         <td>
                             <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
-                            <button @onclick="() => EliminarExpediente(expediente.Id)" class="btn-eliminar">Eliminar</button>
                         </td>
                         <td>@expediente.Id</td>
                         <td>@expediente.Folio</td>
                         <td>@expediente.NombreSolicitante</td>
-                        <td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
                         <td>@expediente.Estado</td>
                         <td>
                             <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
@@ -150,13 +139,6 @@
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
 
      private ExpedienteDTO NuevoExpediente { get; set; } = new();
-    //ExpedienteDTO NuevoExpediente = new ExpedienteDTO();
-
-    // protected override void OnInitialized()
-    // {
-    //     // Establecer la fecha de inicio a la fecha actual Formulario
-    //     NuevoExpediente.FechaInicio = DateTime.Now;
-    // }
 
     protected override async Task OnInitializedAsync()
     {
@@ -166,31 +148,6 @@
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
         
         NuevoExpediente.FechaInicio = DateTime.Now;
-
-        //         Expedientes = new List<Expediente>
-        //         {
-        //             new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso", ContenidoSolicitud = "Solicito información sobre el proceso de contratación de personal para el año 2023, incluyendo los criterios de selección y las fechas de evaluación." },
-        //             new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Finalizado", ContenidoSolicitud = "Requiero una copia certificada de la resolución emitida en el expediente número 456/2023, con todos los anexos correspondientes." },
-        //             new Expediente { Id = 3, Folio = "F003", Nombre = "Carlos Gómez", FechaInicioTramite = DateTime.Now.AddDays(-1), Estatus = "En revisión", ContenidoSolicitud = "Solicito aclaración sobre las diferencias en el cálculo de impuestos en la nómina de los últimos tres meses." },
-        //             new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-30), Estatus = "En espera", ContenidoSolicitud = "Solicito información sobre los procedimientos internos para la selección de proveedores de servicios." },
-        //             new Expediente { Id = 5, Folio = "F005", Nombre = "Jorge Amador", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "Inicio", ContenidoSolicitud = "Requiero el detalle de las fechas y montos de pagos realizados a contratistas en el año 2022." },
-        //             new Expediente { Id = 6, Folio = "F006", Nombre = "Pedro Martínez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso", ContenidoSolicitud = "Solicito una revisión de la clasificación de los bienes inmuebles registrados en el inventario institucional." },
-        //             new Expediente { Id = 7, Folio = "F007", Nombre = "Luis Fernández", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Pendiente", ContenidoSolicitud = "Pido información sobre el proceso de evaluación de desempeño aplicado en el segundo semestre de 2023." },
-        //             new Expediente { Id = 8, Folio = "F008", Nombre = "Carla Jiménez", FechaInicioTramite = DateTime.Now.AddDays(-20), Estatus = "Finalizado", ContenidoSolicitud = "Requiero una copia de la normativa interna que regula las licencias médicas y permisos especiales." },
-        //             new Expediente { Id = 9, Folio = "F009", Nombre = "Ana Rodríguez", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Cancelado", ContenidoSolicitud = "Solicito el desglose detallado de las partidas presupuestales utilizadas para capacitación en 2023." },
-        //             new Expediente { Id = 10, Folio = "F010", Nombre = "Daniel Castro", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Pendiente", ContenidoSolicitud = "Requiero información sobre las contrataciones de personal externo realizadas en los últimos seis meses." },
-        //             new Expediente { Id = 11, Folio = "F011", Nombre = "Sofía Morales", FechaInicioTramite = DateTime.Now.AddDays(-20), Estatus = "En proceso", ContenidoSolicitud = "Solicito la lista de los contratos activos con proveedores de servicios tecnológicos." },
-        //             new Expediente { Id = 12, Folio = "F012", Nombre = "Lucía Vargas", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "Finalizado", ContenidoSolicitud = "Requiero el informe sobre la implementación de medidas de seguridad en las instalaciones." },
-        //             new Expediente { Id = 13, Folio = "F013", Nombre = "Carlos Santillán", FechaInicioTramite = DateTime.Now.AddDays(-30), Estatus = "Inicio", ContenidoSolicitud = "Solicito información sobre el proceso de licitación para el mantenimiento de equipos informáticos." },
-        //             new Expediente { Id = 14, Folio = "F014", Nombre = "Raúl Medina", FechaInicioTramite = DateTime.Now.AddDays(-12), Estatus = "En espera", ContenidoSolicitud = "Pido el detalle de los criterios utilizados para la asignación de incentivos al personal." },
-        //             new Expediente { Id = 15, Folio = "F015", Nombre = "Fernanda Torres", FechaInicioTramite = DateTime.Now.AddDays(-25), Estatus = "En revisión", ContenidoSolicitud = "Solicito copia del reglamento interno actualizado y las modificaciones más recientes." },
-        //             new Expediente { Id = 16, Folio = "F016", Nombre = "Antonio Herrera", FechaInicioTramite = DateTime.Now.AddDays(-7), Estatus = "En proceso", ContenidoSolicitud = "Requiero información sobre la política de teletrabajo y las condiciones para su aplicación." },
-        //             new Expediente { Id = 17, Folio = "F017", Nombre = "Clara Mendoza", FechaInicioTramite = DateTime.Now.AddDays(-3), Estatus = "Finalizado", ContenidoSolicitud = "Solicito el informe de gastos operativos del primer trimestre de 2023." },
-        //             new Expediente { Id = 18, Folio = "F018", Nombre = "Roberto Pérez", FechaInicioTramite = DateTime.Now.AddDays(-8), Estatus = "Cancelado", ContenidoSolicitud = "Pido información sobre el proceso de adquisición de equipos de oficina en 2023." },
-        //             new Expediente { Id = 19, Folio = "F019", Nombre = "Julia Ortega", FechaInicioTramite = DateTime.Now.AddDays(-3), Estatus = "En proceso", ContenidoSolicitud = "Solicito el listado de programas de capacitación aprobados para el año 2024." },
-        //             new Expediente { Id = 20, Folio = "F020", Nombre = "Martín González", FechaInicioTramite = DateTime.Now.AddDays(-12), Estatus = "Pendiente", ContenidoSolicitud = "Requiero el informe de cumplimiento de objetivos institucionales en el ejercicio fiscal 2023." }
-        // };
-        //         ExpedientesFiltrados = new List<ExpedienteDTO>(Expedientes);
     }
 
     private async Task FiltrarExpedientes()
@@ -214,32 +171,6 @@
         await Task.CompletedTask;
     }
 
-    private async Task EliminarExpediente(int id)
-    {
-        IdEliminar = id;
-        MostrarModal = true;
-        await Task.CompletedTask;
-    }
-
-    private async Task ConfirmarEliminacion()
-    {
-        var expediente = listaExpedientes!.FirstOrDefault(e => e.Id == IdEliminar);
-        if (expediente != null)
-        {
-            listaExpedientes!.Remove(expediente);
-            ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes);
-            MostrarModal = false;
-        }
-
-        await ExpedienteService.Eliminar(IdEliminar);
-        listaExpedientes = await ExpedienteService.Lista();
-    }
-
-    private void CancelarEliminacion()
-    {
-        MostrarModal = false;
-    }
-
     private void MostrarFormulario()
     {
         MostrarFormularioModal = true;
@@ -252,35 +183,28 @@
 
     private async Task GuardarExpediente()
     {
-        // Verificar si el Folio o el Nombre ya existen en la lista
-        // if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
-        // {
-        //     await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
-        //     return; // Detener la ejecución si el folio está duplicado
-        // }
+        //Verificar si el Folio o el Nombre ya existen en la lista
+        if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
+        {
+            await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
+            return; // Detener la ejecución si el folio está duplicado
+        }
 
-        // if (listaExpedientes!.Any(e => e.NombreSolicitante == NuevoExpediente.NombreSolicitante))
-        // {
-        //     await MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
-        //     return; // Detener la ejecución si el nombre está duplicado
-        // }
+        if (listaExpedientes!.Any(e => e.NombreSolicitante == NuevoExpediente.NombreSolicitante))
+        {
+            await MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
+            return; // Detener la ejecución si el nombre está duplicado
+        }
 
-        // // Asignacion de ID unico
-        // NuevoExpediente.Id = Expedientes.Count > 0 ? Expedientes.Max(e => e.Id) + 1 : 1;
+        Console.WriteLine($"Nuevo expediente: {JsonSerializer.Serialize(NuevoExpediente)}");
 
-        // // Agregar el nuevo expediente a la lista
-        // Expedientes.Add(NuevoExpediente);
-        // ExpedientesFiltrados = new List<Expediente>(Expedientes);
-
-		// Console.WriteLine($"Nuevo expediente: {JsonSerializer.Serialize(NuevoExpediente)}");
-
-		// Guardar el nuevo expediente en la base de datos
+        // Guardar el nuevo expediente en la base de datos
         await ExpedienteService.Crear(NuevoExpediente);
 
-		// Actualizar la lista de expedientes
+        // Actualizar la lista de expedientes
         listaExpedientes = await ExpedienteService.Lista();
 
-        
+
 
         // Cerrar formulario
         MostrarFormularioModal = false;
@@ -319,19 +243,6 @@
     {
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';"); // Ocultar el modal
     }
-
-    // private class Expediente
-    // {
-    //     public int Id { get; set; }
-    //     public string Folio { get; set; }
-    //     public string Nombre { get; set; }
-    //     public DateTime FechaInicioTramite { get; set; }
-    //     public string Estatus { get; set; }
-    //     public string ContenidoSolicitud { get; set; }
-    // } 
-
- 
-     
 }
 
 @if (MostrarMensajeError)
@@ -385,19 +296,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-    /* Boton Eliminar */
-    .btn-eliminar {
-        background: transparent;
-        border: none;
-        color: red;
-        font-size: 16px;
-        width: auto;
-    }
-
-        .btn-eliminar:hover {
-            text-decoration: underline;
-        }
 
     /* Modal */
     .modal {

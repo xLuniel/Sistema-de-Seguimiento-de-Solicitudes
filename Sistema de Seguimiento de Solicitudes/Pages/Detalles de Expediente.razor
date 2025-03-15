@@ -1,8 +1,16 @@
 ﻿@page "/indice-expedientes/detalles/{id:int}/{folio}"
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
+@using System.Collections.Generic
+@using SolicitudesShared
+@using MudBlazor
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using System.Text.Json
+
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject IExpedienteService ExpedienteService
 
 <div class="container mt-4">
     <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
@@ -229,46 +237,71 @@
 
     private Expediente Expediente { get; set; }
 
+    List<ExpedienteDTO>? listaExpedientes = null;
+    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
+    private ExpedienteDTO ExpedienteDTO { get; set; }  // Cambia a ExpedienteDTO
+
+    private ExpedienteDTO NuevoExpediente { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
-        // Simulando la carga del expediente (deberías sustituirlo por una llamada a la API)
-        Console.WriteLine($"Cargando expediente con ID: {Id} y Folio: {Folio}");
-        Expediente = new Expediente
-            {
-                Id = Id,
-                Folio = Folio,
-                MesAdmision = "Enero",
-                TipoSolicitud = "Solicitud A",
-                TipoDerecho = "Derecho 1",
-                FechaInicioTramite = DateTime.Now,
-                FechaLimiteRespuesta10 = DateTime.Now,
-                Ampliacion = "No",
-                FechaLimiteRespuesta20 = DateTime.Now,
-                Estatus = "En proceso",
-                FechaRespuesta = DateTime.Now,
-                PromedioDiasRespuesta = 5,
-                Prevention = "No",
-                SubsanaPrevencion = "No",
-                FechaLimitePrevencion = DateTime.Now,
-                RecibidaRegistrada = "En la PNT",
-                ModalidadEntrega = "Correo",
-                ComoDeseaRecibirRespuestaPersonaSolicitante = "Electrónico",
-                Nombre = "Juan Perez",
-                CorreoElectronico = "juan@correo.com",
-                ContenidoSolicitud = "Contenido de ejemplo...",
-                AreaInformacion = "Transparencia",
-                Materia = "Derecho",
-                Ciudad = "Tijuana",
-                Tematica = "Acceso a la información",
-                TematicaEspecifica = "Datos personales",
-                SentidoRespuesta = "Positiva",
-                PrecisionSentidoRespuesta = "Exacta",
-                Cobro = "Ninguno",
-                RecursoRevision = "No",
-                DatosRecursoRevision = "N/A",
-                Nota = "Ninguna"
-            };
+        // Obtener todos los expedientes
+        listaExpedientes = await ExpedienteService.Lista();
+
+        // Filtrar el expediente que corresponde con el ID de la URL
+        var expedienteDTO = listaExpedientes.FirstOrDefault(e => e.Id == Id);
+
+        // Si el expediente no se encuentra, puedes redirigir o mostrar un mensaje
+        if (expedienteDTO != null)
+        {
+            // Mapear los datos de ExpedienteDTO a Expediente
+            Expediente = new Expediente
+                {
+                    //Etapa Inicial
+                    Id = expedienteDTO.Id,
+                    Folio = expedienteDTO.Folio,
+                    MesAdmision = expedienteDTO.MesAdmision,
+                    TipoSolicitud = expedienteDTO.TipoSolicitud,
+                    TipoDerecho = expedienteDTO.TipoDerecho,
+                    FechaInicioTramite = expedienteDTO.FechaInicio,
+                    FechaLimiteRespuesta10 = expedienteDTO.FechaLimiteRespuesta10dias,
+                    Ampliacion = expedienteDTO.Ampliacion,
+                    FechaLimiteRespuesta20 = expedienteDTO.FechaLimiteRespuesta20dias,
+                    Estatus = expedienteDTO.Estado,
+                    FechaRespuesta = expedienteDTO.FechaRespuesta,
+                    PromedioDiasRespuesta = expedienteDTO.PromedioDiasRespuesta,
+                    Prevention = expedienteDTO.Prevencion,
+                    SubsanaPrevencion = expedienteDTO.SubsanaPrevencion_ReinicoTramite,
+                    //Salta una variable
+                    ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante,
+                    Nombre = expedienteDTO.NombreSolicitante,
+                    CorreoElectronico = expedienteDTO.CorreoElectronicoSolicitante,
+                    ContenidoSolicitud = expedienteDTO.ContenidoSolicitud,
+                    
+                    //Etapa de Seguimiento
+                    AreaInformacion = expedienteDTO.AreaPoseedoraInformacion,
+                    
+                    //Etapa Final
+                    Materia = expedienteDTO.Materia,
+                    Ciudad = expedienteDTO.CiudadSolicitante,
+                    Tematica = expedienteDTO.Tematica,
+                    TematicaEspecifica = expedienteDTO.TematicaEspecifica,
+                    SentidoRespuesta = expedienteDTO.SentidoRespuesta,
+                    PrecisionSentidoRespuesta = expedienteDTO.PrecisionSentidoRespuesta,
+                    ModalidadEntrega = expedienteDTO.ModalidadEntrega,
+                    Cobro = expedienteDTO.Cobro,
+                    RecursoRevision = expedienteDTO.RecursoRevision,
+                    DatosRecursoRevision = expedienteDTO.DatosRecursoRevision,
+                    Nota = expedienteDTO.Nota
+                };
+        }
+        else
+        {
+            // Redirigir si no se encuentra el expediente (opcional)
+            Navigation.NavigateTo("/indice-expedientes");
+        }
     }
+
 
     private List<string> MesesAdmision = new()
     {
@@ -297,7 +330,6 @@
         {
             var response = await Http.PutAsJsonAsync($"api/expedientes/{Expediente.Id}", Expediente);
 
-
             if (response.IsSuccessStatusCode)
             {
                 Navigation.NavigateTo("/indice-expedientes");
@@ -313,6 +345,7 @@
         }
     }
 }
+
 
 
 <style>

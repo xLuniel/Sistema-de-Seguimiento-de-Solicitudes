@@ -1,6 +1,15 @@
 ﻿@page "/"
+
+@using System.Collections.Generic
+@using SolicitudesShared
 @using MudBlazor
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using System.Text.Json 
+
+@inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject IExpedienteService ExpedienteService
 
 <PageTitle>Solicitudes Pendientes</PageTitle>
 
@@ -119,36 +128,20 @@
     private List<Expediente> solicitudesAmarillas = new();
     private List<Expediente> solicitudesVerdes = new();
 
-    private List<Expediente> ExpedientesFiltrados = new();
+    //private List<Expediente> ExpedientesFiltrados = new();
+
+    List<ExpedienteDTO>? listaExpedientes = null;
+    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
+
+    private ExpedienteDTO NuevoExpediente { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulación de carga de datos desde el índice de expedientes
-        ExpedientesFiltrados = new List<Expediente>
-    {
-        new Expediente { Id = 1, Folio = "F001", Nombre = "Juan Perez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso" },
-        new Expediente { Id = 2, Folio = "F002", Nombre = "Maria Lopez", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Finalizado" },
-        new Expediente { Id = 3, Folio = "F003", Nombre = "Carlos Gómez", FechaInicioTramite = DateTime.Now.AddDays(-1), Estatus = "En revisión" },
-        new Expediente { Id = 4, Folio = "F004", Nombre = "Ana Torres", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "En espera" },
-        new Expediente { Id = 5, Folio = "F005", Nombre = "Jorge Amador", FechaInicioTramite = DateTime.Now.AddDays(-31), Estatus = "Inicio" },
-        new Expediente { Id = 6, Folio = "F006", Nombre = "Pedro Martínez", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "En proceso" },
-        new Expediente { Id = 7, Folio = "F007", Nombre = "Luis Fernández", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Pendiente" },
-        new Expediente { Id = 8, Folio = "F008", Nombre = "Carla Jiménez", FechaInicioTramite = DateTime.Now.AddDays(-20), Estatus = "Finalizado" },
-        new Expediente { Id = 9, Folio = "F009", Nombre = "Ana Rodríguez", FechaInicioTramite = DateTime.Now.AddDays(-10), Estatus = "Cancelado" },
-        new Expediente { Id = 10, Folio = "F010", Nombre = "Daniel Castro", FechaInicioTramite = DateTime.Now.AddDays(-15), Estatus = "Pendiente" },
-        new Expediente { Id = 11, Folio = "F011", Nombre = "Sofía Morales", FechaInicioTramite = DateTime.Now.AddDays(-20), Estatus = "En proceso" },
-        new Expediente { Id = 12, Folio = "F012", Nombre = "Lucía Vargas", FechaInicioTramite = DateTime.Now.AddDays(-5), Estatus = "Finalizado" },
-        new Expediente { Id = 13, Folio = "F013", Nombre = "Carlos Santillán", FechaInicioTramite = DateTime.Now.AddDays(-30), Estatus = "Inicio" },
-        new Expediente { Id = 14, Folio = "F014", Nombre = "Raúl Medina", FechaInicioTramite = DateTime.Now.AddDays(-12), Estatus = "En espera" },
-        new Expediente { Id = 15, Folio = "F015", Nombre = "Fernanda Torres", FechaInicioTramite = DateTime.Now.AddDays(-25), Estatus = "En revisión" },
-        new Expediente { Id = 16, Folio = "F016", Nombre = "Antonio Herrera", FechaInicioTramite = DateTime.Now.AddDays(-7), Estatus = "En proceso" },
-        new Expediente { Id = 17, Folio = "F017", Nombre = "Clara Mendoza", FechaInicioTramite = DateTime.Now.AddDays(-3), Estatus = "Finalizado" },
-        new Expediente { Id = 18, Folio = "F018", Nombre = "Roberto Pérez", FechaInicioTramite = DateTime.Now.AddDays(-8), Estatus = "Cancelado" },
-        new Expediente { Id = 19, Folio = "F019", Nombre = "Julia Ortega", FechaInicioTramite = DateTime.Now.AddDays(-3), Estatus = "En proceso" },
-        new Expediente { Id = 20, Folio = "F020", Nombre = "Martín González", FechaInicioTramite = DateTime.Now.AddDays(-12), Estatus = "Pendiente" }
 
-    };
+        listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
 
+        NuevoExpediente.FechaInicio = DateTime.Now;
+        
         ClasificarSolicitudes();
     }
 
@@ -160,41 +153,59 @@
         solicitudesAmarillas.Clear();
         solicitudesVerdes.Clear();
 
-        foreach (var expediente in ExpedientesFiltrados)
+        foreach (var expedienteDTO in listaExpedientes)
         {
-            int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite);
+            // Convertir de ExpedienteDTO a Expediente
+            var expediente = new Expediente
+                {
+                    Id = expedienteDTO.Id,
+                    Folio = expedienteDTO.Folio,
+                    Nombre = expedienteDTO.NombreSolicitante,
+                    FechaInicioTramite = expedienteDTO.FechaInicio, // Asumiendo que FechaInicio es nullable
+                    Estatus = expedienteDTO.Estado
+                };
 
-            // Si está vencida, se añade a la tarjeta gris
-            if (tiempoRestante < 0)
+            // Verificar que FechaInicioTramite no sea null
+            if (expediente.FechaInicioTramite != DateTime.MinValue)
             {
-                solicitudesGrises.Add(expediente);
-            }
+                int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite); // Usamos .Value porque sabemos que no es null
 
-            // Si tiene menos de 10 días restantes, también puede estar en la tarjeta roja
-            if (tiempoRestante >= 0 && tiempoRestante < 10)
-            {
-                solicitudesRojas.Add(expediente);
-            }
-
-            // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
-            if (tiempoRestante >= 10 && tiempoRestante < 20)
-            {
-                solicitudesAmarillas.Add(expediente);
-            }
-
-            // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
-            if (tiempoRestante >= 20 && tiempoRestante < 30)
-            {
-                solicitudesVerdes.Add(expediente);
+                // Si está vencida, se añade a la tarjeta gris
+                if (tiempoRestante < 0)
+                {
+                    solicitudesGrises.Add(expediente);
+                }
+                // Si tiene menos de 10 días restantes, también puede estar en la tarjeta roja
+                if (tiempoRestante >= 0 && tiempoRestante < 10)
+                {
+                    solicitudesRojas.Add(expediente);
+                }
+                // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
+                if (tiempoRestante >= 10 && tiempoRestante < 20)
+                {
+                    solicitudesAmarillas.Add(expediente);
+                }
+                // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
+                if (tiempoRestante >= 20 && tiempoRestante < 30)
+                {
+                    solicitudesVerdes.Add(expediente);
+                }
             }
         }
     }
 
-    private int GetTiempoRestante(DateTime fechaInicio)
+
+
+    private int GetTiempoRestante(DateTime? fechaInicio)
     {
-        DateTime fechaVencimiento = fechaInicio.AddDays(30); // Límite de 30 días
-        return (fechaVencimiento - DateTime.Now).Days;
+        if (fechaInicio.HasValue)
+        {
+            DateTime fechaVencimiento = fechaInicio.Value.AddDays(30); // Límite de 30 días
+            return (fechaVencimiento - DateTime.Now).Days;
+        }
+        return 0; // Devuelve 0 si la fecha es null
     }
+
 
     private void ToggleVisibility(int index)
     {
@@ -203,12 +214,15 @@
 
     private void RedirigirADetalles(int id)
     {
-        var expediente = ExpedientesFiltrados.FirstOrDefault(e => e.Id == id);
+        // Busca el expediente en la lista de expedientes (en lugar de usar ExpedientesFiltrados, usa directamente listaExpedientes)
+        var expediente = listaExpedientes.FirstOrDefault(e => e.Id == id);
         if (expediente != null)
         {
+            // Asegúrate de que la ruta esté correcta
             Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
         }
     }
+
 
 
        // Clase para expediente
