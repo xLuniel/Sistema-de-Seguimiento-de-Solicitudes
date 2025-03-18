@@ -153,42 +153,45 @@
         solicitudesAmarillas.Clear();
         solicitudesVerdes.Clear();
 
-        foreach (var expedienteDTO in listaExpedientes)
+        if (listaExpedientes != null)
         {
-            // Convertir de ExpedienteDTO a Expediente
-            var expediente = new Expediente
-                {
-                    Id = expedienteDTO.Id,
-                    Folio = expedienteDTO.Folio,
-                    Nombre = expedienteDTO.NombreSolicitante,
-                    FechaInicioTramite = expedienteDTO.FechaInicio, // Asumiendo que FechaInicio es nullable
-                    Estatus = expedienteDTO.Estado
-                };
-
-            // Verificar que FechaInicioTramite no sea null
-            if (expediente.FechaInicioTramite != DateTime.MinValue)
+            foreach (var expedienteDTO in listaExpedientes)
             {
-                int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite); // Usamos .Value porque sabemos que no es null
+                // Convertir de ExpedienteDTO a Expediente
+                var expediente = new Expediente
+                    {
+                        Id = expedienteDTO.Id,
+                        Folio = expedienteDTO.Folio ?? string.Empty,
+                        Nombre = expedienteDTO.NombreSolicitante ?? string.Empty,
+                        FechaInicioTramite = expedienteDTO.FechaInicio,
+                        Estatus = expedienteDTO.Estado ?? string.Empty
+                    };
 
-                // Si está vencida, se añade a la tarjeta gris
-                if (tiempoRestante < 0)
+                // Verificar que FechaInicioTramite no sea null
+                if (expediente.FechaInicioTramite != DateTime.MinValue)
                 {
-                    solicitudesGrises.Add(expediente);
-                }
-                // Si tiene menos de 10 días restantes, también puede estar en la tarjeta roja
-                if (tiempoRestante >= 0 && tiempoRestante < 10)
-                {
-                    solicitudesRojas.Add(expediente);
-                }
-                // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
-                if (tiempoRestante >= 10 && tiempoRestante < 20)
-                {
-                    solicitudesAmarillas.Add(expediente);
-                }
-                // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
-                if (tiempoRestante >= 20 && tiempoRestante < 30)
-                {
-                    solicitudesVerdes.Add(expediente);
+                    int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite);
+
+                    // Si está vencida, se añade a la tarjeta gris
+                    if (tiempoRestante < 0)
+                    {
+                        solicitudesGrises.Add(expediente);
+                    }
+                    // Si tiene menos de 10 días restantes, también puede estar en la tarjeta roja
+                    if (tiempoRestante >= 0 && tiempoRestante < 10)
+                    {
+                        solicitudesRojas.Add(expediente);
+                    }
+                    // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
+                    if (tiempoRestante >= 10 && tiempoRestante < 20)
+                    {
+                        solicitudesAmarillas.Add(expediente);
+                    }
+                    // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
+                    if (tiempoRestante >= 20 && tiempoRestante < 30)
+                    {
+                        solicitudesVerdes.Add(expediente);
+                    }
                 }
             }
         }
@@ -214,14 +217,25 @@
 
     private void RedirigirADetalles(int id)
     {
-        // Busca el expediente en la lista de expedientes (en lugar de usar ExpedientesFiltrados, usa directamente listaExpedientes)
-        var expediente = listaExpedientes.FirstOrDefault(e => e.Id == id);
-        if (expediente != null)
+        // Verificar que listaExpedientes no sea null
+        if (listaExpedientes != null)
         {
-            // Asegúrate de que la ruta esté correcta
-            Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+            // Busca el expediente en la lista de expedientes
+            var expediente = listaExpedientes.FirstOrDefault(e => e.Id == id);
+            if (expediente != null)
+            {
+                // Asegúrate de que la ruta esté correcta
+                Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+            }
+        }
+        else
+        {
+            // Manejar el caso en que listaExpedientes sea null (opcional)
+            Console.WriteLine("La lista de expedientes es null.");
         }
     }
+
+
 
 
 
@@ -229,11 +243,13 @@
     private class Expediente
     {
         public int Id { get; set; }
-        public string Folio { get; set; }
-        public string Nombre { get; set; }
+        public string Folio { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
         public DateTime FechaInicioTramite { get; set; }
-        public string Estatus { get; set; }
+        public string Estatus { get; set; } = string.Empty;
     }
+
+
 }
 
 <style>

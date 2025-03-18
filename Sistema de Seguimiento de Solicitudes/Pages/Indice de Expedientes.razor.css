@@ -1,0 +1,191 @@
+﻿
+    /* Limitar ancho de la columna del contenido de la solicitud */
+    .contenido-solicitud {
+        max-width: 50%;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-contenido {
+        width: 90%;
+        max-width: 70%;
+        margin: 0 auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+    }
+
+        .modal-contenido button {
+            margin: 5px;
+        }
+
+    /* Alerta Flotante */
+    .alerta.flotante {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background-color: #ffcccc;
+        color: #900;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        animation: fadeInOut 3s;
+        z-index: 9999;
+    }
+
+    /* Modal para ver el contenido completo de la solicitud */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow: auto;
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+    }
+
+    .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    /*Tabla*/
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+    /* Truncar el texto con "..." */
+    .truncate {
+        display: inline-block;
+        max-width: 80%;
+        white-space: nowrap;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    /* Estilo del botón Ver más */
+    .ver-mas {
+        color: blue;
+        max-width: 150px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: underline;
+        display: inline-block;
+        z-index: 10;
+        position: relative;
+        text-overflow: ellipsis;
+    }
+
+
+    /* Estilos para los formularios y botones */
+    input, textarea, button {
+        width: auto;
+        padding: 5px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    /* Estilos para el botón Agregar Expediente */
+    .btn-agregar {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #008000;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        display: block; /* Asegura que se mantenga en su propia línea */
+        transition: background-color 0.3s ease-in-out;
+    }
+
+        .btn-agregar:hover {
+            background-color: #0a5c0a;
+        }
+
+    .navbar-toggler {
+        width: 20%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: 007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        display: block; /* Asegura que se mantenga en su propia línea */
+        transition: background-color 0.3s ease-in-out;
+    }

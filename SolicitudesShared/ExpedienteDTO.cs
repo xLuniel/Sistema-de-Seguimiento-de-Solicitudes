@@ -10,6 +10,7 @@ namespace SolicitudesShared
 {
     public class ExpedienteDTO
     {
+        //Etapa Inicial
         public int Id { get; set; }
 
         public string? Folio { get; set; }
@@ -49,8 +50,11 @@ namespace SolicitudesShared
 
         public string? ContenidoSolicitud { get; set; }
 
+        //Etapa de Seguimiento
+
         public string? AreaPoseedoraInformacion { get; set; } // Se puede buscar por ID en otra tabla, mostrando las areas en un dropdown
 
+        //Etapa Final
         public string? Materia { get; set; } // Se puede buscar por ID en otra tabla, mostrando las Materias en un dropdown
 
         public string? CiudadSolicitante { get; set; }
