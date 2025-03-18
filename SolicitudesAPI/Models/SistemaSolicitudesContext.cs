@@ -19,10 +19,30 @@ public partial class SistemaSolicitudesContext : DbContext
 
     public virtual DbSet<ExpedienteDto> ExpedienteDtos { get; set; }
 
+    public virtual DbSet<Usuario> Usuarios { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Ignore<Expediente>();
+        modelBuilder.Ignore<ExpedienteDto>();
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Usuarios__3214EC27AA69A3A2");
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.NombreUsuario)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.password)
+                .HasMaxLength(4000)
+                .IsUnicode(false);
+            entity.Property(e => e.Rol)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Expediente>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Solicitu__3214EC27AA69A3A2");

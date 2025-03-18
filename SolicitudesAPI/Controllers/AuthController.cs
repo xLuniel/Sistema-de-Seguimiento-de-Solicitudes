@@ -1,0 +1,135 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using SolicitudesAPI.Models;
+using SolicitudesShared;
+using Microsoft.EntityFrameworkCore;
+
+namespace SolicitudesAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly SistemaSolicitudesContext _context;
+
+        private readonly UserManager<Usuario> _userManager;
+        private readonly SignInManager<Usuario> _signInManager;
+        private readonly IConfiguration _configuration;
+
+        //public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, IConfiguration configuration)
+        //{
+        //    _userManager = userManager;
+        //    _signInManager = signInManager;
+        //    
+        //}
+
+        public AuthController(SistemaSolicitudesContext context, IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _context = context;
+        }
+
+        [HttpGet("Lista_Usuarios")]
+        public async Task<IActionResult> Lista_Usuarios()
+        {
+            var responseApi = new ResponseAPI<List<UsuariosDTO>>();
+            var listaUsuariosDTO = new List<UsuariosDTO>();
+
+            try
+            {
+                foreach (var usuarios in await _context.Usuarios.ToListAsync())
+                {
+                    listaUsuariosDTO.Add(new UsuariosDTO
+                    {
+                        Id = usuarios.Id,
+                        NombreUsuario = usuarios.NombreUsuario,
+                        password = usuarios.password,
+                        Rol = usuarios.Rol
+                    });
+                }
+                responseApi.Exito = true;
+                responseApi.Data = listaUsuariosDTO;
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false; 
+                responseApi.Mensaje = ex.Message;
+            }
+             return Ok(responseApi);
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UsuariosDTO usuariosDTO)
+        {
+            var user = new Usuario
+            {
+                NombreUsuario = usuariosDTO.NombreUsuario,
+                password = new PasswordHasher<Usuario>().HashPassword(null, usuariosDTO.password),
+                Rol = usuariosDTO.Rol
+            };
+
+            _context.Usuarios.Add(user);
+            await _context.SaveChangesAsync();
+
+            if (user.Id != 0)
+            {
+                return Ok(new { message = "Usuario creado con éxito" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Error al crear el usuario" });
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UsuariosDTO usuariosDTO)
+        {
+            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.NombreUsuario == usuariosDTO.NombreUsuario);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+            }
+
+            var passwordHasher = new PasswordHasher<Usuario>();
+            var result = passwordHasher.VerifyHashedPassword(user, user.password, usuariosDTO.password);
+
+            if (result == PasswordVerificationResult.Success)
+            {
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.NombreUsuario),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
+
+                var token = GenerarToken(authClaims);
+
+                return Ok(new { token });
+            }
+            else
+            {
+                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+            }
+        }
+
+        private string GenerarToken(List<Claim> claims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]!));
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
+                expires: DateTime.Now.AddHours(2),
+                claims: claims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        
+    }
+}
