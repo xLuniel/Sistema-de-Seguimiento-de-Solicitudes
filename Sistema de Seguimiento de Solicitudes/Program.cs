@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7123/") });
 
-
+builder.Services.AddScoped<ICalendarioService, CalendarioService>();
 builder.Services.AddScoped<IExpedienteService, ExpedienteService>();
 
 builder.Services.AddSweetAlert2();

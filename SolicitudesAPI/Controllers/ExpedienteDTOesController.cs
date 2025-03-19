@@ -35,7 +35,7 @@ namespace SolicitudesAPI.Controllers
                         Id = expediente.Id,
                         Folio = expediente.Folio,
                         NombreSolicitante = expediente.NombreSolicitante,
-                        FechaInicio = (DateTime)expediente.FechaInicio,
+                        FechaInicio = expediente.FechaInicio ?? default(DateTime), // Manejar valores NULL
                         Estado = expediente.Estado,
                         ContenidoSolicitud = expediente.ContenidoSolicitud
                     });
@@ -51,21 +51,6 @@ namespace SolicitudesAPI.Controllers
             }
 
             return Ok(responseApi);
-
-            /*var expedientes = await _context.Expedientes.AsNoTracking().ToListAsync();
-
-            if (expedientes.Count == 0)
-                return NotFound();
-
-            return Ok(expedientes.Select(e => new ExpedienteDTO
-            {
-                Id = e.Id,
-                Folio = e.Folio,
-                NombreSolicitante = e.NombreSolicitante,
-                FechaInicio = e.FechaInicio,
-                Estado = e.Estado,
-                ContenidoSolicitud = e.ContenidoSolicitud
-            }).ToList());*/
         }
 
         // GET: api/Expedientes/single/5
@@ -77,7 +62,7 @@ namespace SolicitudesAPI.Controllers
 
             try
             {
-                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id); 
+                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
 
                 if (dbExpediente != null)
                 {
@@ -86,7 +71,7 @@ namespace SolicitudesAPI.Controllers
                         Id = dbExpediente.Id,
                         Folio = dbExpediente.Folio,
                         NombreSolicitante = dbExpediente.NombreSolicitante,
-                        FechaInicio = (DateTime)dbExpediente.FechaInicio,
+                        FechaInicio = dbExpediente.FechaInicio ?? default(DateTime), // Manejar valores NULL
                         Estado = dbExpediente.Estado,
                         ContenidoSolicitud = dbExpediente.ContenidoSolicitud
                     };
@@ -99,8 +84,6 @@ namespace SolicitudesAPI.Controllers
                     responseApi.Exito = false;
                     responseApi.Mensaje = "No se encontró el expediente";
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -109,8 +92,6 @@ namespace SolicitudesAPI.Controllers
             }
 
             return Ok(responseApi);
-
-            
         }
 
         // PUT: api/Expedientes/5
@@ -123,31 +104,25 @@ namespace SolicitudesAPI.Controllers
             {
                 var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
 
-                
-
                 if (dbExpediente != null)
                 {
                     dbExpediente.Folio = expediente.Folio;
-                    dbExpediente.NombreSolicitante = expediente.NombreSolicitante; 
+                    dbExpediente.NombreSolicitante = expediente.NombreSolicitante;
                     dbExpediente.FechaInicio = expediente.FechaInicio;
                     dbExpediente.Estado = expediente.Estado;
                     dbExpediente.ContenidoSolicitud = expediente.ContenidoSolicitud;
-                    
 
                     _context.Expedientes.Update(dbExpediente);
                     await _context.SaveChangesAsync();
 
                     responseApi.Exito = true;
-                    responseApi.Data = dbExpediente.Id; // posiblemente cree error al querer guardar sin proporcionar el id
-                
+                    responseApi.Data = dbExpediente.Id;
                 }
                 else
                 {
                     responseApi.Exito = false;
                     responseApi.Mensaje = "No se pudo encontrar el expediente";
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -156,8 +131,6 @@ namespace SolicitudesAPI.Controllers
             }
 
             return Ok(responseApi);
-
-
         }
 
         // POST: api/Expedientes/add
@@ -180,18 +153,16 @@ namespace SolicitudesAPI.Controllers
                 _context.Expedientes.Add(dbExpediente);
                 await _context.SaveChangesAsync();
 
-                if(dbExpediente.Id != 0)
+                if (dbExpediente.Id != 0)
                 {
                     responseApi.Exito = true;
-                    responseApi.Data = dbExpediente.Id; // posiblemente cree error al querer guardar sin proporcionar el id
+                    responseApi.Data = dbExpediente.Id;
                 }
                 else
                 {
                     responseApi.Exito = false;
                     responseApi.Mensaje = "No se pudo crear el expediente";
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -200,8 +171,6 @@ namespace SolicitudesAPI.Controllers
             }
 
             return Ok(responseApi);
-
-
         }
 
         // DELETE: api/Expedientes/5
@@ -234,7 +203,6 @@ namespace SolicitudesAPI.Controllers
             }
 
             return Ok(responseApi);
-
         }
     }
 }
