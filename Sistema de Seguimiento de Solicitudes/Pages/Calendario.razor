@@ -39,16 +39,37 @@
 
     private void CargarFechasImportantes()
     {
+        var tercerDomingoJunio = new DateTime(currentMonth.Year, 6, 1);
+
+        while (tercerDomingoJunio.DayOfWeek != DayOfWeek.Sunday)
+        {
+            tercerDomingoJunio = tercerDomingoJunio.AddDays(1);
+        }
+        tercerDomingoJunio = tercerDomingoJunio.AddDays(14); // Sumar dos semanas para llegar al tercer domingo
+
         fechasImportantes = new Dictionary<DateTime, string>
             {
                 [new DateTime(currentMonth.Year, 1, 1)] = "Año Nuevo",
+                [new DateTime(currentMonth.Year, 1, 6)] = "Día de Reyes",
                 [new DateTime(currentMonth.Year, 2, 5)] = "Día de la Constitución",
+                [new DateTime(currentMonth.Year, 2, 14)] = "Día de San Valentín",
+                [new DateTime(currentMonth.Year, 2, 24)] = "Día de la Bandera",
                 [new DateTime(currentMonth.Year, 3, 21)] = "Natalicio de Benito Juárez",
                 [new DateTime(currentMonth.Year, 5, 1)] = "Día del Trabajo",
                 [new DateTime(currentMonth.Year, 5, 5)] = "Batalla de Puebla",
+                [new DateTime(currentMonth.Year, 5, 10)] = "Día de las Madres",
+                [new DateTime(currentMonth.Year, 5, 15)] = "Día del Maestro",
+                [tercerDomingoJunio] = "Día del Padre", // tercer domingo de junio
+                [new DateTime(currentMonth.Year, 9, 15)] = "Grito de Independencia",
                 [new DateTime(currentMonth.Year, 9, 16)] = "Día de la Independencia",
+                [new DateTime(currentMonth.Year, 10, 12)] = "Día de la Raza",
+                [new DateTime(currentMonth.Year, 11, 1)] = "Día de Todos los Santos",
+                [new DateTime(currentMonth.Year, 11, 2)] = "Día de los Fieles Difuntos",
                 [new DateTime(currentMonth.Year, 11, 20)] = "Día de la Revolución",
-                [new DateTime(currentMonth.Year, 12, 25)] = "Navidad"
+                [new DateTime(currentMonth.Year, 12, 12)] = "Día de la Virgen de Guadalupe",
+                [new DateTime(currentMonth.Year, 12, 24)] = "Nochebuena",
+                [new DateTime(currentMonth.Year, 12, 25)] = "Navidad",
+                [new DateTime(currentMonth.Year, 12, 31)] = "Fin de Año"
             };
     }
 
@@ -131,7 +152,7 @@
         <div class="dia encabezado">@dayName</div>
     }
 
-    @for (int i = 0; i < (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 1; i++)
+    @for (int i = 0; i < ((int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek == 0 ? 6 : (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 1); i++)
     {
         <div class="dia vacio"></div>
     }

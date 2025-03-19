@@ -11,6 +11,7 @@
 
 /* Modal */
 .modal {
+    border: 1px solid #ddd;
     display: none;
     position: fixed;
     top: 0;
