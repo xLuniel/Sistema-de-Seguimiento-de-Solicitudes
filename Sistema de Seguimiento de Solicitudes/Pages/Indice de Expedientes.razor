@@ -21,7 +21,7 @@
 
 <!-- Toca arreglar esta cosa -->
 <input @bind="Filtro" placeholder="Buscar expediente..." />
-<button @onclick="FiltrarExpedientes">Buscar</button> 
+<button @onclick="FiltrarExpedientes" class="btn-buscar">Buscar</button>
 
 <!-- Botón para agregar nuevo expediente -->
 <button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> 
@@ -93,9 +93,11 @@
                             <span class="truncate">
                                 @expediente.ContenidoSolicitud
                             </span>
-                            @if (expediente.ContenidoSolicitud?.Length > 300)
+                            @if (expediente.ContenidoSolicitud?.Length > 150)
                             {
-                                <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)"> Ver más</span>
+                                <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)">
+                                    Ver más
+                                </span>
                             }
                         </td>
                     </tr>
@@ -137,9 +139,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulación de carga de datos (puedes hacer una petición HTTP en su lugar)
-        
-
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
         
         NuevoExpediente.FechaInicio = DateTime.Now;
@@ -160,7 +159,6 @@
         var expediente = listaExpedientes!.FirstOrDefault(e => e.Id == id);
         if (expediente != null)
         {
-            // Redirigir a la página de detalles (ajusta la ruta según tu aplicación)
             Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
         }
         await Task.CompletedTask;
@@ -182,13 +180,13 @@
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
             await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
-            return; // Detener la ejecución si el folio está duplicado
+            return; 
         }
 
         if (listaExpedientes!.Any(e => e.NombreSolicitante == NuevoExpediente.NombreSolicitante))
         {
             await MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
-            return; // Detener la ejecución si el nombre está duplicado
+            return; 
         }
 
         Console.WriteLine($"Nuevo expediente: {JsonSerializer.Serialize(NuevoExpediente)}");
@@ -203,11 +201,6 @@
 
         // Cerrar formulario
         MostrarFormularioModal = false;
-
-        // Limpiar objeto para el próximo registro
-        //NuevoExpediente = new ExpedienteDTO();
-
-        // await Task.CompletedTask;
 
     }
 
@@ -226,14 +219,14 @@
         await Task.CompletedTask;
     }
 
-//     // Función para abrir el modal con el contenido
+    // Función para abrir el modal con el contenido
     private async Task OpenModal(string contenido)
     {
         modalContenido = contenido;
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';"); // Mostrar el modal
     }
 
-//     // Función para cerrar el modal
+    // Función para cerrar el modal
     private async Task CloseModal()
     {
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';"); // Ocultar el modal

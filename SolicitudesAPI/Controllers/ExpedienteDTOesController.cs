@@ -18,6 +18,7 @@ namespace SolicitudesAPI.Controllers
         {
             _context = context;
         }
+        public string? RecibidaRegistradaPNT { get; set; }
 
         // GET: api/Expedientes/Lista
         [HttpGet("Lista")]
@@ -204,5 +205,35 @@ namespace SolicitudesAPI.Controllers
 
             return Ok(responseApi);
         }
+
+        [HttpPut("Actualizar/{id}")]
+        public async Task<IActionResult> Actualizar(int id, [FromBody] ExpedienteDTO expediente)
+        {
+            if (id != expediente.Id)
+            {
+                return BadRequest("ID mismatch");
+            }
+
+            var expedienteExistente = await _context.Expedientes.FindAsync(id);
+            if (expedienteExistente == null)
+            {
+                return NotFound("Expediente no encontrado");
+            }
+
+            // Etapa Inicial
+            expedienteExistente.Id = expediente.Id;
+            expedienteExistente.Folio = expediente.Folio;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok("Expediente actualizado correctamente");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
     }
 }

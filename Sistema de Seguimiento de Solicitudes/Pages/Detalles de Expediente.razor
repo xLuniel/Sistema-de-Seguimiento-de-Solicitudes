@@ -192,6 +192,10 @@
                                 <th>Precisión del Sentido de Respuesta</th>
                                 <td><InputText class="form-control" @bind-Value="Expediente.PrecisionSentidoRespuesta" /></td>
                             </tr>
+                            <tr>
+                                <th>Modalidad de Entrega</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -199,10 +203,6 @@
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tbody>
-                            <tr>
-                                <th>Modalidad de Entrega</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
-                            </tr>
                             <tr>
                                 <th>Cobro</th>
                                 <td>
@@ -341,20 +341,60 @@
     {
         try
         {
-            var response = await Http.PutAsJsonAsync($"api/expedientes/{Expediente.Id}", Expediente);
+            // Mapear Expediente a ExpedienteDTO
+            var expedienteDTO = new ExpedienteDTO
+                {
+                    Id = Expediente.Id,
+                    Folio = Expediente.Folio,
+                    MesAdmision = Expediente.MesAdmision,
+                    TipoSolicitud = Expediente.TipoSolicitud,
+                    TipoDerecho = Expediente.TipoDerecho,
+                    FechaInicio = Expediente.FechaInicioTramite,
+                    FechaLimiteRespuesta10dias = Expediente.FechaLimiteRespuesta10,
+                    Ampliacion = Expediente.Ampliacion,
+                    FechaLimiteRespuesta20dias = Expediente.FechaLimiteRespuesta20,
+                    Estado = Expediente.Estatus,
+                    FechaRespuesta = Expediente.FechaRespuesta,
+                    PromedioDiasRespuesta = Expediente.PromedioDiasRespuesta,
+                    Prevencion = Expediente.Prevention,
+                    SubsanaPrevencion_ReinicoTramite = Expediente.SubsanaPrevencion,
+                    FechaLimitePrevencion10dias = Expediente.FechaLimitePrevencion,
+                    ComoDeseaRecibirRespuestaPersonaSolicitante = Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
+                    NombreSolicitante = Expediente.Nombre,
+                    CorreoElectronicoSolicitante = Expediente.CorreoElectronico,
+                    ContenidoSolicitud = Expediente.ContenidoSolicitud,
+                    AreaPoseedoraInformacion = Expediente.AreaInformacion,
+                    Materia = Expediente.Materia,
+                    CiudadSolicitante = Expediente.Ciudad,
+                    Tematica = Expediente.Tematica,
+                    TematicaEspecifica = Expediente.TematicaEspecifica,
+                    SentidoRespuesta = Expediente.SentidoRespuesta,
+                    PrecisionSentidoRespuesta = Expediente.PrecisionSentidoRespuesta,
+                    ModalidadEntrega = Expediente.ModalidadEntrega,
+                    Cobro = Expediente.Cobro,
+                    RecursoRevision = Expediente.RecursoRevision,
+                    DatosRecursoRevision = Expediente.DatosRecursoRevision,
+                    Nota = Expediente.Nota
+                };
 
-            if (response.IsSuccessStatusCode)
+            // Llamar al servicio para actualizar el expediente
+            var response = await ExpedienteService.Actualizar(expedienteDTO);
+
+            if (response.Exito)
             {
+                await JSRuntime.InvokeVoidAsync("alert", "Cambios guardados correctamente.");
                 Navigation.NavigateTo("/indice-expedientes");
             }
             else
             {
-                Console.WriteLine("Error al guardar los cambios.");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {response.Mensaje}");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", "Error al guardar los cambios.");
         }
     }
+
 }
