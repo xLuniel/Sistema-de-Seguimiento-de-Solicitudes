@@ -1,8 +1,19 @@
 ﻿@page "/indice-expedientes/detalles/{id:int}/{folio}"
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
+@using System.Collections.Generic
+@using SolicitudesShared
+@using MudBlazor
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using System.Text.Json
+
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject IExpedienteService ExpedienteService
+
+
+<PageTitle>Detalles</PageTitle>
 
 <div class="container mt-4">
     <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
@@ -14,7 +25,10 @@
             <ValidationSummary />
 
             <div class="row">
-                <h3 class="text-left">Etapa Inicial</h3>
+                <!-- Barra de Etapa -->
+                <div class="etapas">
+                    <div class="etapa etapa-inicial"><h3>Etapa Inicial</h3></div>
+                </div>
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tbody>
@@ -125,7 +139,10 @@
                     </table>
                 </div>
 
-                <h3 class="text-left">Etapa de Seguimiento</h3>
+                <!-- Barra de Etapa -->
+                <div class="etapas">
+                    <div class="etapa etapa-seguimiento"><h3>Etapa de Seguimiento</h3></div>
+                </div>
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tbody>
@@ -137,7 +154,10 @@
                     </table>
                 </div>
 
-                <h3 class="text-left">Etapa Final</h3>
+                <!-- Barra de Etapa -->
+                <div class="etapas">
+                    <div class="etapa etapa-final"><h3>Etapa Final</h3></div>
+                </div>
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tbody>
@@ -172,6 +192,10 @@
                                 <th>Precisión del Sentido de Respuesta</th>
                                 <td><InputText class="form-control" @bind-Value="Expediente.PrecisionSentidoRespuesta" /></td>
                             </tr>
+                            <tr>
+                                <th>Modalidad de Entrega</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -179,10 +203,6 @@
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tbody>
-                            <tr>
-                                <th>Modalidad de Entrega</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
-                            </tr>
                             <tr>
                                 <th>Cobro</th>
                                 <td>
@@ -225,50 +245,76 @@
     public int Id { get; set; }
 
     [Parameter]
-    public string Folio { get; set; }
+    public string Folio { get; set; } = string.Empty;
 
-    private Expediente Expediente { get; set; }
+    private Expediente Expediente { get; set; } = new Expediente();
+
+    List<ExpedienteDTO>? listaExpedientes = null;
+    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
+    private ExpedienteDTO ExpedienteDTO { get; set; } = new ExpedienteDTO();
+
+    private ExpedienteDTO NuevoExpediente { get; set; } = new ExpedienteDTO();
+
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulando la carga del expediente (deberías sustituirlo por una llamada a la API)
-        Console.WriteLine($"Cargando expediente con ID: {Id} y Folio: {Folio}");
-        Expediente = new Expediente
-            {
-                Id = Id,
-                Folio = Folio,
-                MesAdmision = "Enero",
-                TipoSolicitud = "Solicitud A",
-                TipoDerecho = "Derecho 1",
-                FechaInicioTramite = DateTime.Now,
-                FechaLimiteRespuesta10 = DateTime.Now,
-                Ampliacion = "No",
-                FechaLimiteRespuesta20 = DateTime.Now,
-                Estatus = "En proceso",
-                FechaRespuesta = DateTime.Now,
-                PromedioDiasRespuesta = 5,
-                Prevention = "No",
-                SubsanaPrevencion = "No",
-                FechaLimitePrevencion = DateTime.Now,
-                RecibidaRegistrada = "En la PNT",
-                ModalidadEntrega = "Correo",
-                ComoDeseaRecibirRespuestaPersonaSolicitante = "Electrónico",
-                Nombre = "Juan Perez",
-                CorreoElectronico = "juan@correo.com",
-                ContenidoSolicitud = "Contenido de ejemplo...",
-                AreaInformacion = "Transparencia",
-                Materia = "Derecho",
-                Ciudad = "Tijuana",
-                Tematica = "Acceso a la información",
-                TematicaEspecifica = "Datos personales",
-                SentidoRespuesta = "Positiva",
-                PrecisionSentidoRespuesta = "Exacta",
-                Cobro = "Ninguno",
-                RecursoRevision = "No",
-                DatosRecursoRevision = "N/A",
-                Nota = "Ninguna"
-            };
+        // Obtener todos los expedientes
+        listaExpedientes = await ExpedienteService.Lista();
+
+        // Filtrar el expediente que corresponde con el ID de la URL
+        var expedienteDTO = listaExpedientes.FirstOrDefault(e => e.Id == Id);
+
+        // Si el expediente no se encuentra, puedes redirigir o mostrar un mensaje
+        if (expedienteDTO != null)
+        {
+            // Mapear los datos de ExpedienteDTO a Expediente
+            Expediente = new Expediente
+                {
+                //Etapa Inicial
+                    Id = expedienteDTO.Id,
+                    Folio = expedienteDTO.Folio ?? string.Empty,
+                    MesAdmision = expedienteDTO.MesAdmision ?? string.Empty,
+                    TipoSolicitud = expedienteDTO.TipoSolicitud ?? string.Empty,
+                    TipoDerecho = expedienteDTO.TipoDerecho ?? string.Empty,
+                    FechaInicioTramite = expedienteDTO.FechaInicio,
+                    FechaLimiteRespuesta10 = expedienteDTO.FechaLimiteRespuesta10dias,
+                    Ampliacion = expedienteDTO.Ampliacion ?? string.Empty,
+                    FechaLimiteRespuesta20 = expedienteDTO.FechaLimiteRespuesta20dias,
+                    Estatus = expedienteDTO.Estado ?? string.Empty,
+                    FechaRespuesta = expedienteDTO.FechaRespuesta,
+                    PromedioDiasRespuesta = expedienteDTO.PromedioDiasRespuesta,
+                    Prevention = expedienteDTO.Prevencion ?? string.Empty,
+                    SubsanaPrevencion = expedienteDTO.SubsanaPrevencion_ReinicoTramite ?? string.Empty,
+                    FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias,
+                    ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante ?? string.Empty,
+                    Nombre = expedienteDTO.NombreSolicitante ?? string.Empty,
+                    CorreoElectronico = expedienteDTO.CorreoElectronicoSolicitante ?? string.Empty,
+                    ContenidoSolicitud = expedienteDTO.ContenidoSolicitud ?? string.Empty,
+
+                //Etapa de Seguimiento
+                    AreaInformacion = expedienteDTO.AreaPoseedoraInformacion ?? string.Empty,
+
+                //Etapa Final
+                    Materia = expedienteDTO.Materia ?? string.Empty,
+                    Ciudad = expedienteDTO.CiudadSolicitante ?? string.Empty,
+                    Tematica = expedienteDTO.Tematica ?? string.Empty,
+                    TematicaEspecifica = expedienteDTO.TematicaEspecifica ?? string.Empty,
+                    SentidoRespuesta = expedienteDTO.SentidoRespuesta ?? string.Empty,
+                    PrecisionSentidoRespuesta = expedienteDTO.PrecisionSentidoRespuesta ?? string.Empty,
+                    ModalidadEntrega = expedienteDTO.ModalidadEntrega ?? string.Empty,
+                    Cobro = expedienteDTO.Cobro ?? string.Empty,
+                    RecursoRevision = expedienteDTO.RecursoRevision ?? string.Empty,
+                    DatosRecursoRevision = expedienteDTO.DatosRecursoRevision ?? string.Empty,
+                    Nota = expedienteDTO.Nota ?? string.Empty
+                };
+        }
+        else
+        {
+            // Redirigir si no se encuentra el expediente (opcional)
+            Navigation.NavigateTo("/indice-expedientes");
+        }
     }
+
 
     private List<string> MesesAdmision = new()
     {
@@ -295,42 +341,60 @@
     {
         try
         {
-            var response = await Http.PutAsJsonAsync($"api/expedientes/{Expediente.Id}", Expediente);
+            // Mapear Expediente a ExpedienteDTO
+            var expedienteDTO = new ExpedienteDTO
+                {
+                    Id = Expediente.Id,
+                    Folio = Expediente.Folio,
+                    MesAdmision = Expediente.MesAdmision,
+                    TipoSolicitud = Expediente.TipoSolicitud,
+                    TipoDerecho = Expediente.TipoDerecho,
+                    FechaInicio = Expediente.FechaInicioTramite,
+                    FechaLimiteRespuesta10dias = Expediente.FechaLimiteRespuesta10,
+                    Ampliacion = Expediente.Ampliacion,
+                    FechaLimiteRespuesta20dias = Expediente.FechaLimiteRespuesta20,
+                    Estado = Expediente.Estatus,
+                    FechaRespuesta = Expediente.FechaRespuesta,
+                    PromedioDiasRespuesta = Expediente.PromedioDiasRespuesta,
+                    Prevencion = Expediente.Prevention,
+                    SubsanaPrevencion_ReinicoTramite = Expediente.SubsanaPrevencion,
+                    FechaLimitePrevencion10dias = Expediente.FechaLimitePrevencion,
+                    ComoDeseaRecibirRespuestaPersonaSolicitante = Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
+                    NombreSolicitante = Expediente.Nombre,
+                    CorreoElectronicoSolicitante = Expediente.CorreoElectronico,
+                    ContenidoSolicitud = Expediente.ContenidoSolicitud,
+                    AreaPoseedoraInformacion = Expediente.AreaInformacion,
+                    Materia = Expediente.Materia,
+                    CiudadSolicitante = Expediente.Ciudad,
+                    Tematica = Expediente.Tematica,
+                    TematicaEspecifica = Expediente.TematicaEspecifica,
+                    SentidoRespuesta = Expediente.SentidoRespuesta,
+                    PrecisionSentidoRespuesta = Expediente.PrecisionSentidoRespuesta,
+                    ModalidadEntrega = Expediente.ModalidadEntrega,
+                    Cobro = Expediente.Cobro,
+                    RecursoRevision = Expediente.RecursoRevision,
+                    DatosRecursoRevision = Expediente.DatosRecursoRevision,
+                    Nota = Expediente.Nota
+                };
 
+            // Llamar al servicio para actualizar el expediente
+            var response = await ExpedienteService.Actualizar(expedienteDTO);
 
-            if (response.IsSuccessStatusCode)
+            if (response.Exito)
             {
+                await JSRuntime.InvokeVoidAsync("alert", "Cambios guardados correctamente.");
                 Navigation.NavigateTo("/indice-expedientes");
             }
             else
             {
-                Console.WriteLine("Error al guardar los cambios.");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {response.Mensaje}");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", "Error al guardar los cambios.");
         }
     }
+
 }
-
-
-<style>
-    table, tr {
-        max-width: 100%;
-    }
-    div {
-        max-width: 100%;
-    }
-
-    th, td {
-        max-width: 200px;
-        min-width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2; /* Máximo 2 líneas */
-        white-space: normal; /* Permite saltos de línea */
-    }
-
-</style>

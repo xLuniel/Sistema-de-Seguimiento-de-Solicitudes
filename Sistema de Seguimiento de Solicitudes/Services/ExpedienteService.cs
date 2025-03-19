@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-
 namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 {
     public class ExpedienteService : IExpedienteService
@@ -38,6 +37,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             else
                 throw new Exception(response.Mensaje);
         }
+
         public async Task<int> Editar(ExpedienteDTO Expediente)
         {
             var result = await _http.PutAsJsonAsync($"api/Expedientes/Editar/{Expediente.Id}", Expediente);
@@ -54,8 +54,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
         public async Task<int> Crear(ExpedienteDTO NuevoExpediente)
         {
             var result = await _http.PostAsJsonAsync("api/Expedientes/Crear", NuevoExpediente);
-             var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
-
+            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
             if (response!.Exito)
             {
@@ -63,9 +62,6 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             }
             else
                 throw new Exception(response.Mensaje);
-
-
-
         }
 
         public async Task<bool> Eliminar(int id)
@@ -81,6 +77,17 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception(response.Mensaje);
         }
 
-        
+        public async Task<ResponseAPI<ExpedienteDTO>> Actualizar(ExpedienteDTO expediente)
+        {
+            var result = await _http.PutAsJsonAsync($"api/Expedientes/Actualizar/{expediente.Id}", expediente);
+            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<ExpedienteDTO>>();
+
+            if (response!.Exito)
+            {
+                return response;
+            }
+            else
+                throw new Exception(response.Mensaje);
+        }
     }
 }

@@ -1,0 +1,120 @@
+﻿/* Etapas */
+.etapas {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.etapa {
+    flex: 1 1 calc(33% - 12px);
+    padding: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    margin: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .etapa:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+.etapa-inicial {
+    background-color: #e74c3c;
+}
+
+.etapa-seguimiento {
+    background-color: #3498db;
+}
+
+.etapa-final {
+    background-color: #f1c40f;
+    color: #333;
+}
+
+/* Estilo para la tabla */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+    .table th, .table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    /* Encabezado de la tabla */
+    .table thead th {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    /* Filas impares y pares para mejor visibilidad */
+    .table tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f1f1f1;
+    }
+
+    /* Resaltar fila al pasar el mouse */
+    .table tbody tr:hover {
+        background-color: #e2e6ea;
+        transition: background-color 0.2s ease;
+    }
+
+/* Truncamiento con múltiples líneas */
+td {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Máximo 2 líneas */
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+}
+
+/* Bordes redondeados para los extremos */
+table tr:first-child th:first-child {
+    border-top-left-radius: 12px;
+}
+
+table tr:first-child th:last-child {
+    border-top-right-radius: 12px;
+}
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+/* Mejora en diseño de scrollbar para tabla */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 8px;
+}
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background-color: #aaa;
+    }
+

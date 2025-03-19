@@ -1,4 +1,4 @@
-﻿@page "/TestExpedientes"
+﻿@page "/Elim/{id?}"
 
 @using SolicitudesShared
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
@@ -6,9 +6,12 @@
 
 @inject IExpedienteService ExpedienteService
 @inject SweetAlertService Swal
+@inject NavigationManager NavigationManager
 
 
-<h3>TestExpedientes</h3>
+<PageTitle>Eliminar</PageTitle>
+
+<h3>Eliminacion de Expedientes</h3>
 
 <table class="table">
 	<thead>
@@ -18,7 +21,7 @@
 			<th>NOMBRE</th>
 			<th>FECHA DE INICIO</th>
 			<th>ESTATUS</th>
-			<th></th>
+			<th>ELIMINAR</th>
 		</tr>	
 	</thead>
 	<tbody>
@@ -30,11 +33,11 @@
 					<td>@expediente.Id</td>
 					<td>@expediente.Folio</td>
 					<td>@expediente.NombreSolicitante</td>
-					<td>@(expediente.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A")</td> 
+					<td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td> 
 					<td>@expediente.Estado</td>
 					<td>
 						<button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
-							<i class="oi oi-trash"></i>
+							<i class="bi bi-trash">Eliminar</i>
 						</button>
 					</td>
 				</tr>
@@ -44,6 +47,8 @@
 </table>
 
 @code {
+	[Parameter]
+	public string? Id { get; set; }
 
 	List<ExpedienteDTO>? listaExpedientes = null;
 
@@ -51,6 +56,12 @@
 	protected override async Task OnInitializedAsync()
 	{
 		listaExpedientes = await ExpedienteService.Lista();
+
+		//Genera ID Aleatorio a la ruta
+		var randomNumber = new Random().Next(1000, 9999);
+		var guidPart = Guid.NewGuid().ToString().Substring(0, 4); // Solo los primeros 4 caracteres
+		Id = $"{randomNumber}-{guidPart}";
+		NavigationManager.NavigateTo($"/Elim/{Id}");
 	}
 
 	private async Task Eliminar(int id)

@@ -16,6 +16,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Configuracion de HttpClient
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7123/") });
 
+builder.Services.AddScoped<ICalendarioService, CalendarioService>();
+
 // Registrando los servicios
 builder.Services.AddScoped<IExpedienteService, ExpedienteService>();
 builder.Services.AddScoped<AuthService>();

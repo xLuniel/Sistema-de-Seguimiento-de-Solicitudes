@@ -23,7 +23,7 @@
     <label for="password">Password</label>
     <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
 </div>@*@
-<button @onclick="Login2Click" class="btn btn-primary">LoginTEST</button>
+@* <button @onclick="Login2Click" class="btn btn-primary">LoginTEST</button> *@
 
 @*@if (!string.IsNullOrEmpty(errorMessage))
 {
@@ -113,8 +113,8 @@
         // }
     }
 
-    private async Task Login2Click()
-    {
-        NavigationManager.NavigateTo("/home");
-    }
+    // private async Task Login2Click()
+    // {
+    //     NavigationManager.NavigateTo("/home");
+    // }
 }
