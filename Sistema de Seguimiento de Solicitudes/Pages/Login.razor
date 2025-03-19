@@ -1,7 +1,120 @@
-﻿@layout LoginLayout
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
+@using SolicitudesShared
+@using System.Text.Json
+@layout LoginLayout
 
-<h3>Login</h3>
+@inject AuthService AuthService
+@inject CustomAuthenticationStateProvider CustomAuthStateProvider
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime js
+
+
+
+@* <h3>Login</h3>
+
+ <div class="form-group">
+    <label for="username">Username</label>
+    <input type="text" @bind="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
+</div>
+<div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
+</div>@*@
+<button @onclick="Login2Click" class="btn btn-primary">LoginTEST</button>
+
+@*@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-2">@errorMessage</div> 
+} *@
+
+
+<div class="container">
+    <div class="row">
+        <h3>Login</h3>
+        <EditForm Model="sessionLogin" OnValidSubmit="LoginClicked">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="username">Username</label>
+                <InputText @bind-Value="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-2">@errorMessage</div>
+}
 
 @code {
+    private string username;
+    private string password;
+    private string errorMessage;
 
+    private UsuariosDTO sesionUsuario { get; set; }
+
+    //private LoginDTO sessionLogin { get; set; }
+
+    private LoginDTO sessionLogin { get; set; } = new LoginDTO
+        {
+            NombreUsuario = string.Empty,
+            password = string.Empty
+        };
+
+    private async Task LoginClicked()
+    {
+        errorMessage = string.Empty;
+
+        try
+        {
+            LoginResponse response = await AuthService.Login(sessionLogin);
+
+            NavigationManager.NavigateTo("/home");
+
+            if (!response.Flag)
+            {
+               
+                await js.InvokeVoidAsync("alert", response.Message ?? "Unknown error occured");
+                //return;
+            }
+            else
+            {
+                await CustomAuthStateProvider.SetToken(response.Token);
+                
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+
+
+
+        // if (result)
+        // {
+        //     NavigationManager.NavigateTo("/");
+        // }
+        // else
+        // {
+        //     errorMessage = "Invalid username or password.";
+        // }
+    }
+
+    private async Task Login2Click()
+    {
+        NavigationManager.NavigateTo("/home");
+    }
 }

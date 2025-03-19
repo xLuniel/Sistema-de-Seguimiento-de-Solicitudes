@@ -87,17 +87,18 @@ namespace SolicitudesAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UsuariosDTO usuariosDTO)
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.NombreUsuario == usuariosDTO.NombreUsuario);
+            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.NombreUsuario == loginDTO.NombreUsuario);
 
             if (user == null)
             {
-                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+                //return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+                return Unauthorized(new LoginResponse { Token = null, Flag = false, Message = "Usuario o contraseña incorrectos" });
             }
 
             var passwordHasher = new PasswordHasher<Usuario>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.password, usuariosDTO.password);
+            var result = passwordHasher.VerifyHashedPassword(user, user.password, loginDTO.password);
 
             if (result == PasswordVerificationResult.Success)
             {
@@ -109,11 +110,13 @@ namespace SolicitudesAPI.Controllers
 
                 var token = GenerarToken(authClaims);
 
-                return Ok(new { token });
+                //return Ok(new { token });
+                return Ok(new LoginResponse { Token = token, Flag = true, Message = "Login successful"});
             }
             else
             {
-                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+                //return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+                return Unauthorized(new LoginResponse { Token = null, Flag = false, Message = "Usuario o contraseña incorrectos" });
             }
         }
 
