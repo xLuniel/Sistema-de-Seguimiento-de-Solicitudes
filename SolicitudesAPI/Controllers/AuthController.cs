@@ -17,16 +17,9 @@ namespace SolicitudesAPI.Controllers
     {
         private readonly SistemaSolicitudesContext _context;
 
-        private readonly UserManager<Usuario> _userManager;
-        private readonly SignInManager<Usuario> _signInManager;
         private readonly IConfiguration _configuration;
 
-        //public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, IConfiguration configuration)
-        //{
-        //    _userManager = userManager;
-        //    _signInManager = signInManager;
-        //    
-        //}
+ 
 
         public AuthController(SistemaSolicitudesContext context, IConfiguration configuration)
         {

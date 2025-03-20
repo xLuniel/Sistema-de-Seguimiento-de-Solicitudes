@@ -12,25 +12,6 @@
 @inject IJSRuntime js
 
 
-
-@* <h3>Login</h3>
-
- <div class="form-group">
-    <label for="username">Username</label>
-    <input type="text" @bind="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
-</div>
-<div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
-</div>@*@
-@* <button @onclick="Login2Click" class="btn btn-primary">LoginTEST</button> *@
-
-@*@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger mt-2">@errorMessage</div> 
-} *@
-
-
 <div class="container">
     <div class="row">
         <h3>Login</h3>
@@ -103,18 +84,8 @@
 
 
 
-        // if (result)
-        // {
-        //     NavigationManager.NavigateTo("/");
-        // }
-        // else
-        // {
-        //     errorMessage = "Invalid username or password.";
-        // }
+       
     }
 
-    // private async Task Login2Click()
-    // {
-    //     NavigationManager.NavigateTo("/home");
-    // }
+  
 }
