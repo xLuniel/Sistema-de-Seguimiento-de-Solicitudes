@@ -104,19 +104,21 @@
     .table th, .table td {
         padding: 8px;
         border: 1px solid #ddd;
-        text-align: left;
+        text-align: center;
         white-space: nowrap;
+        align-content: center;
     }
 
 /* Truncar el texto con "..." */
 .truncate {
     display: inline-block;
-    max-width: 300px;
+    max-width: 650px;
     white-space: nowrap;
     vertical-align: middle;
     text-overflow: ellipsis;
     overflow: hidden;
 }
+
 
 /* Estilo del botón Ver más */
 .ver-mas {

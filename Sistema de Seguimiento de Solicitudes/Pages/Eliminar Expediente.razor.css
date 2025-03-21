@@ -9,6 +9,7 @@
     .table th, .table td {
         border: 1px solid #ddd;
         text-align: center;
+        align-content: center;
     }
 
     /* Encabezado de la tabla */
@@ -38,7 +39,7 @@
     background-color: #dc3545;
     color: #fff;
     border: none;
-    padding: 8px 12px;
+    padding: 4px 8px;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.2s ease;

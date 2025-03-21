@@ -47,7 +47,12 @@
                     <InputDate id="FechaInicioTramite" @bind-Value="NuevoExpediente.FechaInicio" />
 
                     <label for="Estatus">Estatus</label>
-                    <InputText id="Estatus" @bind-Value="NuevoExpediente.Estado" />
+                    <InputSelect id="Estatus" @bind-Value="NuevoExpediente.Estado">
+                        @foreach (var estado in ListaEstados)
+                        {
+                            <option value="@estado">@estado</option>
+                        }
+                    </InputSelect>
                 </div>
 
                 <div>
@@ -76,8 +81,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (listaExpedientes != null){
-                @foreach (var expediente in listaExpedientes) // ExpedientesFiltrados
+            @if (ExpedientesFiltrados != null && ExpedientesFiltrados.Any())
+            {
+                @foreach (var expediente in ExpedientesFiltrados)
                 {
                     <tr>
                         <td>
@@ -88,12 +94,11 @@
                         <td>@expediente.NombreSolicitante</td>
                         <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
                         <td>@expediente.Estado</td>
-                        <td>
-                            <!-- Truncar el contenido y mostrar "Ver más" si es largo -->
+                        <td style="padding-left: 8px; padding-right: 8px; width: 518px;">
                             <span class="truncate">
                                 @expediente.ContenidoSolicitud
                             </span>
-                            @if (expediente.ContenidoSolicitud?.Length > 150)
+                            @if (expediente.ContenidoSolicitud?.Length > 100)
                             {
                                 <span class="ver-mas" @onclick="() => OpenModal(expediente.ContenidoSolicitud)">
                                     Ver más
@@ -105,7 +110,11 @@
             }
             else
             {
-                <tr>Cargando...</tr>
+                <tr>
+                    <td colspan="7" style="text-align: center; font-size: 30px; font-weight: bold; color: #ff0000; padding: 15px; background-color: #ffecec; border: 1px solid #ffaaaa;">
+                        No se encontraron resultados.
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
@@ -140,6 +149,7 @@
     protected override async Task OnInitializedAsync()
     {
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
+        ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes);
         
         NuevoExpediente.FechaInicio = DateTime.Now;
     }
@@ -147,10 +157,13 @@
     private async Task FiltrarExpedientes()
     {
         ExpedientesFiltrados = listaExpedientes!
-            .Where(e => e.NombreSolicitante!.Contains(Filtro, StringComparison.OrdinalIgnoreCase) ||
+            .Where(e => (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                        (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                        (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
                         e.Id.ToString().Contains(Filtro))
             .ToList();
 
+        StateHasChanged();
         await Task.CompletedTask;
     }
 
@@ -163,6 +176,14 @@
         }
         await Task.CompletedTask;
     }
+
+    private List<string> ListaEstados = new()
+    {
+        "En Proceso",
+        "Pendiente",
+        "Finalizado",
+        "Cancelado"
+    };
 
     private void MostrarFormulario()
     {
@@ -197,11 +218,8 @@
         // Actualizar la lista de expedientes
         listaExpedientes = await ExpedienteService.Lista();
 
-
-
         // Cerrar formulario
         MostrarFormularioModal = false;
-
     }
 
     private async Task MostrarAlerta(string mensaje)
