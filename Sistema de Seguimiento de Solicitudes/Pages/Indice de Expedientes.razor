@@ -197,17 +197,16 @@
 
     private async Task GuardarExpediente()
     {
-        //Verificar si el Folio o el Nombre ya existen en la lista
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
             await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
-            return; 
+            return;
         }
 
         if (listaExpedientes!.Any(e => e.NombreSolicitante == NuevoExpediente.NombreSolicitante))
         {
             await MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
-            return; 
+            return;
         }
 
         Console.WriteLine($"Nuevo expediente: {JsonSerializer.Serialize(NuevoExpediente)}");
@@ -215,12 +214,14 @@
         // Guardar el nuevo expediente en la base de datos
         await ExpedienteService.Crear(NuevoExpediente);
 
-        // Actualizar la lista de expedientes
+        // Actualizar la lista de expedientes con el nuevo agregado primero
         listaExpedientes = await ExpedienteService.Lista();
+        ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
 
         // Cerrar formulario
         MostrarFormularioModal = false;
     }
+
 
     private async Task MostrarAlerta(string mensaje)
     {

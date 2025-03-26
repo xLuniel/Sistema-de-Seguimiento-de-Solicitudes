@@ -11,32 +11,32 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime js
 
-
-<div class="container">
-    <div class="row">
-        <h3>Login</h3>
-        <EditForm Model="sessionLogin" OnValidSubmit="LoginClicked">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="form-group">
-                <label for="username">Username</label>
-                <InputText @bind-Value="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
-            </div>
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-        </EditForm>
+<div class="login-container">
+    <div class="login-content">
+        <div class="login-form">
+            <h3>Login</h3>
+            <EditForm Model="sessionLogin" OnValidSubmit="LoginClicked">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <InputText @bind-Value="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
+                </div>
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </EditForm>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mt-2">@errorMessage</div>
+            }
+        </div>
     </div>
 </div>
-
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger mt-2">@errorMessage</div>
-}
 
 @code {
     private string username;
@@ -44,8 +44,6 @@
     private string errorMessage;
 
     private UsuariosDTO sesionUsuario { get; set; }
-
-    //private LoginDTO sessionLogin { get; set; }
 
     private LoginDTO sessionLogin { get; set; } = new LoginDTO
         {
@@ -65,27 +63,16 @@
 
             if (!response.Flag)
             {
-               
                 await js.InvokeVoidAsync("alert", response.Message ?? "Unknown error occured");
-                //return;
             }
             else
             {
                 await CustomAuthStateProvider.SetToken(response.Token);
-                
             }
-
-
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
         }
-
-
-
-       
     }
-
-  
 }
