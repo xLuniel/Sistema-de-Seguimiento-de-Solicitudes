@@ -63,7 +63,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
         public async Task Logout()
         {
             await _authStateProvider.SetToken(null);
-            //await LocalStorage.RemoveAsync("auth_token");
+           // await LocalStorage.RemoveAsync("auth_token");
             //((CustomAuthenticationStateProvider)_authStateProvider).MarkUserAsLoggedOut();
         }
 
