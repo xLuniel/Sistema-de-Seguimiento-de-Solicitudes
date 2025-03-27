@@ -149,8 +149,8 @@
     protected override async Task OnInitializedAsync()
     {
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
-        ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes);
-        
+        ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
+
         NuevoExpediente.FechaInicio = DateTime.Now;
     }
 
@@ -179,10 +179,7 @@
 
     private List<string> ListaEstados = new()
     {
-        "En Proceso",
-        "Pendiente",
-        "Finalizado",
-        "Cancelado"
+        "INICIO", "PROCESO", "EN PREVENCION", "EN AMPLIACION", "TERMINADA", "DESECHADA"
     };
 
     private void MostrarFormulario()
