@@ -64,7 +64,6 @@
     private async Task LoginClicked()
     {
         IsLoading = true;
-
         errorMessage = string.Empty;
 
         try
@@ -88,6 +87,10 @@
         catch (Exception ex)
         {
             errorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false; // Asegurar que se reestablezca aunque haya error
         }
     }
 }
