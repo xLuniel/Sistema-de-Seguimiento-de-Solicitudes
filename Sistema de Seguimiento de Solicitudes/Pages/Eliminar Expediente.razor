@@ -64,42 +64,67 @@
 		NavigationManager.NavigateTo($"/Elim/{Id}");
 	}
 
-	private async Task Eliminar(int id)
-	{
-		var resultado = await Swal.FireAsync(new SweetAlertOptions
-			{
-				Title = "¿Estás seguro?",
-				Text = "¡No podrás revertir esto!",
-				Icon = SweetAlertIcon.Warning,
-				ShowCancelButton = true,
-				ConfirmButtonText = "Sí, bórralo",
-				CancelButtonText = "Cancelar",
-			});
+    private async Task Eliminar(int id)
+    {
+        var resultado1 = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "¡No podrás revertir esto!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, continuar",
+                CancelButtonText = "Cancelar",
+            });
 
-		if (resultado.IsConfirmed)
-		{
-			var eliminado = await ExpedienteService.Eliminar(id);
+        if (resultado1.IsConfirmed)
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "¿Realmente estás seguro?",
+                    Text = "Esta es tu última oportunidad para cancelar.",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Sí, estoy seguro",
+                    CancelButtonText = "Cancelar",
+                });
 
-			if (eliminado)
-			{
-				await Swal.FireAsync(new SweetAlertOptions
-					{
-						Title = "¡Eliminado!",
-						Text = "El expediente ha sido eliminado.",
-						Icon = SweetAlertIcon.Success,
-					});
-				listaExpedientes = await ExpedienteService.Lista();
-			}
-			else
-			{
-				await Swal.FireAsync(new SweetAlertOptions
-					{
-						Title = "¡Error!",
-						Text = "Ha ocurrido un error al intentar eliminar el expediente.",
-						Icon = SweetAlertIcon.Error,
-					});
-			}
-		}
-	}
+            if (resultado2.IsConfirmed)
+            {
+                var resultado3 = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "¡Confirmación final!",
+                        Text = "¿De verdad quieres eliminar este expediente? Esta acción no se puede deshacer.",
+                        Icon = SweetAlertIcon.Warning,
+                        ShowCancelButton = true,
+                        ConfirmButtonText = "Sí, eliminar definitivamente",
+                        CancelButtonText = "Cancelar",
+                    });
 
+                if (resultado3.IsConfirmed)
+                {
+                    var eliminado = await ExpedienteService.Eliminar(id);
+
+                    if (eliminado)
+                    {
+                        await Swal.FireAsync(new SweetAlertOptions
+                            {
+                                Title = "¡Eliminado!",
+                                Text = "El expediente ha sido eliminado.",
+                                Icon = SweetAlertIcon.Success,
+                            });
+                        listaExpedientes = await ExpedienteService.Lista();
+                    }
+                    else
+                    {
+                        await Swal.FireAsync(new SweetAlertOptions
+                            {
+                                Title = "¡Error!",
+                                Text = "Ha ocurrido un error al intentar eliminar el expediente.",
+                                Icon = SweetAlertIcon.Error,
+                            });
+                    }
+                }
+            }
+        }
+    }
 }

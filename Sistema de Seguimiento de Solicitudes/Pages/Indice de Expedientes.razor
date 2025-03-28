@@ -10,7 +10,6 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
-
 @inject IExpedienteService ExpedienteService
 
 <!-- SSSSSS -->
@@ -37,16 +36,13 @@
                 <ValidationSummary />
 
                 <div>
-                    <label for="Folio">Folio</label>
-                    <InputText id="Folio" @bind-Value="NuevoExpediente.Folio" />
-
-                    <label for="Nombre">Nombre</label>
+                    <label for="Nombre">Nombre: </label>
                     <InputText id="Nombre" @bind-Value="NuevoExpediente.NombreSolicitante" />
 
-                    <label for="FechaInicioTramite">Fecha de Inicio</label>
+                    <label for="FechaInicioTramite">Fecha de Inicio: </label>
                     <InputDate id="FechaInicioTramite" @bind-Value="NuevoExpediente.FechaInicio" />
 
-                    <label for="Estatus">Estatus</label>
+                    <label for="Estatus">Estatus: </label>
                     <InputSelect id="Estatus" @bind-Value="NuevoExpediente.Estado">
                         @foreach (var estado in ListaEstados)
                         {
@@ -154,7 +150,7 @@
         NuevoExpediente.FechaInicio = DateTime.Now;
     }
 
-    private async Task FiltrarExpedientes()
+    private void FiltrarExpedientes()
     {
         ExpedientesFiltrados = listaExpedientes!
             .Where(e => (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
@@ -164,18 +160,17 @@
             .ToList();
 
         StateHasChanged();
-        await Task.CompletedTask;
     }
 
-    private async Task VerDetalle(int id)
+    private void VerDetalle(int id)
     {
         var expediente = listaExpedientes!.FirstOrDefault(e => e.Id == id);
         if (expediente != null)
         {
             Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
         }
-        await Task.CompletedTask;
     }
+
 
     private List<string> ListaEstados = new()
     {
@@ -194,6 +189,9 @@
 
     private async Task GuardarExpediente()
     {
+        // Generar un nuevo Folio único antes de asignarlo al expediente
+        NuevoExpediente.Folio = await GenerarFolioUnico();
+
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
             await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
@@ -225,27 +223,47 @@
         MensajeError = mensaje;
         MostrarMensajeError = true;
 
-        // Ocultar el mensaje después de 3 segundos
-        await Task.Delay(4000).ContinueWith(_ =>
-        {
-            MostrarMensajeError = false;
-            StateHasChanged();
-        });
+        await Task.Delay(4000);
 
-        await Task.CompletedTask;
+        MostrarMensajeError = false;
+        StateHasChanged();
     }
 
     // Función para abrir el modal con el contenido
     private async Task OpenModal(string contenido)
     {
         modalContenido = contenido;
-        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';"); // Mostrar el modal
+        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';");
     }
 
     // Función para cerrar el modal
     private async Task CloseModal()
     {
-        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';"); // Ocultar el modal
+        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';");
+    }
+
+    private async Task<string> GenerarFolioUnico()
+    {
+        DateTime hoy = DateTime.Now;
+        string prefijo = $"200584{hoy:yy}"; // Prefijo + últimos 2 dígitos del año (Ej: 20058424)
+
+        // Obtener los folios registrados este año con el mismo prefijo
+        var foliosEsteAnio = listaExpedientes!
+            .Where(e => e.Folio.StartsWith(prefijo))
+            .Select(e => e.Folio)
+            .ToList();
+
+        // Obtener el último número usado en el año
+        int ultimoNumero = foliosEsteAnio
+            .Select(folio => int.Parse(folio.Substring(8))) // Tomar los últimos 6 dígitos
+            .DefaultIfEmpty(0) // Si no hay folios aún, empezar desde 0
+            .Max();
+
+        // Generar el siguiente número con 6 dígitos
+        int nuevoNumero = ultimoNumero + 1;
+        string folioFinal = $"{prefijo}{nuevoNumero:D6}";
+
+        return folioFinal;
     }
 }
 

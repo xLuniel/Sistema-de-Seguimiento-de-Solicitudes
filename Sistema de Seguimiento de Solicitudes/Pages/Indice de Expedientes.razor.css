@@ -1,12 +1,11 @@
-﻿
-/* Limitar ancho de la columna del contenido de la solicitud */
+﻿/* Limitar ancho de la columna del contenido de la solicitud */
 .contenido-solicitud {
     display: -webkit-box;
     -webkit-line-clamp: 10;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 25%;
+    max-width: 30%;
 }
 
 /* Modal */
@@ -24,7 +23,7 @@
 }
 
 .modal-contenido {
-    width: auto;
+    width: fit-content;
     max-width: 70%;
     margin: 0 auto;
     padding: 20px;
