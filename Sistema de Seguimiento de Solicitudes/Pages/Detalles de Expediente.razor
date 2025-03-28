@@ -6,6 +6,7 @@
 @using MudBlazor
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json
+@using Sistema_de_Seguimiento_de_Solicitudes.Models
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -44,7 +45,7 @@
                                 <th>Mes de Admisión</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision">
-                                        @foreach (var mes in MesesAdmision)
+                                        @foreach (var mes in Catalogos.MesesAdmision)
                                         {
                                             <option value="@mes">@mes</option>
                                         }
@@ -79,7 +80,7 @@
                                 <th>Estatus</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Estatus">
-                                        @foreach (var estatus in Estatuses)
+                                        @foreach (var estatus in Catalogos.Estatuses)
                                         {
                                             <option value="@estatus">@estatus</option>
                                         }
@@ -169,7 +170,7 @@
                                 <th>Ciudad</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Ciudad">
-                                        @foreach (var ciudad in Ciudades)
+                                        @foreach (var ciudad in Catalogos.Ciudades)
                                         {
                                             <option value="@ciudad">@ciudad</option>
                                         }
@@ -207,7 +208,7 @@
                                 <th>Cobro</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Cobro">
-                                        @foreach (var cobro in Cobros)
+                                        @foreach (var cobro in Catalogos.Cobros)
                                         {
                                             <option value="@cobro">@cobro</option>
                                         }
@@ -254,6 +255,11 @@
     private ExpedienteDTO ExpedienteDTO { get; set; } = new ExpedienteDTO();
 
     private ExpedienteDTO NuevoExpediente { get; set; } = new ExpedienteDTO();
+
+    // List<string> MesesAdmision;
+    // private List<string> Estatuses = new();
+    // private List<string> Ciudades = new();
+    // private List<string> Cobros = new();
 
 
     protected override async Task OnInitializedAsync()
@@ -316,26 +322,26 @@
     }
 
 
-    private List<string> MesesAdmision = new()
-    {
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    };
+    // private List<string> MesesAdmision = new()
+    // {
+    //     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    //     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    // };
 
-    private List<string> Estatuses = new()
-    {
-        "En proceso", "Pendiente", "Terminado","Cancelado"
-    };
+    // private List<string> Estatuses = new()
+    // {
+    //     "En proceso", "Pendiente", "Terminado","Cancelado"
+    // };
 
-    private List<string> Ciudades = new()
-    {
-        "Tijuana", "Mexicali", "Ensenada", "Rosarito", "Tecate"
-    };
+    // private List<string> Ciudades = new()
+    // {
+    //     "Tijuana", "Mexicali", "Ensenada", "Rosarito", "Tecate"
+    // };
 
-    private List<string> Cobros = new()
-    {
-        "Ninguno", "Si"
-    };
+    // private List<string> Cobros = new()
+    // {
+    //     "Ninguno", "Si"
+    // };
 
     private async Task HandleValidSubmit()
     {
