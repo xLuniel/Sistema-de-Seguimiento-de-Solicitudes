@@ -6,7 +6,6 @@
 @using MudBlazor
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json
-@using Sistema_de_Seguimiento_de_Solicitudes.Models
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -164,7 +163,14 @@
                         <tbody>
                             <tr>
                                 <th>Materia</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Materia" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Materia">
+                                        @foreach (var materia in Catalogos.Materia)
+                                        {
+                                            <option value="@materia">@materia</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Ciudad</th>
@@ -179,7 +185,14 @@
                             </tr>
                             <tr>
                                 <th>Temática</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Tematica" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Tematica">
+                                        @foreach (var tematica in Catalogos.Tematica)
+                                        {
+                                            <option value="@tematica">@tematica</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Temática Específica</th>
@@ -187,7 +200,14 @@
                             </tr>
                             <tr>
                                 <th>Sentido de Respuesta</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.SentidoRespuesta" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.SentidoRespuesta">
+                                        @foreach (var sentidoRespuesta in Catalogos.SentidoRespuesta)
+                                        {
+                                            <option value="@sentidoRespuesta">@sentidoRespuesta</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Precisión del Sentido de Respuesta</th>
