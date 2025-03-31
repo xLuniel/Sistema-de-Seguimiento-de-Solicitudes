@@ -53,11 +53,34 @@
                             </tr>
                             <tr>
                                 <th>Tipo de Solicitud</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.TipoSolicitud" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.TipoSolicitud">
+                                        @foreach (var tipoSolicitud in Catalogos.TiposSolicitud)
+                                        {
+                                            <option value="@tipoSolicitud">@tipoSolicitud</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Tipo de Derecho</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.TipoDerecho" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho">
+                                        @if(Expediente.TipoSolicitud == "ARCO")
+                                        {
+                                            @foreach (var derechoArco in Catalogos.SolicitudARCO)
+                                            {
+                                                <option value="@derechoArco">@derechoArco</option>
+                                            }
+                                        }
+                                        else if (Expediente.TipoSolicitud == "DAI")
+                                        {
+                                            var derecho = "N/A";
+
+											<option value="@derecho">@derecho</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Fecha de Inicio del Trámite</th>
@@ -69,7 +92,14 @@
                             </tr>
                             <tr>
                                 <th>Ampliación</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Ampliacion" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Ampliacion">
+                                        @foreach (var ampliacion in Catalogos.Ampliacion)
+                                        {
+                                            <option value="@ampliacion">@ampliacion</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Fecha Límite de Respuesta (20 días hábiles)</th>

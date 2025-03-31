@@ -2,6 +2,8 @@
 {
     public class Catalogos
     {
+        //Etapa Inicial
+
         public static readonly List<string> MesesAdmision = new()
             {
                 "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -12,6 +14,24 @@
             {
                 "En proceso", "Pendiente", "Terminado", "Cancelado"
             };
+
+        public static readonly List<string> TiposSolicitud = new()
+            {
+                "DAI", "ARCO"
+            };
+
+        public static readonly List<string> SolicitudARCO = new()
+            {
+                "ACCESO", "RECTIFICACION", "CANCELACION",
+                "OPOSICION"
+            };
+
+        public static readonly List<string> Ampliacion = new()
+            {
+                "SI", "NO"
+            };
+
+        // Etapa final
 
         public static readonly List<string> Ciudades = new()
             {
