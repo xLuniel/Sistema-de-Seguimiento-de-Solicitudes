@@ -25,7 +25,7 @@ namespace SolicitudesShared
         public string? Estado { get; set; }
         public DateTime FechaRespuesta { get; set; }
         public int PromedioDiasRespuesta { get; set; }
-        public string? Prevencion { get; set; }
+        public bool Prevencion { get; set; } = false;
         public string? SubsanaPrevencion_ReinicoTramite { get; set; }
         public DateTime FechaLimitePrevencion10dias { get; set; }
         public string? ComoDeseaRecibirRespuestaPersonaSolicitante { get; set; }

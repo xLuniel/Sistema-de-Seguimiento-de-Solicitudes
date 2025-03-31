@@ -31,6 +31,11 @@
                 "SI", "NO"
             };
 
+        public static readonly List<string> SubsanaPrevencion = new()
+            {
+                "SI", "NO"
+            };
+
         // Etapa final
 
         public static readonly List<string> Ciudades = new()

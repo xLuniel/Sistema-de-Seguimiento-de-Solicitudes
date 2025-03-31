@@ -126,7 +126,7 @@
                             </tr>
                             <tr>
                                 <th>Prevención</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Prevention" /></td>
+                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="Expediente.Prevencion" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -137,7 +137,14 @@
                         <tbody>
                             <tr>
                                 <th>Subsana Prevención y Reinicio del Trámite</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.SubsanaPrevencion" /></td>
+                                <td>
+                                <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion" disabled="@(!Expediente.Prevencion)">
+                                        @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
+                                        {
+                                            <option value="@subsanaPrevencion">@subsanaPrevencion</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Fecha Límite para Prevención (10 días hábiles)</th>
@@ -339,7 +346,7 @@
                     Estatus = expedienteDTO.Estado ?? string.Empty,
                     FechaRespuesta = expedienteDTO.FechaRespuesta,
                     PromedioDiasRespuesta = expedienteDTO.PromedioDiasRespuesta,
-                    Prevention = expedienteDTO.Prevencion ?? string.Empty,
+                    Prevencion = expedienteDTO.Prevencion,
                     SubsanaPrevencion = expedienteDTO.SubsanaPrevencion_ReinicoTramite ?? string.Empty,
                     FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante ?? string.Empty,
@@ -412,7 +419,7 @@
                     Estado = Expediente.Estatus,
                     FechaRespuesta = Expediente.FechaRespuesta,
                     PromedioDiasRespuesta = Expediente.PromedioDiasRespuesta,
-                    Prevencion = Expediente.Prevention,
+                    Prevencion = Expediente.Prevencion,
                     SubsanaPrevencion_ReinicoTramite = Expediente.SubsanaPrevencion,
                     FechaLimitePrevencion10dias = Expediente.FechaLimitePrevencion,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,

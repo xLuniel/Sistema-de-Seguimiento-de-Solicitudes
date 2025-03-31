@@ -14,7 +14,7 @@
         public string Estatus { get; set; } = string.Empty;
         public DateTime FechaRespuesta { get; set; }
         public int PromedioDiasRespuesta { get; set; }
-        public string Prevention { get; set; } = string.Empty;
+        public bool Prevencion { get; set; } = false;
         public string SubsanaPrevencion { get; set; } = string.Empty;
         public DateTime FechaLimitePrevencion { get; set; }
         public string RecibidaRegistrada { get; set; } = string.Empty;
