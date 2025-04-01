@@ -229,8 +229,7 @@
                             <tr>
                                 <th>Temática</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Tematica"
-                                    @onchange="ActualizarTematicasEspecificas" >
+                                    <InputSelect class="form-control" @bind-value="TematicaBind">
                                         @foreach (var tematica in Catalogos.Tematica)
                                         {
                                             <option value="@tematica">@tematica</option>
@@ -397,6 +396,46 @@
         }
     }
 
+    // Propiedad puente para manejar el cambio de Temática
+    private string TematicaBind
+    {
+        get => Expediente.Tematica;
+        set
+        {
+			if (Expediente.Tematica != value)
+			{
+				Expediente.Tematica = value;
+				ActualizarTematicasEspecificas();
+			}
+        }
+    }
+
+	// Actualizar las temáticas específicas disponibles
+    private void ActualizarTematicasEspecificas()
+    {
+
+        Expediente.TematicaEspecifica = null!; // Limpiamos la selección anterior
+
+        if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica, 
+            out var tematicas))
+        {
+            TematicasEspecificasActuales = tematicas;
+
+            // Si solo hay una opción que coincide con la temática general
+            if (tematicas.Count == 1 && tematicas[0] == Expediente.Tematica)
+            {
+                Expediente.TematicaEspecifica = Expediente.Tematica; // Auto-seleccionar
+            }
+        }
+        else
+        {
+            TematicasEspecificasActuales = new List<string>();
+        }
+
+        // Opcional: Forzar actualización de la UI si es necesario
+        StateHasChanged();
+    }
+
     // Mapeo de Tematicas especificas
     private static readonly Dictionary<string, List<string>> MapeoTematicasEspecificas = new()
     {
@@ -409,35 +448,18 @@
             ["ORIENTACIÓN"] = Catalogos.Orientacion,
             ["PRESTACIONES LABORALES"] = Catalogos.PrestacionesLaborales,
             ["USO DE RECURSOS PÚBLICOS"] = Catalogos.UsoRecursosPublicos,
+
+        // Temáticas que deben copiar el valor general
+            ["DATOS PERSONALES"] = new List<string> { "DATOS PERSONALES" },
+            ["DESECHADA"] = new List<string> { "DESECHADA" },
+            ["IMPROCEDENCIA"] = new List<string> { "IMPROCEDENCIA" },
+            ["INCOMPETENCIA"] = new List<string> { "INCOMPETENCIA" },
+            ["NOTORIA INCOMPETENCIA"] = new List<string> { "NOTORIA INCOMPETENCIA" }
     };
 
 
 
-	// este metodo no se llama, posiblemente por un confllicto con el metodo @onchange
-    private void ActualizarTematicasEspecificas()
-    {
-        Console.WriteLine("Llamada a ActualizarTematicasEspecificas ");
-
-        Expediente.TematicaEspecifica = null; // Limpiamos la selección anterior
-
-        if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica, 
-            out var tematicas))
-        {
-            TematicasEspecificasActuales = tematicas;
-        }
-        else
-        {
-            TematicasEspecificasActuales = new List<string>();
-        }
-
-        Console.WriteLine($"Temática general seleccionada: {Expediente.Tematica}");
-        Console.WriteLine($"Número de opciones específicas: {TematicasEspecificasActuales?.Count ?? 0}");
-        Console.WriteLine($"Primera opción específica: {(TematicasEspecificasActuales?.Count > 0 ? TematicasEspecificasActuales[0] : "N/A")}");
-
-        // Opcional: Forzar actualización de la UI si es necesario
-        StateHasChanged();
-    }
-
+    
 
     private async Task HandleValidSubmit()
     {
