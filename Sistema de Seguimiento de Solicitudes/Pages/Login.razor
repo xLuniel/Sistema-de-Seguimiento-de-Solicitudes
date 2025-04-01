@@ -1,8 +1,10 @@
 ﻿@page "/"
+
 @using Microsoft.AspNetCore.Components.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 @using SolicitudesShared
 @using System.Text.Json
+
 @layout LoginLayout
 
 @inject AuthService AuthService
@@ -49,11 +51,8 @@
 </div>
 
 @code {
-    private bool IsLoading = false;   
-
-
+    private bool IsLoading = false;
     private string errorMessage;
-
 
     private LoginDTO sessionLogin { get; set; } = new LoginDTO
         {
@@ -64,7 +63,6 @@
     private async Task LoginClicked()
     {
         IsLoading = true;
-
         errorMessage = string.Empty;
 
         try
@@ -74,7 +72,6 @@
             IsLoading = false;
 
             NavigationManager.NavigateTo("/home");
-
 
             if (!response.Flag)
             {
@@ -88,6 +85,10 @@
         catch (Exception ex)
         {
             errorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false; // Asegurar que se reestablezca aunque haya error
         }
     }
 }
