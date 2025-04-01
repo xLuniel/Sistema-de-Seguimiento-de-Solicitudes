@@ -192,7 +192,14 @@
                         <tbody>
                             <tr>
                                 <th>Área que Posee la Información</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.AreaInformacion" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion" >
+                                        @foreach (var area in Catalogos.AreaPoseedoraInformacion)
+										{
+											<option value="@area">@area</option>
+										}
+                                    </InputSelect>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -290,7 +297,14 @@
                             </tr>
                             <tr>
                                 <th>Recurso de Revisión</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.RecursoRevision" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.RecursoRevision">
+                                        @foreach (var recursoRevision in Catalogos.RecursoRevision)
+                                        {
+                                            <option value="@recursoRevision">@recursoRevision</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Datos del Recurso de Revisión</th>

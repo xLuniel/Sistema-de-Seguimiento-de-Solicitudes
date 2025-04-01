@@ -110,6 +110,7 @@
                     "CIVIL", "FAMILIAR", "MERCANTIL", "LABORAL", "PENAL", "PENAL ORAL", "OTRO"
                 };
 
+        // requiere los verdaderis valores
         public static readonly List<string> PrecicionSentidoRespuesta = new()
                 {
                     "PARCIAL", "TOTAL"
