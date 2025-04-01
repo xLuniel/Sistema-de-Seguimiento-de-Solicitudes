@@ -65,7 +65,8 @@
                             <tr>
                                 <th>Tipo de Derecho</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
+                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
                                         @if(Expediente.TipoSolicitud == "ARCO")
                                         {
                                             @foreach (var derechoArco in Catalogos.SolicitudARCO)
