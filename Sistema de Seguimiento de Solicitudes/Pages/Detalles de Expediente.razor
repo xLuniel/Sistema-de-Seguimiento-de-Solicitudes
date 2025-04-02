@@ -41,6 +41,10 @@
                                 <td>@Expediente.Folio</td>
                             </tr>
                             <tr>
+                                <th>Año de Admisión</th>
+                                <td><InputNumber class="form-control text-center" @bind-Value="Expediente.AnoAdmision" disabled /></td>
+                            </tr>
+                            <tr>
                                 <th>Mes de Admisión</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision">
@@ -66,8 +70,8 @@
                                 <th>Tipo de Derecho</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
-                                    disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
-                                        @if(Expediente.TipoSolicitud == "ARCO")
+                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
+                                        @if (Expediente.TipoSolicitud == "ARCO")
                                         {
                                             @foreach (var derechoArco in Catalogos.SolicitudARCO)
                                             {
@@ -103,6 +107,14 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th>Número de Sesión del Comité</th>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroSesionComiteAmpliacion" /></td>
+                            </tr>
+                            <tr>
+                                <th>Fecha de Sesión del Comité</th>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaSesionComiteAmpliacion" /></td>
+                            </tr>
+                            <tr>
                                 <th>Fecha Límite de Respuesta (20 días hábiles)</th>
                                 <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta20" /></td>
                             </tr>
@@ -125,10 +137,6 @@
                                 <th>Promedio de Días de Respuesta</th>
                                 <td><InputNumber class="form-control" @bind-Value="Expediente.PromedioDiasRespuesta" /></td>
                             </tr>
-                            <tr>
-                                <th>Prevención</th>
-                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="Expediente.Prevencion" /></td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -137,10 +145,14 @@
                     <table class="table table-bordered">
                         <tbody>
                             <tr>
+                                <th>Prevención</th>
+                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="Expediente.Prevencion" class="prevencion-checkbox" /></td>
+                            </tr>
+                            <tr>
                                 <th>Subsana Prevención y Reinicio del Trámite</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion" 
-                                    disabled="@(!Expediente.Prevencion)">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion"
+                                                 disabled="@(!Expediente.Prevencion)">
 
                                         @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
                                         {
@@ -159,10 +171,13 @@
                                 <td><InputText class="form-control" @bind-Value="Expediente.RecibidaRegistrada" /></td>
                             </tr>
                             <tr>
+                                <th>Medio de Recepción en Solicitud Manual</th>
+                                <td><InputText class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual" /></td>
+                            </tr>
+                            <tr>
                                 <th>Como desea recibir la respuesta la persona solicitante</th>
                                 <td>
-                                    <InputText class="form-control" 
-                                    @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante" />
+                                    <InputText class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante" />
                                 </td>
                             </tr>
                             <tr>
@@ -193,7 +208,7 @@
                             <tr>
                                 <th>Área que Posee la Información</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion" >
+                                    <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion">
                                         @foreach (var area in Catalogos.AreaPoseedoraInformacion)
                                         {
                                             <option value="@area">@area</option>
@@ -249,7 +264,7 @@
                                 <th>Temática Específica</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TematicaEspecifica"
-                                    disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
+                                                 disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
                                         @* <option value="">-- Seleccione una temática específica --</option> *@
                                         @foreach (var tematicaEspecifica in TematicasEspecificasActuales)
                                         {
@@ -305,6 +320,10 @@
                                         }
                                     </InputSelect>
                                 </td>
+                            </tr>
+                            <tr>
+                                <th>Número de Recurso de Revisión</th>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroRecursoRevision" /></td>
                             </tr>
                             <tr>
                                 <th>Datos del Recurso de Revisión</th>
@@ -404,6 +423,9 @@
             // Redirigir si no se encuentra el expediente (opcional)
             Navigation.NavigateTo("/indice-expedientes");
         }
+
+
+        Expediente.AnoAdmision = DateTime.Now.Year;
     }
 
     // Calculo de fechas limites
@@ -477,21 +499,21 @@
         get => Expediente.Tematica;
         set
         {
-			if (Expediente.Tematica != value)
-			{
-				Expediente.Tematica = value;
-				ActualizarTematicasEspecificas();
-			}
+            if (Expediente.Tematica != value)
+            {
+                Expediente.Tematica = value;
+                ActualizarTematicasEspecificas();
+            }
         }
     }
 
-	// Actualizar las temáticas específicas disponibles
+    // Actualizar las temáticas específicas disponibles
     private void ActualizarTematicasEspecificas()
     {
 
         Expediente.TematicaEspecifica = null!; // Limpiamos la selección anterior
 
-        if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica, 
+        if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica,
             out var tematicas))
         {
             TematicasEspecificasActuales = tematicas;
@@ -511,6 +533,26 @@
         StateHasChanged();
     }
 
+    // Mapeo de Tematicas especificas
+    private static readonly Dictionary<string, List<string>> MapeoTematicasEspecificas = new()
+        {
+            ["ACTIVIDADES DEL CJE"] = Catalogos.ActividadesCJE,
+            ["ACTIVIDADES DEL TSJ"] = Catalogos.ActividadesTSJ,
+            ["ACTIVIDADES DE LOS ÓRGANOS JURISDICCIONALES DE PRIMERA INSTANCIA"] = Catalogos.ActividadesOrganosJurisdiccionales,
+            ["ADMINISTRACIÓN JUDICIAL"] = Catalogos.AdministracionJudicial,
+            ["INFORMACIÓN ESTADÍSTICA"] = Catalogos.InformacionEstadistica,
+            ["MANEJO PRESUPUESTAL"] = Catalogos.ManejoPresupuestal,
+            ["ORIENTACIÓN"] = Catalogos.Orientacion,
+            ["PRESTACIONES LABORALES"] = Catalogos.PrestacionesLaborales,
+            ["USO DE RECURSOS PÚBLICOS"] = Catalogos.UsoRecursosPublicos,
+
+        // Temáticas que deben copiar el valor general
+            ["DATOS PERSONALES"] = new List<string> { "DATOS PERSONALES" },
+            ["DESECHADA"] = new List<string> { "DESECHADA" },
+            ["IMPROCEDENCIA"] = new List<string> { "IMPROCEDENCIA" },
+            ["INCOMPETENCIA"] = new List<string> { "INCOMPETENCIA" },
+            ["NOTORIA INCOMPETENCIA"] = new List<string> { "NOTORIA INCOMPETENCIA" }
+        };
 
     private async Task HandleValidSubmit()
     {
@@ -571,5 +613,28 @@
             await JSRuntime.InvokeVoidAsync("alert", "Error al guardar los cambios.");
         }
     }
-
 }
+
+    <style>
+
+    .prevencion-checkbox {
+        width: 25px; 
+        height: 25px; 
+        accent-color: #007bff; 
+        margin-right: 10px; 
+    }
+
+
+    label[for="prevencionCheckbox"] {
+        font-size: 14px; 
+        color: #333; 
+        font-weight: bold; 
+    }
+
+
+    .prevencion-checkbox:hover {
+        cursor: pointer; 
+        opacity: 0.8; 
+    }
+
+    </style>
