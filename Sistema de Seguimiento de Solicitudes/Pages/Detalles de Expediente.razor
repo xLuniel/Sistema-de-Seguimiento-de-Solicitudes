@@ -511,30 +511,6 @@
         StateHasChanged();
     }
 
-    // Mapeo de Tematicas especificas
-    private static readonly Dictionary<string, List<string>> MapeoTematicasEspecificas = new()
-    {
-            ["ACTIVIDADES DEL CJE"] = Catalogos.ActividadesCJE,
-            ["ACTIVIDADES DEL TSJ"] = Catalogos.ActividadesTSJ,
-            ["ACTIVIDADES DE LOS ÓRGANOS JURISDICCIONALES DE PRIMERA INSTANCIA"] = Catalogos.ActividadesOrganosJurisdiccionales,
-            ["ADMINISTRACIÓN JUDICIAL"] = Catalogos.AdministracionJudicial,
-            ["INFORMACIÓN ESTADÍSTICA"] = Catalogos.InformacionEstadistica,
-            ["MANEJO PRESUPUESTAL"] = Catalogos.ManejoPresupuestal,
-            ["ORIENTACIÓN"] = Catalogos.Orientacion,
-            ["PRESTACIONES LABORALES"] = Catalogos.PrestacionesLaborales,
-            ["USO DE RECURSOS PÚBLICOS"] = Catalogos.UsoRecursosPublicos,
-
-        // Temáticas que deben copiar el valor general
-            ["DATOS PERSONALES"] = new List<string> { "DATOS PERSONALES" },
-            ["DESECHADA"] = new List<string> { "DESECHADA" },
-            ["IMPROCEDENCIA"] = new List<string> { "IMPROCEDENCIA" },
-            ["INCOMPETENCIA"] = new List<string> { "INCOMPETENCIA" },
-            ["NOTORIA INCOMPETENCIA"] = new List<string> { "NOTORIA INCOMPETENCIA" }
-    };
-
-
-
-    
 
     private async Task HandleValidSubmit()
     {
