@@ -6,7 +6,6 @@
 @using MudBlazor
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json
-@using System.Text.RegularExpressions;
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -172,13 +171,7 @@
                             </tr>
                             <tr>
                                 <th>Correo Electrónico</th>
-                                <td>
-                                    <InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" />
-                                    @if (!EsCorreoValido(Expediente.CorreoElectronico))
-                                    {
-                                        <span class="text-danger">Correo electrónico no válido</span>
-                                    }
-                                </td>
+                                <td><InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" /></td>
                             </tr>
                             <tr>
                                 <th>Contenido de la Solicitud</th>
@@ -518,13 +511,6 @@
         StateHasChanged();
     }
 
-    private bool EsCorreoValido(string correo)
-    {
-        if (string.IsNullOrWhiteSpace(correo))
-            return false;
-
-        return Regex.IsMatch(correo, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-    }
 
     private async Task HandleValidSubmit()
     {
