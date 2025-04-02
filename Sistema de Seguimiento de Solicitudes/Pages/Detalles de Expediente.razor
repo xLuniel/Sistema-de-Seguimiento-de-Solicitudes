@@ -54,7 +54,7 @@
                             <tr>
                                 <th>Tipo de Solicitud</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.TipoSolicitud">
+                                    <InputSelect class="form-control" @bind-Value="_TipoSolicitudBind">
                                         @foreach (var tipoSolicitud in Catalogos.TiposSolicitud)
                                         {
                                             <option value="@tipoSolicitud">@tipoSolicitud</option>
@@ -66,7 +66,7 @@
                                 <th>Tipo de Derecho</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
-                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
+                                    disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
                                         @if(Expediente.TipoSolicitud == "ARCO")
                                         {
                                             @foreach (var derechoArco in Catalogos.SolicitudARCO)
@@ -195,9 +195,9 @@
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion" >
                                         @foreach (var area in Catalogos.AreaPoseedoraInformacion)
-										{
-											<option value="@area">@area</option>
-										}
+                                        {
+                                            <option value="@area">@area</option>
+                                        }
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -346,11 +346,6 @@
     // Lista para almacenar las temáticas específicas actuales
     private List<string> TematicasEspecificasActuales { get; set; } = new();
 
-    // List<string> MesesAdmision;
-    // private List<string> Estatuses = new();
-    // private List<string> Ciudades = new();
-    // private List<string> Cobros = new();
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -410,6 +405,54 @@
             Navigation.NavigateTo("/indice-expedientes");
         }
     }
+
+    // Calculo de fechas limites
+    private DateTime CalcularFechaLimite(DateTime fechaInicio, string tipoSolicitud)
+    {
+        int diasAdicionales = tipoSolicitud == "DAI" ? 10 : 20;
+        DateTime fechaLimite = fechaInicio;
+
+        while (diasAdicionales > 0)
+        {
+            fechaLimite = fechaLimite.AddDays(1);
+
+            // Si el día no es sábado ni domingo, cuenta como hábil
+            if (fechaLimite.DayOfWeek != DayOfWeek.Saturday && fechaLimite.DayOfWeek != DayOfWeek.Sunday)
+            {
+                diasAdicionales--;
+            }
+        }
+
+        return fechaLimite;
+    }
+
+    private void ActualizarFechaLimite()
+    {
+        if (Expediente.FechaInicioTramite != null && !string.IsNullOrEmpty(Expediente.TipoSolicitud))
+        {
+            if (Expediente.TipoSolicitud == "ARCO")
+            {
+                Expediente.FechaLimiteRespuesta20 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+            }
+            else if (Expediente.TipoSolicitud == "DAI")
+            {
+                Expediente.FechaLimiteRespuesta10 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+            }
+        }
+    }
+
+    // Propiedad para llamar la funcion para la actualizacion de fecha limite
+	private string _TipoSolicitudBind
+	{
+		get => Expediente.TipoSolicitud;
+		set
+		{
+            Expediente.TipoSolicitud = value;
+            ActualizarFechaLimite();
+		}
+	}
+
+
 
     // Propiedad puente para manejar el cambio de Temática
     private string TematicaBind
