@@ -8,9 +8,9 @@
         public string TipoSolicitud { get; set; } = string.Empty;
         public string TipoDerecho { get; set; } = string.Empty;
         public DateTime FechaInicioTramite { get; set; }
-        public DateTime FechaLimiteRespuesta10 { get; set; }
+        public DateTime? FechaLimiteRespuesta10 { get; set; }
         public string Ampliacion { get; set; } = string.Empty;
-        public DateTime FechaLimiteRespuesta20 { get; set; }
+        public DateTime? FechaLimiteRespuesta20 { get; set; }
         public string Estatus { get; set; } = string.Empty;
         public DateTime FechaRespuesta { get; set; }
         public int PromedioDiasRespuesta { get; set; }
@@ -40,8 +40,8 @@
         {
             // Inicializar con la fecha y hora actual
             FechaInicioTramite = DateTime.Now;
-            FechaLimiteRespuesta10 = DateTime.Now;
-            FechaLimiteRespuesta20 = DateTime.Now;
+            //FechaLimiteRespuesta10 = DateTime.Now;
+            //FechaLimiteRespuesta20 = DateTime.Now;
             FechaRespuesta = DateTime.Now;
             FechaLimitePrevencion = DateTime.Now;
         }

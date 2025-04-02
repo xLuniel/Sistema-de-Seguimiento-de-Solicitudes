@@ -94,7 +94,7 @@
                             <tr>
                                 <th>Ampliación</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Ampliacion">
+                                    <InputSelect class="form-control" @bind-Value="_AmpliacionBind">
                                         @foreach (var ampliacion in Catalogos.Ampliacion)
                                         {
                                             <option value="@ampliacion">@ampliacion</option>
@@ -412,6 +412,11 @@
         int diasAdicionales = tipoSolicitud == "DAI" ? 10 : 20;
         DateTime fechaLimite = fechaInicio;
 
+        if (Expediente.Ampliacion == "SI")
+        {
+            diasAdicionales = diasAdicionales * 2;
+        }
+
         while (diasAdicionales > 0)
         {
             fechaLimite = fechaLimite.AddDays(1);
@@ -433,24 +438,36 @@
             if (Expediente.TipoSolicitud == "ARCO")
             {
                 Expediente.FechaLimiteRespuesta20 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                Expediente.FechaLimiteRespuesta10 = null;
             }
-			else if (Expediente.TipoSolicitud == "DAI")
+            else if (Expediente.TipoSolicitud == "DAI")
             {
                 Expediente.FechaLimiteRespuesta10 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                Expediente.FechaLimiteRespuesta20 = null;
             }
         }
     }
 
     // Propiedad para llamar la funcion para la actualizacion de fecha limite
-	private string _TipoSolicitudBind
-	{
-		get => Expediente.TipoSolicitud;
-		set
-		{
+    private string _TipoSolicitudBind
+    {
+        get => Expediente.TipoSolicitud;
+        set
+        {
             Expediente.TipoSolicitud = value;
             ActualizarFechaLimite();
-		}
-	}
+        }
+    }
+
+    private string _AmpliacionBind
+    {
+        get => Expediente.Ampliacion;
+        set
+        {
+            Expediente.Ampliacion = value;
+            ActualizarFechaLimite();
+        }
+    }
 
 
 

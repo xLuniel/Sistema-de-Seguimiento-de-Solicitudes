@@ -19,9 +19,9 @@ namespace SolicitudesShared
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string? NombreSolicitante { get; set; }
         public DateTime FechaInicio { get; set; }
-        public DateTime FechaLimiteRespuesta10dias { get; set; }
+        public DateTime? FechaLimiteRespuesta10dias { get; set; }
         public string? Ampliacion { get; set; }
-        public DateTime FechaLimiteRespuesta20dias { get; set; }
+        public DateTime? FechaLimiteRespuesta20dias { get; set; }
         public string? Estado { get; set; }
         public DateTime FechaRespuesta { get; set; }
         public int PromedioDiasRespuesta { get; set; }
@@ -54,8 +54,8 @@ namespace SolicitudesShared
         {
             // Inicializar con la fecha y hora actual
             FechaInicio = DateTime.Now;
-            FechaLimiteRespuesta10dias = DateTime.Now;
-            FechaLimiteRespuesta20dias = DateTime.Now;
+            //FechaLimiteRespuesta10dias = DateTime.Now;
+            //FechaLimiteRespuesta20dias = DateTime.Now;
             FechaRespuesta = DateTime.Now;
             FechaLimitePrevencion10dias = DateTime.Now;
         }
