@@ -54,7 +54,7 @@
         public string SubsanaPrevencion { get; set; } = string.Empty;
 
         // Fecha límite para subsanar la prevención
-        public DateTime FechaLimitePrevencion { get; set; }
+        public DateTime? FechaLimitePrevencion { get; set; }
 
         // Cómo fue recibida o registrada la solicitud en la PNT
         public string RecibidaRegistrada { get; set; } = string.Empty;
@@ -122,7 +122,7 @@
             //FechaLimiteRespuesta10 = DateTime.Now;
             //FechaLimiteRespuesta20 = DateTime.Now;
             FechaRespuesta = DateTime.Now;
-            FechaLimitePrevencion = DateTime.Now;
+            //FechaLimitePrevencion = DateTime.Now;
         }
     }
 }

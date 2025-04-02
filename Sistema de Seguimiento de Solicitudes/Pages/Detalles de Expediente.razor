@@ -70,7 +70,7 @@
                                 <th>Tipo de Derecho</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
-                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
+                                    disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
                                         @if (Expediente.TipoSolicitud == "ARCO")
                                         {
                                             @foreach (var derechoArco in Catalogos.SolicitudARCO)
@@ -146,13 +146,13 @@
                         <tbody>
                             <tr>
                                 <th>Prevención</th>
-                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="Expediente.Prevencion" class="prevencion-checkbox" /></td>
+                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="_prevencionBind" class="prevencion-checkbox" /></td>
                             </tr>
                             <tr>
                                 <th>Subsana Prevención y Reinicio del Trámite</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion"
-                                                 disabled="@(!Expediente.Prevencion)">
+                                    disabled="@(!Expediente.Prevencion)">
 
                                         @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
                                         {
@@ -264,7 +264,7 @@
                                 <th>Temática Específica</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TematicaEspecifica"
-                                                 disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
+                                    disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
                                         @* <option value="">-- Seleccione una temática específica --</option> *@
                                         @foreach (var tematicaEspecifica in TematicasEspecificasActuales)
                                         {
@@ -439,6 +439,14 @@
             diasAdicionales = diasAdicionales * 2;
         }
 
+        // if (Expediente.Prevencion == true)
+        // {
+        //     DateTime fechaInicioPrevencion = DateTime.Now;
+
+        //     int diasAdicionalesPrevencion = 10;
+        // }
+
+
         while (diasAdicionales > 0)
         {
             fechaLimite = fechaLimite.AddDays(1);
@@ -451,6 +459,27 @@
         }
 
         return fechaLimite;
+    }
+
+    // Actualizar la fecha límite de prevencion
+    private DateTime CalcularFechaLimitePrevencion()
+    {
+        DateTime fechaInicioPrevencion = DateTime.Now;
+        DateTime fechaLimitePrevencion = fechaInicioPrevencion;
+
+        int diasAdicionalesPrevencion = 10;
+
+		while (diasAdicionalesPrevencion > 0)
+		{
+			fechaLimitePrevencion = fechaLimitePrevencion.AddDays(1);
+			// Si el día no es sábado ni domingo, cuenta como hábil
+			if (fechaLimitePrevencion.DayOfWeek != DayOfWeek.Saturday && fechaLimitePrevencion.DayOfWeek != DayOfWeek.Sunday)
+			{
+				diasAdicionalesPrevencion--;
+			}
+		}
+
+		return fechaLimitePrevencion;
     }
 
     private void ActualizarFechaLimite()
@@ -468,6 +497,11 @@
                 Expediente.FechaLimiteRespuesta20 = null;
             }
         }
+
+		if (Expediente.Prevencion == true)
+		{
+            Expediente.FechaLimitePrevencion = CalcularFechaLimitePrevencion();
+		}
     }
 
     // Propiedad para llamar la funcion para la actualizacion de fecha limite
@@ -490,6 +524,16 @@
             ActualizarFechaLimite();
         }
     }
+
+    private bool _prevencionBind
+    {
+        get => Expediente.Prevencion;
+        set
+        {
+            Expediente.Prevencion = value;
+            ActualizarFechaLimite();
+        }
+	}
 
 
 

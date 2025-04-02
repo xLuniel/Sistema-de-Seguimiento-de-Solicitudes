@@ -67,7 +67,7 @@ namespace SolicitudesShared
         public string? SubsanaPrevencion_ReinicoTramite { get; set; }
 
         // Fecha límite para subsanar la prevención
-        public DateTime FechaLimitePrevencion10dias { get; set; }
+        public DateTime? FechaLimitePrevencion10dias { get; set; }
 
         // Cómo fue recibida o registrada la solicitud en la PNT
         public string RecibidaRegistrada { get; set; } = string.Empty;
@@ -137,7 +137,7 @@ namespace SolicitudesShared
             //FechaLimiteRespuesta10dias = DateTime.Now;
             //FechaLimiteRespuesta20dias = DateTime.Now;
             FechaRespuesta = DateTime.Now;
-            FechaLimitePrevencion10dias = DateTime.Now;
+            //FechaLimitePrevencion10dias = DateTime.Now;
         }
     }
 
