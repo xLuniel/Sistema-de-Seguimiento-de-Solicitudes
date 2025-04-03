@@ -42,7 +42,7 @@
         public string Estatus { get; set; } = string.Empty;
 
         // Fecha de respuesta de la solicitud
-        public DateTime FechaRespuesta { get; set; }
+        public DateTime? FechaRespuesta { get; set; }
 
         // Promedio de días de respuesta
         public int PromedioDiasRespuesta { get; set; }

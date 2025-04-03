@@ -17,11 +17,12 @@ public partial class Expediente
     public string? Ampliacion { get; set; }
     public DateTime? FechaLimiteRespuesta20dias { get; set; }
     public string? Estado { get; set; }
-    public string? FechaRespuesta { get; set; }
-    public string? Prevencion { get; set; }
+    public DateTime? FechaRespuesta { get; set; }
+    public int PromedioDiasRespuesta { get; set; }
+    public bool Prevencion { get; set; }
 
     public string? SubsanaPrevencionReinicoTramite { get; set; }
-    public string? FechaLimitePrevencion10dias { get; set; }
+    public DateTime? FechaLimitePrevencion10dias { get; set; }
     public string? PreferenciaParaRecibirRespuesta { get; set; }
     public string? CorreoElectronicoSolicitante { get; set; }
     public string? ContenidoSolicitud { get; set; }

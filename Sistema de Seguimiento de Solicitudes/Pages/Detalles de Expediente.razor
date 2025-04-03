@@ -394,7 +394,7 @@
                     FechaRespuesta = expedienteDTO.FechaRespuesta,
                     PromedioDiasRespuesta = expedienteDTO.PromedioDiasRespuesta,
                     Prevencion = expedienteDTO.Prevencion,
-                    SubsanaPrevencion = expedienteDTO.SubsanaPrevencion_ReinicoTramite ?? string.Empty,
+                    SubsanaPrevencion = expedienteDTO.SubsanaPrevencionReinicoTramite ?? string.Empty,
                     FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante ?? string.Empty,
                     Nombre = expedienteDTO.NombreSolicitante ?? string.Empty,
@@ -618,7 +618,7 @@
                     FechaRespuesta = Expediente.FechaRespuesta,
                     PromedioDiasRespuesta = Expediente.PromedioDiasRespuesta,
                     Prevencion = Expediente.Prevencion,
-                    SubsanaPrevencion_ReinicoTramite = Expediente.SubsanaPrevencion,
+                    SubsanaPrevencionReinicoTramite = Expediente.SubsanaPrevencion,
                     FechaLimitePrevencion10dias = Expediente.FechaLimitePrevencion,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                     NombreSolicitante = Expediente.Nombre,
@@ -638,10 +638,13 @@
                     Nota = Expediente.Nota
                 };
 
+            Console.WriteLine($"Enviando expediente: {JsonSerializer.Serialize(expedienteDTO)}");
+
+
             // Llamar al servicio para actualizar el expediente
             var response = await ExpedienteService.Actualizar(expedienteDTO);
 
-            if (response.Exito)
+            if (response.Exito )
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Cambios guardados correctamente.");
                 Navigation.NavigateTo("/indice-expedientes");
@@ -654,7 +657,7 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", "Error al guardar los cambios.");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al guardar los cambios: {ex.Message}");
         }
     }
 }

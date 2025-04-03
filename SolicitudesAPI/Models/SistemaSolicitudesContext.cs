@@ -26,7 +26,8 @@ public partial class SistemaSolicitudesContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //modelBuilder.Ignore<Expediente>();
-        //modelBuilder.Ignore<ExpedienteDto>();
+        modelBuilder.Ignore<ExpedienteDto>();
+        modelBuilder.Ignore<Usuario>();
 
         modelBuilder.Entity<Usuario>(entity =>
         {

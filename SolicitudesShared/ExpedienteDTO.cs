@@ -55,7 +55,7 @@ namespace SolicitudesShared
         public string? Estado { get; set; }
 
         // Fecha de respuesta de la solicitud
-        public DateTime FechaRespuesta { get; set; }
+        public DateTime? FechaRespuesta { get; set; }
 
         // Promedio de días de respuesta
         public int PromedioDiasRespuesta { get; set; }
@@ -64,10 +64,12 @@ namespace SolicitudesShared
         public bool Prevencion { get; set; } = false;
 
         // Información sobre la subsanación de la prevención y reinicio del trámite
-        public string? SubsanaPrevencion_ReinicoTramite { get; set; }
+        public string? SubsanaPrevencionReinicoTramite { get; set; }
 
         // Fecha límite para subsanar la prevención
         public DateTime? FechaLimitePrevencion10dias { get; set; }
+
+        public string? PreferenciaParaRecibirRespuesta { get; set; }
 
         // Cómo fue recibida o registrada la solicitud en la PNT
         public string RecibidaRegistrada { get; set; } = string.Empty;

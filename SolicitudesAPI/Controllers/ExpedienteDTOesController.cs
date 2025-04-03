@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SolicitudesAPI.Models;
 using SolicitudesShared;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -107,13 +108,60 @@ namespace SolicitudesAPI.Controllers
 
                 if (dbExpediente != null)
                 {
-                    dbExpediente.Folio = expediente.Folio;
-                    dbExpediente.NombreSolicitante = expediente.NombreSolicitante;
-                    dbExpediente.FechaInicio = expediente.FechaInicio;
-                    dbExpediente.Estado = expediente.Estado;
-                    dbExpediente.ContenidoSolicitud = expediente.ContenidoSolicitud;
+                    //dbExpediente.Folio = expediente.Folio;
+                    //dbExpediente.NombreSolicitante = expediente.NombreSolicitante;
+                    //dbExpediente.FechaInicio = expediente.FechaInicio;
+                    //dbExpediente.Estado = expediente.Estado;
+                    //dbExpediente.ContenidoSolicitud = expediente.ContenidoSolicitud;
 
-                    _context.Expedientes.Update(dbExpediente);
+                    //foreach (var prop in typeof(ExpedienteDTO).GetProperties())
+                    //{
+                    //    var dbProp = typeof(Expediente).GetProperty(prop.Name);
+                    //    if (dbProp != null && dbProp.CanWrite)
+                    //    {
+                    //        dbProp.SetValue(dbExpediente, prop.GetValue(expediente));
+                    //    }
+                    //}
+
+                    foreach (var propDto in typeof(ExpedienteDTO).GetProperties())
+                    {
+                        var propExpediente = typeof(Expediente).GetProperty(propDto.Name);
+
+                        if (propExpediente != null && propExpediente.CanWrite)
+                        {
+                            var value = propDto.GetValue(expediente);
+
+                            try
+                            {
+                                // 🔥 Conversión de tipos si es necesario
+                                if (propExpediente.PropertyType == typeof(string) && value is DateTime dateTimeValue)
+                                {
+                                    propExpediente.SetValue(dbExpediente, dateTimeValue.ToString("dd-MM-yyyy"));
+                                }
+                                else if (propExpediente.PropertyType == typeof(DateTime) && value is string stringValue)
+                                {
+                                    if (DateTime.TryParse(stringValue, out DateTime parsedDate))
+                                    {
+                                        propExpediente.SetValue(dbExpediente, parsedDate);
+                                    }
+                                }
+                                else if (propExpediente.PropertyType == propDto.PropertyType)
+                                {
+                                    propExpediente.SetValue(dbExpediente, value);
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"⚠️ No se pudo asignar {propDto.Name} ({propDto.PropertyType} → {propExpediente.PropertyType})");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"❌ Error al asignar {propDto.Name}: {ex.Message}");
+                            }
+                        }
+                    }
+
+                        _context.Expedientes.Update(dbExpediente);
                     await _context.SaveChangesAsync();
 
                     responseApi.Exito = true;
@@ -221,8 +269,39 @@ namespace SolicitudesAPI.Controllers
             }
 
             // Etapa Inicial
-            expedienteExistente.Id = expediente.Id;
-            expedienteExistente.Folio = expediente.Folio;
+            expedienteExistente.MesAdmision = expediente.MesAdmision;
+            expedienteExistente.TipoSolicitud = expediente.TipoSolicitud;
+            expedienteExistente.TipoDerecho = expediente.TipoDerecho;
+            expedienteExistente.FechaInicio = expediente.FechaInicio;
+            expedienteExistente.FechaLimiteRespuesta10dias = expediente.FechaLimiteRespuesta10dias;
+            expedienteExistente.Ampliacion = expediente.Ampliacion;
+            expedienteExistente.FechaLimiteRespuesta20dias = expediente.FechaLimiteRespuesta20dias;
+            expedienteExistente.Estado = expediente.Estado;
+            expedienteExistente.FechaRespuesta = expediente.FechaRespuesta;
+            expedienteExistente.PromedioDiasRespuesta = expediente.PromedioDiasRespuesta;
+            expedienteExistente.Prevencion = expediente.Prevencion;
+            expedienteExistente.SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite;
+            expedienteExistente.FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias;
+            expedienteExistente.PreferenciaParaRecibirRespuesta = expediente.PreferenciaParaRecibirRespuesta;
+            expedienteExistente.NombreSolicitante = expediente.NombreSolicitante;
+            expedienteExistente.CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante;
+            expedienteExistente.ContenidoSolicitud = expediente.ContenidoSolicitud;
+
+            // Etapa de Seguimiento
+            expedienteExistente.AreaPoseedoraInformacion = expediente.AreaPoseedoraInformacion;
+
+            // Etapa Final
+            expedienteExistente.Materia = expediente.Materia;
+            expedienteExistente.CiudadSolicitante = expediente.CiudadSolicitante;
+            expedienteExistente.Tematica = expediente.Tematica;
+            expedienteExistente.TematicaEspecifica = expediente.TematicaEspecifica;
+            expedienteExistente.SentidoRespuesta = expediente.SentidoRespuesta;
+            expedienteExistente.PrecisionSentidoRespuesta = expediente.PrecisionSentidoRespuesta;
+            expedienteExistente.ModalidadEntrega = expediente.ModalidadEntrega;
+            expedienteExistente.Cobro = expediente.Cobro;
+            expedienteExistente.RecursoRevision = expediente.RecursoRevision;
+            expedienteExistente.DatosRecursoRevision = expediente.DatosRecursoRevision;
+            expedienteExistente.Nota = expediente.Nota;
 
             try
             {

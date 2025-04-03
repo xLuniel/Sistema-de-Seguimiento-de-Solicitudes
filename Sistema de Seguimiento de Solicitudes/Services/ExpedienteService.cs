@@ -45,7 +45,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 
             if (response!.Exito)
             {
-                return response.Data!;
+                return response.Data;
             }
             else
                 throw new Exception(response.Mensaje);
