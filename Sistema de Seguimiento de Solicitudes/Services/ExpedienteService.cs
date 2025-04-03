@@ -77,10 +77,19 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception(response.Mensaje);
         }
 
-        public async Task<ResponseAPI<ExpedienteDTO>> Actualizar(ExpedienteDTO expediente)
+        public async Task<ResponseAPI<int>> Actualizar(ExpedienteDTO expediente)
         {
             var result = await _http.PutAsJsonAsync($"api/Expedientes/Actualizar/{expediente.Id}", expediente);
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<ExpedienteDTO>>();
+
+            // Verificar si la respuesta es exitosa
+            if (!result.IsSuccessStatusCode)
+            {
+                var error = await result.Content.ReadAsStringAsync();
+                throw new Exception($"Error en la API: {error}");
+            }
+
+            // Deserializar correctamente la respuesta
+            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
             if (response!.Exito)
             {

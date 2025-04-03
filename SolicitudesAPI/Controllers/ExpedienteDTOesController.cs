@@ -21,7 +21,8 @@ namespace SolicitudesAPI.Controllers
         }
         public string? RecibidaRegistradaPNT { get; set; }
 
-        // GET: api/Expedientes/Lista
+        // Fixing the syntax errors and context issues in the Lista method
+
         [HttpGet("Lista")]
         public async Task<ActionResult> Lista()
         {
@@ -34,12 +35,42 @@ namespace SolicitudesAPI.Controllers
                 {
                     listaExpedienteDTO.Add(new ExpedienteDTO
                     {
+                        // Etapa inicial
                         Id = expediente.Id,
                         Folio = expediente.Folio,
                         NombreSolicitante = expediente.NombreSolicitante,
                         FechaInicio = expediente.FechaInicio ?? default(DateTime), // Manejar valores NULL
                         Estado = expediente.Estado,
-                        ContenidoSolicitud = expediente.ContenidoSolicitud
+                        ContenidoSolicitud = expediente.ContenidoSolicitud,
+                        MesAdmision = expediente.MesAdmision,
+                        TipoSolicitud = expediente.TipoSolicitud,
+                        TipoDerecho = expediente.TipoDerecho,
+                        FechaLimiteRespuesta10dias = expediente.FechaLimiteRespuesta10dias,
+                        Ampliacion = expediente.Ampliacion,
+                        FechaLimiteRespuesta20dias = expediente.FechaLimiteRespuesta20dias,
+                        FechaRespuesta = expediente.FechaRespuesta,
+                        PromedioDiasRespuesta = expediente.PromedioDiasRespuesta,
+                        Prevencion = expediente.Prevencion,
+                        SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite,
+                        FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias,
+                        PreferenciaParaRecibirRespuesta = expediente.PreferenciaParaRecibirRespuesta,
+                        CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante,
+
+                        // Etapa de seguimiento
+                        AreaPoseedoraInformacion = expediente.AreaPoseedoraInformacion,
+
+                        // Etapa Final
+                        Materia = expediente.Materia,
+                        CiudadSolicitante = expediente.CiudadSolicitante,
+                        Tematica = expediente.Tematica,
+                        TematicaEspecifica = expediente.TematicaEspecifica,
+                        SentidoRespuesta = expediente.SentidoRespuesta,
+                        PrecisionSentidoRespuesta = expediente.PrecisionSentidoRespuesta,
+                        ModalidadEntrega = expediente.ModalidadEntrega,
+                        Cobro = expediente.Cobro,
+                        RecursoRevision = expediente.RecursoRevision,
+                        DatosRecursoRevision = expediente.DatosRecursoRevision,
+                        Nota = expediente.Nota
                     });
                 }
 
@@ -55,7 +86,8 @@ namespace SolicitudesAPI.Controllers
             return Ok(responseApi);
         }
 
-        // GET: api/Expedientes/single/5
+        // Fixing the syntax errors and context issues in the Buscar method
+
         [HttpGet("Buscar/{id}")]
         public async Task<ActionResult> Buscar(int id)
         {
@@ -70,12 +102,42 @@ namespace SolicitudesAPI.Controllers
                 {
                     ExpedienteDTO = new ExpedienteDTO
                     {
+                        // Etapa inicial
                         Id = dbExpediente.Id,
                         Folio = dbExpediente.Folio,
                         NombreSolicitante = dbExpediente.NombreSolicitante,
                         FechaInicio = dbExpediente.FechaInicio ?? default(DateTime), // Manejar valores NULL
                         Estado = dbExpediente.Estado,
-                        ContenidoSolicitud = dbExpediente.ContenidoSolicitud
+                        ContenidoSolicitud = dbExpediente.ContenidoSolicitud,
+                        MesAdmision = dbExpediente.MesAdmision,
+                        TipoSolicitud = dbExpediente.TipoSolicitud,
+                        TipoDerecho = dbExpediente.TipoDerecho,
+                        FechaLimiteRespuesta10dias = dbExpediente.FechaLimiteRespuesta10dias,
+                        Ampliacion = dbExpediente.Ampliacion,
+                        FechaLimiteRespuesta20dias = dbExpediente.FechaLimiteRespuesta20dias,
+                        FechaRespuesta = dbExpediente.FechaRespuesta,
+                        PromedioDiasRespuesta = dbExpediente.PromedioDiasRespuesta,
+                        Prevencion = dbExpediente.Prevencion,
+                        SubsanaPrevencionReinicoTramite = dbExpediente.SubsanaPrevencionReinicoTramite,
+                        FechaLimitePrevencion10dias = dbExpediente.FechaLimitePrevencion10dias,
+                        PreferenciaParaRecibirRespuesta = dbExpediente.PreferenciaParaRecibirRespuesta,
+                        CorreoElectronicoSolicitante = dbExpediente.CorreoElectronicoSolicitante,
+
+                        // Etapa de seguimiento
+                        AreaPoseedoraInformacion = dbExpediente.AreaPoseedoraInformacion,
+
+                        // Etapa Final
+                        Materia = dbExpediente.Materia,
+                        CiudadSolicitante = dbExpediente.CiudadSolicitante,
+                        Tematica = dbExpediente.Tematica,
+                        TematicaEspecifica = dbExpediente.TematicaEspecifica,
+                        SentidoRespuesta = dbExpediente.SentidoRespuesta,
+                        PrecisionSentidoRespuesta = dbExpediente.PrecisionSentidoRespuesta,
+                        ModalidadEntrega = dbExpediente.ModalidadEntrega,
+                        Cobro = dbExpediente.Cobro,
+                        RecursoRevision = dbExpediente.RecursoRevision,
+                        DatosRecursoRevision = dbExpediente.DatosRecursoRevision,
+                        Nota = dbExpediente.Nota
                     };
 
                     responseApi.Exito = true;
@@ -306,7 +368,7 @@ namespace SolicitudesAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok("Expediente actualizado correctamente");
+                return Ok(new ResponseAPI<int> { Exito = true, Data = expedienteExistente.Id });
             }
             catch (Exception ex)
             {
