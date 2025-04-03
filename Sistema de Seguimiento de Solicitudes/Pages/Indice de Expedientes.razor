@@ -156,6 +156,7 @@
             .Where(e => (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
                         (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
                         (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                        (e.ContenidoSolicitud != null && e.ContenidoSolicitud.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) || // Búsqueda por contenido
                         e.Id.ToString().Contains(Filtro) ||
                         (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
                         (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro))
@@ -163,7 +164,6 @@
 
         StateHasChanged();
     }
-
 
     private void VerDetalle(int id)
     {

@@ -391,11 +391,11 @@
                     Ampliacion = expedienteDTO.Ampliacion ?? string.Empty,
                     FechaLimiteRespuesta20 = expedienteDTO.FechaLimiteRespuesta20dias,
                     Estatus = expedienteDTO.Estado ?? string.Empty,
-                    FechaRespuesta = expedienteDTO.FechaRespuesta,
+                    FechaRespuesta = expedienteDTO.FechaRespuesta ?? default(DateTime),
                     PromedioDiasRespuesta = expedienteDTO.PromedioDiasRespuesta,
                     Prevencion = expedienteDTO.Prevencion,
                     SubsanaPrevencion = expedienteDTO.SubsanaPrevencionReinicoTramite ?? string.Empty,
-                    FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias,
+                    FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias ?? default(DateTime),
                     ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante ?? string.Empty,
                     Nombre = expedienteDTO.NombreSolicitante ?? string.Empty,
                     CorreoElectronico = expedienteDTO.CorreoElectronicoSolicitante ?? string.Empty,
@@ -498,11 +498,13 @@
             }
         }
 
-		if (Expediente.Prevencion == true)
-		{
+        if (Expediente.Prevencion)
+        {
             Expediente.FechaLimitePrevencion = CalcularFechaLimitePrevencion();
-		}
+        }
     }
+
+
 
     // Propiedad para llamar la funcion para la actualizacion de fecha limite
     private string _TipoSolicitudBind
