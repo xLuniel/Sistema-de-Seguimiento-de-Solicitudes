@@ -8,6 +8,7 @@
 @using MudBlazor
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json 
+@using Sistema_de_Seguimiento_de_Solicitudes.Models
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -138,13 +139,15 @@
 
     private ExpedienteDTO NuevoExpediente { get; set; } = new();
 
+    //private Expediente Expediente { get; set; } = new Expediente();
+
     protected override async Task OnInitializedAsync()
     {
 
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
 
         NuevoExpediente.FechaInicio = DateTime.Now;
-        
+
         ClasificarSolicitudes();
     }
 
@@ -175,8 +178,25 @@
                 {
                     int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite);
 
+                    int tiempoTranscurrido = CalcularDiasHabiles(expediente.FechaInicioTramite);
+
+                    DateTime? fechaLimite;
+
+					if (expediente.TipoSolicitud == "DAI")
+					{
+						fechaLimite = NuevoExpediente.FechaLimiteRespuesta10dias;
+					}
+					else if (expediente.TipoSolicitud == "ARCO")
+					{
+						fechaLimite = NuevoExpediente.FechaLimiteRespuesta20dias;
+					}
+					else
+					{
+						fechaLimite = DateTime.MinValue; // Valor por defecto si no coincide con ningún tipo
+					}
+
                     // Si está vencida, se añade a la tarjeta gris
-                    if (tiempoRestante < 0)
+                    if (DateTime.Now > fechaLimite)
                     {
                         solicitudesGrises.Add(expediente);
                     }
@@ -186,12 +206,12 @@
                         solicitudesRojas.Add(expediente);
                     }
                     // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
-                    if (tiempoRestante >= 10 && tiempoRestante < 20)
+                    if (tiempoTranscurrido >= 5 )
                     {
                         solicitudesAmarillas.Add(expediente);
                     }
                     // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
-                    if (tiempoRestante >= 20 && tiempoRestante < 30)
+                    if (tiempoTranscurrido < 5)
                     {
                         solicitudesVerdes.Add(expediente);
                     }
@@ -200,6 +220,39 @@
         }
     }
 
+  //   private int GetTiempoRestante()
+  //   {
+  //       if(NuevoExpediente.TipoSolicitud == "DAI")
+  //       {
+  //           DateTime? FechaLimite = NuevoExpediente.FechaLimiteRespuesta10dias;
+		// 	if (FechaLimite.HasValue)
+		// 	{
+		// 		return (FechaLimite.Value - DateTime.Now).Days;
+		// 	}
+		// }
+		// else if (NuevoExpediente.TipoSolicitud == "ARCO" )
+		// {
+		// 	DateTime? FechaLimite = NuevoExpediente.FechaLimiteRespuesta20dias;
+  //       }
+  //   }
+
+    private int CalcularDiasHabiles(DateTime fechaInicio)
+    {
+        int diasHabiles = 0;
+        //DateTime fechaInicio = NuevoExpediente.FechaInicio; // Fecha de inicio
+
+		DateTime fechaActual = DateTime.Now; // Fecha actual
+
+        for (DateTime fecha = fechaInicio; fecha <= fechaActual; fecha = fecha.AddDays(1))
+        {
+            if (fecha.DayOfWeek != DayOfWeek.Saturday && fecha.DayOfWeek != DayOfWeek.Sunday)
+            {
+                diasHabiles++;
+            }
+        }
+
+        return diasHabiles;
+    }
 
 
     private int GetTiempoRestante(DateTime? fechaInicio)
@@ -243,14 +296,14 @@
 
 
        // Clase para expediente
-    private class Expediente
-    {
-        public int Id { get; set; }
-        public string Folio { get; set; } = string.Empty;
-        public string Nombre { get; set; } = string.Empty;
-        public DateTime FechaInicioTramite { get; set; }
-        public string Estatus { get; set; } = string.Empty;
-    }
+    // private class Expediente
+    // {
+    //     public int Id { get; set; }
+    //     public string Folio { get; set; } = string.Empty;
+    //     public string Nombre { get; set; } = string.Empty;
+    //     public DateTime FechaInicioTramite { get; set; }
+    //     public string Estatus { get; set; } = string.Empty;
+    // }
 
 
 }
