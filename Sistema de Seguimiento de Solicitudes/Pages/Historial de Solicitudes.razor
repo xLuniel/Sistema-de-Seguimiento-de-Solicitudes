@@ -1,0 +1,83 @@
+﻿@page "/historial-solicitudes"
+
+@inject IExpedienteService ExpedienteService
+@inject NavigationManager Navigation
+
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using SolicitudesShared
+
+<div class="historial-container">
+    <h3>📁 Historial de Solicitudes</h3>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>DETALLES</th>
+                    <th>ID</th>
+                    <th>FOLIO</th>
+                    <th>NOMBRE</th>
+                    <th>FECHA DE INICIO</th>
+                    <th>ESTADO</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (SolicitudesHistorial != null && SolicitudesHistorial.Any())
+                {
+                    @foreach (var solicitud in SolicitudesHistorial)
+                    {
+                        <tr>
+                            <td>
+                                <button class="btn-detalles" @onclick="() => VerDetalle(solicitud.Id, solicitud.Folio)"> 🔍 Ver Detalles </button>
+                            </td>
+                            <td>@solicitud.Id</td>
+                            <td>@solicitud.Folio</td>
+                            <td>@solicitud.NombreSolicitante</td>
+                            <td>@solicitud.FechaInicio.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge @GetEstadoClass(solicitud.Estado)">
+                                    @solicitud.Estado
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No hay solicitudes terminadas, desechadas o canceladas.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<ExpedienteDTO> SolicitudesHistorial = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var todas = await ExpedienteService.Lista();
+        SolicitudesHistorial = todas
+            .Where(e => e.Estado == "TERMINADA" || e.Estado == "DESECHADA" || e.Estado == "CANCELADA")
+            .OrderByDescending(e => e.FechaInicio)
+            .ToList();
+    }
+
+    private void VerDetalle(int id, string folio)
+    {
+        Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{folio}");
+    }
+
+    private string GetEstadoClass(string estado)
+    {
+        return estado switch
+        {
+            "TERMINADA" => "badge-success",
+            "DESECHADA" => "badge-danger",
+            "CANCELADA" => "badge-warning",
+            _ => "badge-secondary"
+        };
+    }
+}

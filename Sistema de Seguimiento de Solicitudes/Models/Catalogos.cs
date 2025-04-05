@@ -17,7 +17,8 @@
                        "EN PREVENCIÓN",
                        "EN AMPLIACIÓN",
                        "TERMINADA",
-                       "DESECHADA"
+                       "DESECHADA",
+                       "CANCELADA"
                    };
 
         public static readonly List<string> TiposSolicitud = new()
