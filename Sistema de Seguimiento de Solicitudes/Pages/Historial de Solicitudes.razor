@@ -23,9 +23,6 @@
                 <option value="CANCELADA">⚠️ Cancelada</option>
             </select>
         </div>
-        <div class="col-md-4">
-        <button class="btn btn-success mb-3" @onclick="ExportarExcel">📤 Exportar a Excel</button>
-        </div>
     </div>
 
     <div class="table-responsive">
@@ -94,13 +91,6 @@
             .OrderByDescending(e => e.FechaInicio)
             .ToList();
     }
-
-    private async Task ExportarExcel()
-    {
-        var url = $"api/expedientes/exportar?busqueda={Uri.EscapeDataString(busqueda)}&estado={Uri.EscapeDataString(estadoSeleccionado)}";
-        Navigation.NavigateTo(url, true); // Forzamos descarga
-    }
-
 
     private void VerDetalle(int id, string folio)
     {

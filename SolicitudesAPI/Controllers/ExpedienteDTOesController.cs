@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using ClosedXML.Excel;
 
 namespace SolicitudesAPI.Controllers
 {
@@ -377,52 +376,7 @@ namespace SolicitudesAPI.Controllers
             }
         }
 
-        //https://dotnet.microsoft.com/en-us/download/dotnet/9.0
-        //dotnet add package ClosedXML
-
-        [HttpGet("exportar")]
-        public IActionResult ExportarExcel(string? busqueda, string? estado)
-        {
-            var expedientes = _context.Expedientes
-                .Where(e => e.Estado == "TERMINADA" || e.Estado == "DESECHADA" || e.Estado == "CANCELADA")
-                .ToList();
-
-            // Aplica filtros (igual que en el frontend)
-            var filtrados = expedientes.Where(s =>
-                (string.IsNullOrWhiteSpace(busqueda) ||
-                    (!string.IsNullOrEmpty(s.NombreSolicitante) && s.NombreSolicitante.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
-                    (!string.IsNullOrEmpty(s.Folio) && s.Folio.Contains(busqueda, StringComparison.OrdinalIgnoreCase))) &&
-                (string.IsNullOrWhiteSpace(estado) || s.Estado == estado)
-            ).ToList();
-
-            using var workbook = new ClosedXML.Excel.XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Historial");
-
-            worksheet.Cell(1, 1).Value = "ID";
-            worksheet.Cell(1, 2).Value = "Folio";
-            worksheet.Cell(1, 3).Value = "Nombre";
-            worksheet.Cell(1, 4).Value = "Fecha de Inicio";
-            worksheet.Cell(1, 5).Value = "Estado";
-
-            for (int i = 0; i < filtrados.Count; i++)
-            {
-                var e = filtrados[i];
-                worksheet.Cell(i + 2, 1).Value = e.Id;
-                worksheet.Cell(i + 2, 2).Value = e.Folio;
-                worksheet.Cell(i + 2, 3).Value = e.NombreSolicitante;
-                worksheet.Cell(i + 2, 4).Value = e.FechaInicio?.ToString("dd/MM/yyyy") ?? "N/A";
-                worksheet.Cell(i + 2, 5).Value = e.Estado;
-            }
-
-            using var stream = new MemoryStream();
-            workbook.SaveAs(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-
-            return File(stream.ToArray(),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "HistorialSolicitudes.xlsx");
-        }
-
+        
     }
 }
  
