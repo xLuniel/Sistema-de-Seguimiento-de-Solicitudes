@@ -19,11 +19,12 @@
 <h3>Índice de Expedientes</h3>
 
 <!-- Toca arreglar esta cosa -->
-<input @bind="Filtro" placeholder="Buscar expediente..." />
-<button @onclick="FiltrarExpedientes" class="btn-buscar">Buscar</button>
+<div class="d-flex align-items-center gap-2 mb-3">
+    <input type="text" class="form-control" placeholder="🔍 Buscar por nombre, folio, contenido, fecha, año..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
 
-<!-- Botón para agregar nuevo expediente -->
-<button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> 
+    <!-- Botón para agregar nuevo expediente -->
+    <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nuevo Expediente </button>
+</div>
 
 <!-- Modal de formulario para creación de expediente -->
 @if (MostrarFormularioModal)
@@ -130,9 +131,6 @@
 </div> 
 
 @code {
-    private string Filtro { get; set; } = "";
-    //private List<Expediente> Expedientes { get; set; } = new();
-
     private bool MostrarModal { get; set; } = false;
     private bool MostrarFormularioModal { get; set; } = false;
     private int IdEliminar { get; set; }
@@ -140,10 +138,23 @@
     private bool MostrarMensajeError { get; set; } = false;
     private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
 
+    private string _filtro = string.Empty;
+    private string Filtro
+    {
+        get => _filtro;
+        set
+        {
+            if (_filtro != value)
+            {
+                _filtro = value;
+                FiltrarExpedientes(); // Aquí ejecutamos el filtro
+            }
+        }
+    }
+
     List<ExpedienteDTO>? listaExpedientes = null;
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
-
-     private ExpedienteDTO NuevoExpediente { get; set; } = new();
+    private ExpedienteDTO NuevoExpediente { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,20 +164,27 @@
         NuevoExpediente.FechaInicio = DateTime.Now;
     }
 
+    //Filtro de busqueda
     private void FiltrarExpedientes()
     {
         ExpedientesFiltrados = listaExpedientes!
-            .Where(e => (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        (e.ContenidoSolicitud != null && e.ContenidoSolicitud.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) || // Búsqueda por contenido
-                        e.Id.ToString().Contains(Filtro) ||
-                        (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
-                        (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro))
+            .Where(e =>
+                string.IsNullOrWhiteSpace(Filtro) ||
+                (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.ContenidoSolicitud != null && e.ContenidoSolicitud.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                e.Id.ToString().Contains(Filtro) ||
+                (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
+                (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro) ||
+                (int.TryParse(Filtro, out int anioFechaInicio) && e.FechaInicio.Year == anioFechaInicio) 
+            )
             .ToList();
 
         StateHasChanged();
     }
+
+
 
     private void VerDetalle(int id)
     {

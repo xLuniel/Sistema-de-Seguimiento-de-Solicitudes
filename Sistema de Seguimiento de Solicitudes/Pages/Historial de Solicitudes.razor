@@ -2,12 +2,31 @@
 
 @inject IExpedienteService ExpedienteService
 @inject NavigationManager Navigation
+@inject HttpClient Http
+
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using SolicitudesShared
 
 <div class="historial-container">
     <h3>📁 Historial de Solicitudes</h3>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="🔍 Buscar por nombre o folio..." @bind="busqueda" @bind:event="oninput" />
+        </div>
+        <div class="col-md-4">
+            <select class="form-control" @bind="estadoSeleccionado">
+                <option value="">🗂️ Todos los Estados</option>
+                <option value="TERMINADA">✅ Terminada</option>
+                <option value="DESECHADA">❌ Desechada</option>
+                <option value="CANCELADA">⚠️ Cancelada</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+        <button class="btn btn-success mb-3" @onclick="ExportarExcel">📤 Exportar a Excel</button>
+        </div>
+    </div>
 
     <div class="table-responsive">
         <table class="table">
@@ -22,9 +41,9 @@
                 </tr>
             </thead>
             <tbody>
-                @if (SolicitudesHistorial != null && SolicitudesHistorial.Any())
+                @if (SolicitudesFiltradas != null && SolicitudesFiltradas.Any())
                 {
-                    @foreach (var solicitud in SolicitudesHistorial)
+                    @foreach (var solicitud in SolicitudesFiltradas)
                     {
                         <tr>
                             <td>
@@ -45,7 +64,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center">No hay solicitudes terminadas, desechadas o canceladas.</td>
+                        <td colspan="6" class="text-center">No hay resultados para tu búsqueda.</td>
                     </tr>
                 }
             </tbody>
@@ -55,6 +74,17 @@
 
 @code {
     private List<ExpedienteDTO> SolicitudesHistorial = new();
+    private string busqueda = string.Empty;
+    private string estadoSeleccionado = string.Empty;
+
+    private IEnumerable<ExpedienteDTO> SolicitudesFiltradas =>
+        SolicitudesHistorial.Where(s =>
+            (string.IsNullOrWhiteSpace(busqueda) ||
+                (!string.IsNullOrEmpty(s.NombreSolicitante) && s.NombreSolicitante.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrEmpty(s.Folio) && s.Folio.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
+            &&
+            (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado == estadoSeleccionado)
+        );
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +94,13 @@
             .OrderByDescending(e => e.FechaInicio)
             .ToList();
     }
+
+    private async Task ExportarExcel()
+    {
+        var url = $"api/expedientes/exportar?busqueda={Uri.EscapeDataString(busqueda)}&estado={Uri.EscapeDataString(estadoSeleccionado)}";
+        Navigation.NavigateTo(url, true); // Forzamos descarga
+    }
+
 
     private void VerDetalle(int id, string folio)
     {
