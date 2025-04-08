@@ -19,11 +19,12 @@
 <h3>Índice de Expedientes</h3>
 
 <!-- Toca arreglar esta cosa -->
-<input @bind="Filtro" placeholder="Buscar expediente..." />
-<button @onclick="FiltrarExpedientes" class="btn-buscar">Buscar</button>
+<div class="d-flex align-items-center gap-2 mb-3">
+    <input type="text" class="form-control" placeholder="🔍 Buscar por nombre, folio, contenido, fecha, año..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
 
-<!-- Botón para agregar nuevo expediente -->
-<button class="btn-agregar" @onclick="MostrarFormulario">Agregar Expediente</button> 
+    <!-- Botón para agregar nuevo expediente -->
+    <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nuevo Expediente </button>
+</div>
 
 <!-- Modal de formulario para creación de expediente -->
 @if (MostrarFormularioModal)
@@ -36,6 +37,9 @@
                 <ValidationSummary />
 
                 <div>
+                    <label for="NumeroFolio">Folio: </label>
+                    <InputText id="Folio" @bind-Value="NuevoExpediente.Folio" maxlength="20" />
+                    
                     <label for="Nombre">Nombre: </label>
                     <InputText id="Nombre" @bind-Value="NuevoExpediente.NombreSolicitante" />
 
@@ -127,9 +131,6 @@
 </div> 
 
 @code {
-    private string Filtro { get; set; } = "";
-    //private List<Expediente> Expedientes { get; set; } = new();
-
     private bool MostrarModal { get; set; } = false;
     private bool MostrarFormularioModal { get; set; } = false;
     private int IdEliminar { get; set; }
@@ -137,10 +138,23 @@
     private bool MostrarMensajeError { get; set; } = false;
     private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
 
+    private string _filtro = string.Empty;
+    private string Filtro
+    {
+        get => _filtro;
+        set
+        {
+            if (_filtro != value)
+            {
+                _filtro = value;
+                FiltrarExpedientes(); // Aquí ejecutamos el filtro
+            }
+        }
+    }
+
     List<ExpedienteDTO>? listaExpedientes = null;
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
-
-     private ExpedienteDTO NuevoExpediente { get; set; } = new();
+    private ExpedienteDTO NuevoExpediente { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -150,19 +164,26 @@
         NuevoExpediente.FechaInicio = DateTime.Now;
     }
 
+    //Filtro de busqueda
     private void FiltrarExpedientes()
     {
         ExpedientesFiltrados = listaExpedientes!
-            .Where(e => (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                        e.Id.ToString().Contains(Filtro) ||
-                        (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
-                        (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro))
+            .Where(e =>
+                string.IsNullOrWhiteSpace(Filtro) ||
+                (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.ContenidoSolicitud != null && e.ContenidoSolicitud.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                e.Id.ToString().Contains(Filtro) ||
+                (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
+                (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro) ||
+                (int.TryParse(Filtro, out int anioFechaInicio) && e.FechaInicio.Year == anioFechaInicio) 
+            )
             .ToList();
 
         StateHasChanged();
     }
+
 
 
     private void VerDetalle(int id)
@@ -192,9 +213,6 @@
 
     private async Task GuardarExpediente()
     {
-        // Generar un nuevo Folio único antes de asignarlo al expediente
-        NuevoExpediente.Folio = await GenerarFolioUnico();
-
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
             await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
@@ -245,29 +263,6 @@
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';");
     }
 
-    private async Task<string> GenerarFolioUnico()
-    {
-        DateTime hoy = DateTime.Now;
-        string prefijo = $"200584{hoy:yy}"; // Prefijo + últimos 2 dígitos del año (Ej: 20058424)
-
-        // Obtener los folios registrados este año con el mismo prefijo
-        var foliosEsteAnio = listaExpedientes!
-            .Where(e => e.Folio.StartsWith(prefijo))
-            .Select(e => e.Folio)
-            .ToList();
-
-        // Obtener el último número usado en el año
-        int ultimoNumero = foliosEsteAnio
-            .Select(folio => int.Parse(folio.Substring(8))) // Tomar los últimos 6 dígitos
-            .DefaultIfEmpty(0) // Si no hay folios aún, empezar desde 0
-            .Max();
-
-        // Generar el siguiente número con 6 dígitos
-        int nuevoNumero = ultimoNumero + 1;
-        string folioFinal = $"{prefijo}{nuevoNumero:D6}";
-
-        return folioFinal;
-    }
 }
 
 @if (MostrarMensajeError)
@@ -276,4 +271,3 @@
              @MensajeError
          </div>
      }
-

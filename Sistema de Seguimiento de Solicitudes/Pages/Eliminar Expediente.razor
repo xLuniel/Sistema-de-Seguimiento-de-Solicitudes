@@ -24,26 +24,26 @@
 			<th>ELIMINAR</th>
 		</tr>	
 	</thead>
-	<tbody>
-	@if (listaExpedientes != null)
-		{
-			foreach (var expediente in listaExpedientes)
-			{
-				<tr>
-					<td>@expediente.Id</td>
-					<td>@expediente.Folio</td>
-					<td>@expediente.NombreSolicitante</td>
-					<td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td> 
-					<td>@expediente.Estado</td>
-					<td>
-						<button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
-							<i class="bi bi-trash">Eliminar</i>
-						</button>
-					</td>
-				</tr>
-			}
-		}
-		</tbody>
+    <tbody>
+        @if (listaExpedientes != null)
+        {
+            foreach (var expediente in listaExpedientes.OrderByDescending(e => e.Id))
+            {
+                <tr>
+                    <td>@expediente.Id</td>
+                    <td>@expediente.Folio</td>
+                    <td>@expediente.NombreSolicitante</td>
+                    <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                    <td>@expediente.Estado</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
+                            <i class="bi bi-trash">Eliminar</i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
 </table>
 
 @code {
