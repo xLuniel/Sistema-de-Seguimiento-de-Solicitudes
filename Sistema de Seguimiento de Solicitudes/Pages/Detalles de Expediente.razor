@@ -290,7 +290,15 @@
                             </tr>
                             <tr>
                                 <th>Modalidad de Entrega</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.ModalidadEntrega" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.ModalidadEntrega">
+                                        @foreach (var modalidadEntrega in Catalogos.ModalidadEntrega)
+                                        {
+                                            <option value="@modalidadEntrega">@modalidadEntrega</option>
+                                        }
+                                    </InputSelect>
+                                
+                                </td>
                             </tr>
                         </tbody>
                     </table>
