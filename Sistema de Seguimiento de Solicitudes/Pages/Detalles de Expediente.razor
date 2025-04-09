@@ -512,7 +512,7 @@
 
     private void ActualizarFechaLimite()
     {
-        if (Expediente.FechaInicioTramite != null && !string.IsNullOrEmpty(Expediente.TipoSolicitud))
+        if (!string.IsNullOrEmpty(Expediente.TipoSolicitud))
         {
             if (Expediente.TipoSolicitud == "ARCO")
             {

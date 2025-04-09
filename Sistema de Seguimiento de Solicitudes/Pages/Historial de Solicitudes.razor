@@ -44,14 +44,14 @@
                     {
                         <tr>
                             <td>
-                                <button class="btn-detalles" @onclick="() => VerDetalle(solicitud.Id, solicitud.Folio)"> 🔍 Ver Detalles </button>
+                                <button class="btn-detalles" @onclick="() => VerDetalle(solicitud.Id, solicitud.Folio ?? string.Empty)"> 🔍 Ver Detalles </button>
                             </td>
                             <td>@solicitud.Id</td>
                             <td>@solicitud.Folio</td>
                             <td>@solicitud.NombreSolicitante</td>
                             <td>@solicitud.FechaInicio.ToString("dd/MM/yyyy")</td>
                             <td>
-                                <span class="badge @GetEstadoClass(solicitud.Estado)">
+                                <span class="badge @GetEstadoClass(solicitud.Estado ?? string.Empty)">
                                     @solicitud.Estado
                                 </span>
                             </td>
