@@ -48,6 +48,7 @@
                                 <th>Mes de Admisión</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision">
+                                        <option disabled selected value="">-- Seleccione el mes de admisión --</option>
                                         @foreach (var mes in Catalogos.MesesAdmision)
                                         {
                                             <option value="@mes">@mes</option>
@@ -59,6 +60,7 @@
                                 <th>Tipo de Solicitud</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="_TipoSolicitudBind">
+                                        <option disabled selected value="">-- Seleccione el tipo de solicitud --</option>
                                         @foreach (var tipoSolicitud in Catalogos.TiposSolicitud)
                                         {
                                             <option value="@tipoSolicitud">@tipoSolicitud</option>
@@ -73,14 +75,20 @@
                                     disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
                                         @if (Expediente.TipoSolicitud == "ARCO")
                                         {
+
+
                                             @foreach (var derechoArco in Catalogos.SolicitudARCO)
                                             {
+                                                @* Expediente.TipoDerecho = derechoArco; *@
+
                                                 <option value="@derechoArco">@derechoArco</option>
                                             }
                                         }
                                         else if (Expediente.TipoSolicitud == "DAI")
                                         {
                                             var derecho = "N/A";
+
+                                            Expediente.TipoDerecho = derecho;
 
                                             <option value="@derecho">@derecho</option>
                                         }
@@ -99,6 +107,7 @@
                                 <th>Ampliación</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="_AmpliacionBind">
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var ampliacion in Catalogos.Ampliacion)
                                         {
                                             <option value="@ampliacion">@ampliacion</option>
@@ -122,6 +131,7 @@
                                 <th>Estatus</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Estatus">
+                                        <option disabled selected value="">-- Seleccione un estado --</option>
                                         @foreach (var estatus in Catalogos.Estatuses)
                                         {
                                             <option value="@estatus">@estatus</option>
@@ -153,6 +163,7 @@
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion"
                                     disabled="@(!Expediente.Prevencion)">
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
                                         {
@@ -209,6 +220,7 @@
                                 <th>Área que Posee la Información</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion">
+                                        <option disabled selected value="">-- Seleccione el área --</option>
                                         @foreach (var area in Catalogos.AreaPoseedoraInformacion)
                                         {
                                             <option value="@area">@area</option>
@@ -231,6 +243,7 @@
                                 <th>Materia</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Materia">
+                                        <option disabled selected value="">-- Seleccione la materia --</option>
                                         @foreach (var materia in Catalogos.Materia)
                                         {
                                             <option value="@materia">@materia</option>
@@ -242,6 +255,7 @@
                                 <th>Ciudad</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Ciudad">
+                                        <option disabled selected value="">-- Seleccione la ciudad --</option>
                                         @foreach (var ciudad in Catalogos.Ciudades)
                                         {
                                             <option value="@ciudad">@ciudad</option>
@@ -253,6 +267,7 @@
                                 <th>Temática</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-value="TematicaBind">
+                                        <option disabled selected value="">-- Seleccione una temática --</option>
                                         @foreach (var tematica in Catalogos.Tematica)
                                         {
                                             <option value="@tematica">@tematica</option>
@@ -265,7 +280,7 @@
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TematicaEspecifica"
                                     disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
-                                        @* <option value="">-- Seleccione una temática específica --</option> *@
+                                        <option disabled selected value="">-- Seleccione una temática específica --</option> 
                                         @foreach (var tematicaEspecifica in TematicasEspecificasActuales)
                                         {
                                             <option value="@tematicaEspecifica">@tematicaEspecifica</option>
@@ -277,6 +292,7 @@
                                 <th>Sentido de Respuesta</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.SentidoRespuesta">
+                                        <option disabled selected value="">-- Seleccione el sentido de respuesta --</option>
                                         @foreach (var sentidoRespuesta in Catalogos.SentidoRespuesta)
                                         {
                                             <option value="@sentidoRespuesta">@sentidoRespuesta</option>
@@ -292,12 +308,13 @@
                                 <th>Modalidad de Entrega</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.ModalidadEntrega">
+                                        <option disabled selected value="">-- Seleccione la modalidad de entrega --</option>
                                         @foreach (var modalidadEntrega in Catalogos.ModalidadEntrega)
                                         {
                                             <option value="@modalidadEntrega">@modalidadEntrega</option>
                                         }
                                     </InputSelect>
-                                
+
                                 </td>
                             </tr>
                         </tbody>
@@ -311,6 +328,7 @@
                                 <th>Cobro</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.Cobro">
+                                        <option disabled selected value="">-- Seleccione una opción de cobro --</option>
                                         @foreach (var cobro in Catalogos.Cobros)
                                         {
                                             <option value="@cobro">@cobro</option>
@@ -434,6 +452,8 @@
 
 
         Expediente.AnoAdmision = DateTime.Now.Year;
+
+        ActualizarTematicasEspecificas();
     }
 
     // Calculo de fechas limites
@@ -477,17 +497,17 @@
 
         int diasAdicionalesPrevencion = 10;
 
-		while (diasAdicionalesPrevencion > 0)
-		{
-			fechaLimitePrevencion = fechaLimitePrevencion.AddDays(1);
-			// Si el día no es sábado ni domingo, cuenta como hábil
-			if (fechaLimitePrevencion.DayOfWeek != DayOfWeek.Saturday && fechaLimitePrevencion.DayOfWeek != DayOfWeek.Sunday)
-			{
-				diasAdicionalesPrevencion--;
-			}
-		}
+        while (diasAdicionalesPrevencion > 0)
+        {
+            fechaLimitePrevencion = fechaLimitePrevencion.AddDays(1);
+            // Si el día no es sábado ni domingo, cuenta como hábil
+            if (fechaLimitePrevencion.DayOfWeek != DayOfWeek.Saturday && fechaLimitePrevencion.DayOfWeek != DayOfWeek.Sunday)
+            {
+                diasAdicionalesPrevencion--;
+            }
+        }
 
-		return fechaLimitePrevencion;
+        return fechaLimitePrevencion;
     }
 
     private void ActualizarFechaLimite()
@@ -522,6 +542,8 @@
         {
             Expediente.TipoSolicitud = value;
             ActualizarFechaLimite();
+
+            TipoSolicitudCambio();
         }
     }
 
@@ -543,8 +565,7 @@
             Expediente.Prevencion = value;
             ActualizarFechaLimite();
         }
-	}
-
+    }
 
 
     // Propiedad puente para manejar el cambio de Temática
@@ -560,12 +581,28 @@
             }
         }
     }
+    
+    private void TipoSolicitudCambio()
+    {
+        var nuevaSolicitud = Expediente.TipoSolicitud;
+        //Expediente.TipoSolicitud = nuevaSolicitud;
+
+        // Si se seleccionó ARCO, establecer la primera opción como predeterminada
+        if (nuevaSolicitud == "ARCO" && Catalogos.SolicitudARCO.Any())
+        {
+            Expediente.TipoDerecho = Catalogos.SolicitudARCO.First();
+        }
+        else
+        {
+            Expediente.TipoDerecho = string.Empty;
+        }
+    }
 
     // Actualizar las temáticas específicas disponibles
     private void ActualizarTematicasEspecificas()
     {
 
-        Expediente.TematicaEspecifica = null!; // Limpiamos la selección anterior
+        Expediente.TematicaEspecifica = string.Empty; // Limpiamos la selección anterior
 
         if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica,
             out var tematicas))
@@ -608,6 +645,7 @@
             ["NOTORIA INCOMPETENCIA"] = new List<string> { "NOTORIA INCOMPETENCIA" }
         };
 
+
     private async Task HandleValidSubmit()
     {
         try
@@ -649,6 +687,8 @@
                 };
 
             Console.WriteLine($"Enviando expediente: {JsonSerializer.Serialize(expedienteDTO)}");
+
+            await JSRuntime.InvokeVoidAsync("console.log", Expediente.TematicaEspecifica);
 
 
             // Llamar al servicio para actualizar el expediente

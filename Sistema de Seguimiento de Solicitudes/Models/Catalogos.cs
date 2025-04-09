@@ -6,8 +6,8 @@
 
         public static readonly List<string> MesesAdmision = new()
                    {
-                       "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                       "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+                       "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
                    };
 
         public static readonly List<string> Estatuses = new()
@@ -96,12 +96,12 @@
 
         public static readonly List<string> Ciudades = new()
                    {
-                       "Tijuana", "Mexicali", "Ensenada", "Rosarito", "Tecate"
+                       "TIJUANA", "MEXICALI", "ENSENADA", "ROSARITO", "TECATE"
                    };
 
         public static readonly List<string> Cobros = new()
                    {
-                       "Ninguno", "Si"
+                       "NINGUNO", "SI"
                    };
 
         public static readonly List<string> SentidoRespuesta = new()
