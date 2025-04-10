@@ -69,13 +69,13 @@ namespace SolicitudesShared
         // Fecha límite para subsanar la prevención
         public DateTime? FechaLimitePrevencion10dias { get; set; }
 
-        public string? PreferenciaParaRecibirRespuesta { get; set; }
+       // public string? PreferenciaParaRecibirRespuesta { get; set; }
 
         // Cómo fue recibida o registrada la solicitud en la PNT
-        public string RecibidaRegistrada { get; set; } = string.Empty;
+        public string? RecibidaRegistrada { get; set; }
 
         // Medio de recepción en solicitud manual
-        public string MedioRecepcionSolicitudManual { get; set; } = string.Empty;
+        public string? MedioRecepcionSolicitudManual { get; set; }
 
         // Cómo desea recibir la respuesta la persona solicitante
         public string? ComoDeseaRecibirRespuestaPersonaSolicitante { get; set; }

@@ -23,6 +23,10 @@ public partial class ExpedienteDto
 
     public string? Ampliacion { get; set; }
 
+    public int NumeroSesionComiteAmpliacion { get; set; }
+
+    public DateTime? FechaSesionComiteAmpliacion { get; set; }
+
     public DateTime? FechaLimiteRespuesta20dias { get; set; }
 
     public string? Estado { get; set; }
@@ -35,7 +39,11 @@ public partial class ExpedienteDto
 
     public string? FechaLimitePrevencion10dias { get; set; }
 
-    public string? PreferenciaParaRecibirRespuesta { get; set; }
+    public string? RecibidaRegistrada { get; set; }
+
+    public string? MedioRecepcionSolicitudManual { get; set; } 
+
+    public string? ComoDeseaRecibirRespuestaPersonaSolicitante { get; set; }
 
     public string? CorreoElectronicoSolicitante { get; set; }
 
@@ -60,6 +68,8 @@ public partial class ExpedienteDto
     public string? Cobro { get; set; }
 
     public string? RecursoRevision { get; set; }
+
+    public int NumeroRecursoRevision { get; set; }
 
     public string? DatosRecursoRevision { get; set; }
 

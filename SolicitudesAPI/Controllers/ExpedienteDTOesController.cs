@@ -47,13 +47,18 @@ namespace SolicitudesAPI.Controllers
                         TipoDerecho = expediente.TipoDerecho,
                         FechaLimiteRespuesta10dias = expediente.FechaLimiteRespuesta10dias,
                         Ampliacion = expediente.Ampliacion,
+                        NumeroSesionComiteAmpliacion = expediente.NumeroSesionComiteAmpliacion,
+                        FechaSesionComiteAmpliacion = expediente.FechaSesionComiteAmpliacion,
                         FechaLimiteRespuesta20dias = expediente.FechaLimiteRespuesta20dias,
                         FechaRespuesta = expediente.FechaRespuesta,
                         PromedioDiasRespuesta = expediente.PromedioDiasRespuesta,
+
                         Prevencion = expediente.Prevencion,
                         SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite,
                         FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias,
-                        PreferenciaParaRecibirRespuesta = expediente.PreferenciaParaRecibirRespuesta,
+                        RecibidaRegistrada = expediente.RecibidaRegistrada,
+                        MedioRecepcionSolicitudManual = expediente.RecibidaRegistrada,
+                        ComoDeseaRecibirRespuestaPersonaSolicitante = expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                         CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante,
 
                         // Etapa de seguimiento
@@ -69,6 +74,7 @@ namespace SolicitudesAPI.Controllers
                         ModalidadEntrega = expediente.ModalidadEntrega,
                         Cobro = expediente.Cobro,
                         RecursoRevision = expediente.RecursoRevision,
+                        NumeroRecursoRevision = expediente.NumeroRecursoRevision,
                         DatosRecursoRevision = expediente.DatosRecursoRevision,
                         Nota = expediente.Nota
                     });
@@ -114,13 +120,18 @@ namespace SolicitudesAPI.Controllers
                         TipoDerecho = dbExpediente.TipoDerecho,
                         FechaLimiteRespuesta10dias = dbExpediente.FechaLimiteRespuesta10dias,
                         Ampliacion = dbExpediente.Ampliacion,
+                        NumeroSesionComiteAmpliacion = dbExpediente.NumeroSesionComiteAmpliacion,
+                        FechaSesionComiteAmpliacion = dbExpediente.FechaSesionComiteAmpliacion,
                         FechaLimiteRespuesta20dias = dbExpediente.FechaLimiteRespuesta20dias,
                         FechaRespuesta = dbExpediente.FechaRespuesta,
                         PromedioDiasRespuesta = dbExpediente.PromedioDiasRespuesta,
+
                         Prevencion = dbExpediente.Prevencion,
                         SubsanaPrevencionReinicoTramite = dbExpediente.SubsanaPrevencionReinicoTramite,
                         FechaLimitePrevencion10dias = dbExpediente.FechaLimitePrevencion10dias,
-                        PreferenciaParaRecibirRespuesta = dbExpediente.PreferenciaParaRecibirRespuesta,
+                        RecibidaRegistrada = dbExpediente.RecibidaRegistrada,
+                        MedioRecepcionSolicitudManual = dbExpediente.RecibidaRegistrada,
+                        ComoDeseaRecibirRespuestaPersonaSolicitante = dbExpediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                         CorreoElectronicoSolicitante = dbExpediente.CorreoElectronicoSolicitante,
 
                         // Etapa de seguimiento
@@ -136,6 +147,7 @@ namespace SolicitudesAPI.Controllers
                         ModalidadEntrega = dbExpediente.ModalidadEntrega,
                         Cobro = dbExpediente.Cobro,
                         RecursoRevision = dbExpediente.RecursoRevision,
+                        NumeroRecursoRevision = dbExpediente.NumeroRecursoRevision,
                         DatosRecursoRevision = dbExpediente.DatosRecursoRevision,
                         Nota = dbExpediente.Nota
                     };
@@ -337,14 +349,19 @@ namespace SolicitudesAPI.Controllers
             expedienteExistente.FechaInicio = expediente.FechaInicio;
             expedienteExistente.FechaLimiteRespuesta10dias = expediente.FechaLimiteRespuesta10dias;
             expedienteExistente.Ampliacion = expediente.Ampliacion;
+            expedienteExistente.NumeroSesionComiteAmpliacion = expediente.NumeroSesionComiteAmpliacion;
+            expedienteExistente.FechaSesionComiteAmpliacion = expediente.FechaSesionComiteAmpliacion;
             expedienteExistente.FechaLimiteRespuesta20dias = expediente.FechaLimiteRespuesta20dias;
             expedienteExistente.Estado = expediente.Estado;
             expedienteExistente.FechaRespuesta = expediente.FechaRespuesta;
             expedienteExistente.PromedioDiasRespuesta = expediente.PromedioDiasRespuesta;
+
             expedienteExistente.Prevencion = expediente.Prevencion;
             expedienteExistente.SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite;
             expedienteExistente.FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias;
-            expedienteExistente.PreferenciaParaRecibirRespuesta = expediente.PreferenciaParaRecibirRespuesta;
+            expedienteExistente.RecibidaRegistrada = expediente.RecibidaRegistrada;
+            expedienteExistente.MedioRecepcionSolicitudManual = expediente.RecibidaRegistrada;
+            expedienteExistente.ComoDeseaRecibirRespuestaPersonaSolicitante = expediente.ComoDeseaRecibirRespuestaPersonaSolicitante;
             expedienteExistente.NombreSolicitante = expediente.NombreSolicitante;
             expedienteExistente.CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante;
             expedienteExistente.ContenidoSolicitud = expediente.ContenidoSolicitud;
@@ -362,6 +379,7 @@ namespace SolicitudesAPI.Controllers
             expedienteExistente.ModalidadEntrega = expediente.ModalidadEntrega;
             expedienteExistente.Cobro = expediente.Cobro;
             expedienteExistente.RecursoRevision = expediente.RecursoRevision;
+            expedienteExistente.NumeroRecursoRevision = expediente.NumeroRecursoRevision;
             expedienteExistente.DatosRecursoRevision = expediente.DatosRecursoRevision;
             expedienteExistente.Nota = expediente.Nota;
 

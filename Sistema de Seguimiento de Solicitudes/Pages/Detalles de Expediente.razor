@@ -440,6 +440,8 @@
                     FechaInicioTramite = expedienteDTO.FechaInicio,
                     FechaLimiteRespuesta10 = expedienteDTO.FechaLimiteRespuesta10dias,
                     Ampliacion = expedienteDTO.Ampliacion ?? string.Empty,
+                    NumeroSesionComiteAmpliacion = expedienteDTO.NumeroSesionComiteAmpliacion,
+					FechaSesionComiteAmpliacion = expedienteDTO.FechaSesionComiteAmpliacion ?? default(DateTime),
                     FechaLimiteRespuesta20 = expedienteDTO.FechaLimiteRespuesta20dias,
                     Estatus = expedienteDTO.Estado ?? string.Empty,
                     FechaRespuesta = expedienteDTO.FechaRespuesta ?? default(DateTime),
@@ -447,6 +449,8 @@
                     Prevencion = expedienteDTO.Prevencion,
                     SubsanaPrevencion = expedienteDTO.SubsanaPrevencionReinicoTramite ?? string.Empty,
                     FechaLimitePrevencion = expedienteDTO.FechaLimitePrevencion10dias ?? default(DateTime),
+                    RecibidaRegistrada = expedienteDTO.RecibidaRegistrada ?? string.Empty,
+                    MedioRecepcionSolicitudManual = expedienteDTO.MedioRecepcionSolicitudManual ?? string.Empty,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = expedienteDTO.ComoDeseaRecibirRespuestaPersonaSolicitante ?? string.Empty,
                     Nombre = expedienteDTO.NombreSolicitante ?? string.Empty,
                     CorreoElectronico = expedienteDTO.CorreoElectronicoSolicitante ?? string.Empty,
@@ -465,6 +469,7 @@
                     ModalidadEntrega = expedienteDTO.ModalidadEntrega ?? string.Empty,
                     Cobro = expedienteDTO.Cobro ?? string.Empty,
                     RecursoRevision = expedienteDTO.RecursoRevision ?? string.Empty,
+                    NumeroRecursoRevision = expedienteDTO.NumeroRecursoRevision,
                     DatosRecursoRevision = expedienteDTO.DatosRecursoRevision ?? string.Empty,
                     Nota = expedienteDTO.Nota ?? string.Empty
                 };
@@ -686,18 +691,25 @@
                     FechaInicio = Expediente.FechaInicioTramite,
                     FechaLimiteRespuesta10dias = Expediente.FechaLimiteRespuesta10,
                     Ampliacion = Expediente.Ampliacion,
+                    NumeroSesionComiteAmpliacion = Expediente.NumeroSesionComiteAmpliacion,
+                    FechaSesionComiteAmpliacion = Expediente.FechaSesionComiteAmpliacion,
                     FechaLimiteRespuesta20dias = Expediente.FechaLimiteRespuesta20,
                     Estado = Expediente.Estatus,
                     FechaRespuesta = Expediente.FechaRespuesta,
                     PromedioDiasRespuesta = Expediente.PromedioDiasRespuesta,
+
                     Prevencion = Expediente.Prevencion,
                     SubsanaPrevencionReinicoTramite = Expediente.SubsanaPrevencion,
                     FechaLimitePrevencion10dias = Expediente.FechaLimitePrevencion,
+                    RecibidaRegistrada = Expediente.RecibidaRegistrada,
+                    MedioRecepcionSolicitudManual = Expediente.MedioRecepcionSolicitudManual,
                     ComoDeseaRecibirRespuestaPersonaSolicitante = Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                     NombreSolicitante = Expediente.Nombre,
                     CorreoElectronicoSolicitante = Expediente.CorreoElectronico,
                     ContenidoSolicitud = Expediente.ContenidoSolicitud,
+
                     AreaPoseedoraInformacion = Expediente.AreaInformacion,
+
                     Materia = Expediente.Materia,
                     CiudadSolicitante = Expediente.Ciudad,
                     Tematica = Expediente.Tematica,
@@ -705,8 +717,10 @@
                     SentidoRespuesta = Expediente.SentidoRespuesta,
                     PrecisionSentidoRespuesta = Expediente.PrecisionSentidoRespuesta,
                     ModalidadEntrega = Expediente.ModalidadEntrega,
+
                     Cobro = Expediente.Cobro,
                     RecursoRevision = Expediente.RecursoRevision,
+                    NumeroRecursoRevision = Expediente.NumeroRecursoRevision,
                     DatosRecursoRevision = Expediente.DatosRecursoRevision,
                     Nota = Expediente.Nota
                 };
