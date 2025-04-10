@@ -180,7 +180,8 @@
                             <tr>
                                 <th>Cómo fue Recibida/Registrada en la PNT</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.RecibidaRegistrada">
+                                    <InputSelect class="form-control"
+                                                 @bind-Value="_RecibidaRegistradaBind">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var recibida in Catalogos.ComoFueRecibida)
                                         {
@@ -193,7 +194,7 @@
                                 <th>Medio de Recepción en Solicitud Manual</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual"
-                                                 disabled="@(Expediente.RecibidaRegistrada)">
+                                                 disabled="@(!HabilitarMedioRecepcion)">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var medioRecepcion in Catalogos.MedioRecepcionSolicitudManual)
@@ -596,6 +597,22 @@
             ActualizarFechaLimite();
         }
     }
+
+    private bool HabilitarMedioRecepcion => Expediente.RecibidaRegistrada == "MANUAL";
+
+	private string _RecibidaRegistradaBind
+	{
+		get => Expediente.RecibidaRegistrada;
+		set
+		{
+			Expediente.RecibidaRegistrada = value;
+			
+			if (value != "MANUAL")
+			{
+				Expediente.MedioRecepcionSolicitudManual = string.Empty; // Limpiar el campo si no es "MANUAL"
+			}
+		}
+	}
 
 
     // Propiedad puente para manejar el cambio de Temática
