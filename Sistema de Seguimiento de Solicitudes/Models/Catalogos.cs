@@ -124,8 +124,7 @@
 
         public static readonly List<string> ModalidadEntrega = new()
                    {
-                       "ELECTRÓNICO A TRAVÉS DE PNT", "CORREO ELECTRÓNICO", "MEDIO ELECTRÓNICO DEL SOLICITANTE",
-                       "COPIA SIMPLE", "COPIA CERTIFICADA", "CUALQUIER OTRO MEDIO ELECTRÓNICO"
+                       "DIGITAL", "DIGITAL/CORREO", "COPIA CERTIFICADA", "COPIA SIMPLE"
                    };
 
         public static readonly List<string> RecursoRevision = new()

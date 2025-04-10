@@ -179,16 +179,41 @@
                             </tr>
                             <tr>
                                 <th>Cómo fue Recibida/Registrada en la PNT</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.RecibidaRegistrada" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.RecibidaRegistrada">
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
+                                        @foreach (var recibida in Catalogos.ComoFueRecibida)
+                                        {
+                                            <option value="@recibida">@recibida</option>
+                                        }
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Medio de Recepción en Solicitud Manual</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual" /></td>
+                                <td>
+                                    <InputSelect class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual"
+                                                 disabled="@(Expediente.RecibidaRegistrada)">
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
+
+                                        @foreach (var medioRecepcion in Catalogos.MedioRecepcionSolicitudManual)
+                                        {
+                                            <option value="@medioRecepcion">@medioRecepcion</option>
+                                        }
+
+                                    </InputSelect>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Como desea recibir la respuesta la persona solicitante</th>
                                 <td>
-                                    <InputText class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante" />
+                                    <InputSelect class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante">
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
+                                        @foreach (var opciones in Catalogos.ComoDeseaRecibirRespuesta)
+                                        {
+                                            <option value="@opciones">@opciones</option>
+                                        }
+                                    </InputSelect>
                                 </td>
                             </tr>
                             <tr>
