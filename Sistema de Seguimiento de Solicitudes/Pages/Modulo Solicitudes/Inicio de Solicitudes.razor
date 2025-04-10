@@ -1,4 +1,4 @@
-﻿@page "/home"
+﻿@page "/inicio-solicitudes"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 
@@ -33,9 +33,9 @@
                             @foreach (var solicitud in solicitudesGrises)
                             {
                                 <MudText @onclick="(() => RedirigirADetalles(solicitud.Id))">
-                                    <strong>ID:</strong> @solicitud.Id |
-                                    <strong>Folio:</strong> @solicitud.Folio |
-                                    <strong>Nombre:</strong> @solicitud.Nombre |
+                                    <strong>ID:</strong> @solicitud.Id            |
+                                    <strong>Folio:</strong> @solicitud.Folio      |
+                                    <strong>Nombre:</strong> @solicitud.Nombre    |
                                     <strong>Fecha:</strong> @solicitud.FechaInicioTramite.ToString("dd/MM/yyyy") |
                                     <strong>Tiempo restante:</strong> @(GetTiempoRestante(solicitud.FechaInicioTramite)) días
                                 </MudText>
@@ -51,16 +51,16 @@
             <MudCard Class="card card-red">
                 <MudCardContent @onclick="@(() => ToggleVisibility(2))">
                     <MudText Typo="Typo.h6" Style="text-align: center;"><strong>@solicitudesRojas.Count Solicitudes</strong></MudText>
-                    <MudText Style="text-align: center;">Vigencia: <strong>Menos de 10 días</strong></MudText>
+                    <MudText Style="text-align: center;">Vigencia: <strong>Menos de 2 días</strong></MudText>
                     @if (isVisible[2])
                     {
                         <div class="scroll-container">
                             @foreach (var solicitud in solicitudesRojas)
                             {
                                 <MudText @onclick="(() => RedirigirADetalles(solicitud.Id))">
-                                    <strong>ID:</strong> @solicitud.Id |
-                                    <strong>Folio:</strong> @solicitud.Folio |
-                                    <strong>Nombre:</strong> @solicitud.Nombre |
+                                    <strong>ID:</strong> @solicitud.Id            |
+                                    <strong>Folio:</strong> @solicitud.Folio      |
+                                    <strong>Nombre:</strong> @solicitud.Nombre    |
                                     <strong>Fecha:</strong> @solicitud.FechaInicioTramite.ToString("dd/MM/yyyy") |
                                     <strong>Tiempo restante:</strong> @(GetTiempoRestante(solicitud.FechaInicioTramite)) días
                                 </MudText>
@@ -76,16 +76,16 @@
             <MudCard Class="card card-yellow">
                 <MudCardContent @onclick="@(() => ToggleVisibility(1))">
                     <MudText Typo="Typo.h6" Style="text-align: center;"><strong>@solicitudesAmarillas.Count Solicitudes</strong></MudText>
-                    <MudText Style="text-align: center;">Vigencia: <strong>Entre 10 y 20 días</strong></MudText>
+                    <MudText Style="text-align: center;">Vigencia: <strong>Menos de 5 días</strong></MudText>
                     @if (isVisible[1])
                     {
                         <div class="scroll-container">
                             @foreach (var solicitud in solicitudesAmarillas)
                             {
                                 <MudText @onclick="(() => RedirigirADetalles(solicitud.Id))">
-                                    <strong>ID:</strong> @solicitud.Id |
-                                    <strong>Folio:</strong> @solicitud.Folio |
-                                    <strong>Nombre:</strong> @solicitud.Nombre |
+                                    <strong>ID:</strong> @solicitud.Id            |
+                                    <strong>Folio:</strong> @solicitud.Folio      |
+                                    <strong>Nombre:</strong> @solicitud.Nombre    |
                                     <strong>Fecha:</strong> @solicitud.FechaInicioTramite.ToString("dd/MM/yyyy") |
                                     <strong>Tiempo restante:</strong> @(GetTiempoRestante(solicitud.FechaInicioTramite)) días
                                 </MudText>
@@ -101,16 +101,16 @@
             <MudCard Class="card card-green">
                 <MudCardContent @onclick="@(() => ToggleVisibility(0))">
                     <MudText Typo="Typo.h6" Style="text-align: center;"><strong>@solicitudesVerdes.Count Solicitudes</strong></MudText>
-                    <MudText Style="text-align: center;">Vigencia: <strong>Entre 20 y 30 días</strong></MudText>
+                    <MudText Style="text-align: center;">Vigencia: <strong>Mayor a 6 dias</strong></MudText>
                     @if (isVisible[0])
                     {
                         <div class="scroll-container">
                             @foreach (var solicitud in solicitudesVerdes)
                             {
                                 <MudText @onclick="(() => RedirigirADetalles(solicitud.Id))">
-                                    <strong>ID:</strong> @solicitud.Id |
-                                    <strong>Folio:</strong> @solicitud.Folio |
-                                    <strong>Nombre:</strong> @solicitud.Nombre |
+                                    <strong>ID:</strong> @solicitud.Id            |
+                                    <strong>Folio:</strong> @solicitud.Folio      |
+                                    <strong>Nombre:</strong> @solicitud.Nombre    |
                                     <strong>Fecha:</strong> @solicitud.FechaInicioTramite.ToString("dd/MM/yyyy") |
                                     <strong>Tiempo restante:</strong> @(GetTiempoRestante(solicitud.FechaInicioTramite)) días
                                 </MudText>
@@ -177,9 +177,6 @@
                 if (expediente.FechaInicioTramite != DateTime.MinValue)
                 {
                     int tiempoRestante = GetTiempoRestante(expediente.FechaInicioTramite);
-
-                    int tiempoTranscurrido = CalcularDiasHabiles(expediente.FechaInicioTramite);
-
                     DateTime? fechaLimite;
 
 					if (expediente.TipoSolicitud == "DAI")
@@ -196,22 +193,22 @@
 					}
 
                     // Si está vencida, se añade a la tarjeta gris
-                    if (DateTime.Now > fechaLimite)
+                    if (DateTime.Now < fechaLimite)
                     {
                         solicitudesGrises.Add(expediente);
                     }
-                    // Si tiene menos de 10 días restantes, también puede estar en la tarjeta roja
-                    if (tiempoRestante >= 0 && tiempoRestante < 10)
+                    // Si tiene menos de 2 días restantes (Tarjeta roja)
+                    else if (tiempoRestante < 3)
                     {
                         solicitudesRojas.Add(expediente);
                     }
-                    // Si está entre 10 y 20 días restantes, también puede estar en la tarjeta amarilla
-                    if (tiempoTranscurrido >= 5 )
+                    // Si está entre 3 y 5 días restantes (Tarjeta amarilla)
+                    else if (tiempoRestante < 6)
                     {
                         solicitudesAmarillas.Add(expediente);
                     }
-                    // Si está entre 20 y 30 días restantes, también puede estar en la tarjeta verde
-                    if (tiempoTranscurrido < 5)
+                    // Mayor a 6 dias restantes (Tarjeta verde)
+                    else 
                     {
                         solicitudesVerdes.Add(expediente);
                     }
@@ -219,22 +216,6 @@
             }
         }
     }
-
-  //   private int GetTiempoRestante()
-  //   {
-  //       if(NuevoExpediente.TipoSolicitud == "DAI")
-  //       {
-  //           DateTime? FechaLimite = NuevoExpediente.FechaLimiteRespuesta10dias;
-		// 	if (FechaLimite.HasValue)
-		// 	{
-		// 		return (FechaLimite.Value - DateTime.Now).Days;
-		// 	}
-		// }
-		// else if (NuevoExpediente.TipoSolicitud == "ARCO" )
-		// {
-		// 	DateTime? FechaLimite = NuevoExpediente.FechaLimiteRespuesta20dias;
-  //       }
-  //   }
 
     private int CalcularDiasHabiles(DateTime fechaInicio)
     {
@@ -254,7 +235,6 @@
         return diasHabiles;
     }
 
-
     private int GetTiempoRestante(DateTime? fechaInicio)
     {
         if (fechaInicio.HasValue)
@@ -264,7 +244,6 @@
         }
         return 0; // Devuelve 0 si la fecha es null
     }
-
 
     private void ToggleVisibility(int index)
     {
@@ -290,25 +269,10 @@
             Console.WriteLine("La lista de expedientes es null.");
         }
     }
-
-
-
-
-
-       // Clase para expediente
-    // private class Expediente
-    // {
-    //     public int Id { get; set; }
-    //     public string Folio { get; set; } = string.Empty;
-    //     public string Nombre { get; set; } = string.Empty;
-    //     public DateTime FechaInicioTramite { get; set; }
-    //     public string Estatus { get; set; } = string.Empty;
-    // }
-
-
 }
 
-<style>
+
+<style> /*    No quitar Style, no lo detecta en razor.css    */
     .mud-text {
         text-align: center;
     }
