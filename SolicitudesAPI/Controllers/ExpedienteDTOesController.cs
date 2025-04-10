@@ -57,7 +57,7 @@ namespace SolicitudesAPI.Controllers
                         SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite,
                         FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias,
                         RecibidaRegistrada = expediente.RecibidaRegistrada,
-                        MedioRecepcionSolicitudManual = expediente.RecibidaRegistrada,
+                        MedioRecepcionSolicitudManual = expediente.MedioRecepcionSolicitudManual,
                         ComoDeseaRecibirRespuestaPersonaSolicitante = expediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                         CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante,
 
@@ -130,7 +130,7 @@ namespace SolicitudesAPI.Controllers
                         SubsanaPrevencionReinicoTramite = dbExpediente.SubsanaPrevencionReinicoTramite,
                         FechaLimitePrevencion10dias = dbExpediente.FechaLimitePrevencion10dias,
                         RecibidaRegistrada = dbExpediente.RecibidaRegistrada,
-                        MedioRecepcionSolicitudManual = dbExpediente.RecibidaRegistrada,
+                        MedioRecepcionSolicitudManual = dbExpediente.MedioRecepcionSolicitudManual,
                         ComoDeseaRecibirRespuestaPersonaSolicitante = dbExpediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
                         CorreoElectronicoSolicitante = dbExpediente.CorreoElectronicoSolicitante,
 
@@ -360,7 +360,7 @@ namespace SolicitudesAPI.Controllers
             expedienteExistente.SubsanaPrevencionReinicoTramite = expediente.SubsanaPrevencionReinicoTramite;
             expedienteExistente.FechaLimitePrevencion10dias = expediente.FechaLimitePrevencion10dias;
             expedienteExistente.RecibidaRegistrada = expediente.RecibidaRegistrada;
-            expedienteExistente.MedioRecepcionSolicitudManual = expediente.RecibidaRegistrada;
+            expedienteExistente.MedioRecepcionSolicitudManual = expediente.MedioRecepcionSolicitudManual;
             expedienteExistente.ComoDeseaRecibirRespuestaPersonaSolicitante = expediente.ComoDeseaRecibirRespuestaPersonaSolicitante;
             expedienteExistente.NombreSolicitante = expediente.NombreSolicitante;
             expedienteExistente.CorreoElectronicoSolicitante = expediente.CorreoElectronicoSolicitante;
