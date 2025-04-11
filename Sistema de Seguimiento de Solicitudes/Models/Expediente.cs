@@ -9,7 +9,7 @@
         public int AnoAdmision { get; set; }
 
         // Número de la solicitud
-        public string Folio { get; set; } = string.Empty;
+        public string? Folio { get; set; }
 
         // Mes de admisión
         public string MesAdmision { get; set; } = string.Empty;
@@ -39,7 +39,7 @@
         public DateTime? FechaLimiteRespuesta20 { get; set; }
 
         // Estatus del expediente
-        public string Estatus { get; set; } = string.Empty;
+        public string? Estatus { get; set; }
 
         // Fecha de respuesta de la solicitud
         public DateTime? FechaRespuesta { get; set; }
@@ -66,7 +66,7 @@
         public string ComoDeseaRecibirRespuestaPersonaSolicitante { get; set; } = string.Empty;
 
         // Nombre del peticionario
-        public string Nombre { get; set; } = string.Empty;
+        public string? Nombre { get; set; }
 
         // Correo electrónico del peticionario
         public string CorreoElectronico { get; set; } = string.Empty;

@@ -52,7 +52,8 @@
 
 @code {
     private bool IsLoading = false;
-    private string errorMessage;
+    private string errorMessage = string.Empty;
+
 
     private LoginDTO sessionLogin { get; set; } = new LoginDTO
         {
