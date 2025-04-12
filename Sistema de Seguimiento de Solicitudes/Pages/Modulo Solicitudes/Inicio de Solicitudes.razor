@@ -193,7 +193,7 @@
 					}
 
                     // Si está vencida, se añade a la tarjeta gris
-                    if (DateTime.Now < fechaLimite)
+                    if (tiempoRestante < 0)
                     {
                         solicitudesGrises.Add(expediente);
                     }

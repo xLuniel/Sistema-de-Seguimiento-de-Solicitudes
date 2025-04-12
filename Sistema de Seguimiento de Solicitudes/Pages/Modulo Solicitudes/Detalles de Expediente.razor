@@ -223,7 +223,8 @@
                             </tr>
                             <tr>
                                 <th>Correo Electrónico</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" /></td>
+                                <InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" type="email" />
+                                <ValidationMessage For="@(() => Expediente.CorreoElectronico)" />
                             </tr>
                             <tr>
                                 <th>Contenido de la Solicitud</th>

@@ -1,4 +1,6 @@
-﻿namespace Sistema_de_Seguimiento_de_Solicitudes.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Sistema_de_Seguimiento_de_Solicitudes.Models
 {
     public class Expediente
     {
@@ -68,7 +70,10 @@
         // Nombre del peticionario
         public string? Nombre { get; set; }
 
+
         // Correo electrónico del peticionario
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Debes ingresar un correo electrónico válido.")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
         // Contenido de la solicitud
