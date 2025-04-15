@@ -18,13 +18,74 @@
 
 <h1>Calendario</h1>
 
+<div class="calendario-nav">
+    <button @onclick="() => CambiarMes(-1)" class="nav-btn">← Anterior</button>
+    <span class="month-name">@currentMonth.ToString("MMMM yyyy")</span>
+    <button @onclick="() => CambiarMes(1)" class="nav-btn">Siguiente →</button>
+</div>
+
+<div class="calendario">
+    @foreach (var dayName in new[] { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" })
+    {
+        <div class="dia encabezado">@dayName</div>
+    }
+
+    @for (int i = 0; i < ((int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek == 0 ? 6 : (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 1); i++)
+    {
+        <div class="dia vacio"></div>
+    }
+
+    @foreach (var day in Enumerable.Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month)))
+    {
+        var fecha = new DateTime(currentMonth.Year, currentMonth.Month, day);
+        <div class="@ObtenerClaseDia(fecha)" @onclick="() => AlternarDia(fecha)">
+            @fecha.Day
+
+            @if (fechasImportantes.TryGetValue(fecha, out var info))
+            {
+                <span class="etiqueta @(info.EsNoLaboral ? "no-laboral" : "importante")">@info.Etiqueta</span>
+            }
+
+            @if (etiquetas.ContainsKey(fecha))
+            {
+                <span class="etiqueta-personal" @onclick="() => EditarEtiqueta(fecha)">
+                    @etiquetas[fecha]
+                </span>
+            }
+
+            @if (fechaEditando == fecha)
+            {
+                <input type="text"
+                       @bind="nuevaEtiqueta"
+                       @onblur="() => AsignarEtiqueta(fecha)"
+                       class="input-etiqueta"
+                       placeholder="Nueva etiqueta" />
+            }
+        </div>
+    }
+</div>
+
+<div class="resumen-calendario">
+    <p><strong>Total de días hábiles del mes:</strong> @totalDiasHabiles</p>
+    <p><strong>Días no laborables (festivos):</strong> @diasNoLaborables</p>
+    <p><strong>Días activos:</strong> @diasActivosContados</p>
+    <p><strong>Días desactivados:</strong> @diasDesactivadosManualmente</p>
+</div>
+
+<button @onclick="GuardarCambios" class="guardar-btn">Guardar Cambios</button>
+
+
 @code {
     private DateTime currentMonth = DateTime.Today;
     private HashSet<DateTime> diasActivos = new();
     private Dictionary<DateTime, string> etiquetas = new();
-    private Dictionary<DateTime, string> fechasImportantes = new();
+    private Dictionary<DateTime, (string Etiqueta, bool EsNoLaboral)> fechasImportantes = new();
     private DateTime? fechaEditando = null;
     private string nuevaEtiqueta = "";
+    private int totalDiasHabiles;
+    private int diasActivosContados;
+    private int diasDesactivadosManualmente;
+    private int diasNoLaborables;
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,44 +100,140 @@
                 diasActivos.Add(fecha);
             }
         }
-
         CargarFechasImportantes();
+        CalcularResumen();
     }
 
     private void CargarFechasImportantes()
     {
-        var tercerDomingoJunio = new DateTime(currentMonth.Year, 6, 1);
+        fechasImportantes.Clear();
 
-        while (tercerDomingoJunio.DayOfWeek != DayOfWeek.Sunday)
+        int year = currentMonth.Year;
+
+        // Días fijos y movibles con descanso oficial por ley
+        fechasImportantes[new DateTime(year, 1, 1)] = ("Año Nuevo", true);
+        fechasImportantes[PrimerLunesDeFebrero(year)] = ("Día de la Constitución", true);
+        fechasImportantes[TercerLunesDeMarzo(year)] = ("Natalicio de Benito Juárez", true);
+        fechasImportantes[new DateTime(year, 5, 1)] = ("Día del Trabajo", true);
+        fechasImportantes[new DateTime(year, 9, 16)] = ("Día de la Independencia", true);
+        fechasImportantes[TercerLunesDeNoviembre(year)] = ("Día de la Revolución", true);
+        fechasImportantes[new DateTime(year, 12, 25)] = ("Navidad", true);
+
+        // Semana Santa (jueves y viernes santo)
+        var (juevesSanto, viernesSanto) = CalcularSemanaSanta(year);
+        fechasImportantes[juevesSanto] = ("Jueves Santo", true);
+        fechasImportantes[viernesSanto] = ("Viernes Santo", true);
+
+        // Otros festivos (no son oficiales, pero se pueden mostrar)
+        fechasImportantes[new DateTime(year, 1, 6)] = ("Día de Reyes", false);
+        fechasImportantes[new DateTime(year, 2, 14)] = ("Día de San Valentín", false);
+        fechasImportantes[new DateTime(year, 2, 24)] = ("Día de la Bandera", false);
+        fechasImportantes[new DateTime(year, 5, 5)] = ("Batalla de Puebla", false);
+        fechasImportantes[new DateTime(year, 5, 10)] = ("Día de las Madres", false);
+        fechasImportantes[new DateTime(year, 5, 15)] = ("Día del Maestro", false);
+        fechasImportantes[new DateTime(year, 9, 15)] = ("Grito de Independencia", false);
+        fechasImportantes[new DateTime(year, 10, 12)] = ("Día de la Raza", false);
+        fechasImportantes[new DateTime(year, 11, 1)] = ("Día de Todos los Santos", false);
+        fechasImportantes[new DateTime(year, 11, 2)] = ("Día de los Fieles Difuntos", false);
+        fechasImportantes[new DateTime(year, 12, 12)] = ("Día de la Virgen de Guadalupe", false);
+        fechasImportantes[new DateTime(year, 12, 24)] = ("Nochebuena", false);
+        fechasImportantes[new DateTime(year, 12, 31)] = ("Fin de Año", false);
+
+        // Día del padre (tercer domingo de junio)
+        fechasImportantes[TercerDomingoJunio(year)] = ("Día del Padre", false);
+    }
+
+    private DateTime PrimerLunesDeFebrero(int year)
+    {
+        var date = new DateTime(year, 2, 1);
+        while (date.DayOfWeek != DayOfWeek.Monday)
+            date = date.AddDays(1);
+        return date;
+    }
+
+    private DateTime TercerLunesDeMarzo(int year)
+    {
+        var date = new DateTime(year, 3, 1);
+        int lunesContados = 0;
+        while (lunesContados < 3)
         {
-            tercerDomingoJunio = tercerDomingoJunio.AddDays(1);
+            if (date.DayOfWeek == DayOfWeek.Monday) lunesContados++;
+            if (lunesContados < 3) date = date.AddDays(1);
         }
-        tercerDomingoJunio = tercerDomingoJunio.AddDays(14); // Sumar dos semanas para llegar al tercer domingo
+        return date;
+    }
 
-        fechasImportantes = new Dictionary<DateTime, string>
-            {
-                [new DateTime(currentMonth.Year, 1, 1)] = "Año Nuevo",
-                [new DateTime(currentMonth.Year, 1, 6)] = "Día de Reyes",
-                [new DateTime(currentMonth.Year, 2, 5)] = "Día de la Constitución",
-                [new DateTime(currentMonth.Year, 2, 14)] = "Día de San Valentín",
-                [new DateTime(currentMonth.Year, 2, 24)] = "Día de la Bandera",
-                [new DateTime(currentMonth.Year, 3, 21)] = "Natalicio de Benito Juárez",
-                [new DateTime(currentMonth.Year, 5, 1)] = "Día del Trabajo",
-                [new DateTime(currentMonth.Year, 5, 5)] = "Batalla de Puebla",
-                [new DateTime(currentMonth.Year, 5, 10)] = "Día de las Madres",
-                [new DateTime(currentMonth.Year, 5, 15)] = "Día del Maestro",
-                [tercerDomingoJunio] = "Día del Padre", // tercer domingo de junio
-                [new DateTime(currentMonth.Year, 9, 15)] = "Grito de Independencia",
-                [new DateTime(currentMonth.Year, 9, 16)] = "Día de la Independencia",
-                [new DateTime(currentMonth.Year, 10, 12)] = "Día de la Raza",
-                [new DateTime(currentMonth.Year, 11, 1)] = "Día de Todos los Santos",
-                [new DateTime(currentMonth.Year, 11, 2)] = "Día de los Fieles Difuntos",
-                [new DateTime(currentMonth.Year, 11, 20)] = "Día de la Revolución",
-                [new DateTime(currentMonth.Year, 12, 12)] = "Día de la Virgen de Guadalupe",
-                [new DateTime(currentMonth.Year, 12, 24)] = "Nochebuena",
-                [new DateTime(currentMonth.Year, 12, 25)] = "Navidad",
-                [new DateTime(currentMonth.Year, 12, 31)] = "Fin de Año"
-            };
+    private DateTime TercerLunesDeNoviembre(int year)
+    {
+        var date = new DateTime(year, 11, 1);
+        int lunesContados = 0;
+        while (lunesContados < 3)
+        {
+            if (date.DayOfWeek == DayOfWeek.Monday) lunesContados++;
+            if (lunesContados < 3) date = date.AddDays(1);
+        }
+        return date;
+    }
+
+    private DateTime TercerDomingoJunio(int year)
+    {
+        var date = new DateTime(year, 6, 1);
+        int domingos = 0;
+        while (domingos < 3)
+        {
+            if (date.DayOfWeek == DayOfWeek.Sunday) domingos++;
+            if (domingos < 3) date = date.AddDays(1);
+        }
+        return date;
+    }
+
+    private (DateTime juevesSanto, DateTime viernesSanto) CalcularSemanaSanta(int year)
+    {
+        // Algoritmo de Meeus para Pascua
+        int a = year % 19;
+        int b = year / 100;
+        int c = year % 100;
+        int d = b / 4;
+        int e = b % 4;
+        int f = (b + 8) / 25;
+        int g = (b - f + 1) / 3;
+        int h = (19 * a + b - d - g + 15) % 30;
+        int i = c / 4;
+        int k = c % 4;
+        int l = (32 + 2 * e + 2 * i - h - k) % 7;
+        int m = (a + 11 * h + 22 * l) / 451;
+        int mes = (h + l - 7 * m + 114) / 31;
+        int dia = ((h + l - 7 * m + 114) % 31) + 1;
+
+        var pascua = new DateTime(year, mes, dia);
+        var juevesSanto = pascua.AddDays(-3);
+        var viernesSanto = pascua.AddDays(-2);
+
+        return (juevesSanto, viernesSanto);
+    }
+
+    private void CalcularResumen()
+    {
+        var diasDelMes = Enumerable.Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month))
+            .Select(d => new DateTime(currentMonth.Year, currentMonth.Month, d))
+            .ToList();
+
+        // Días hábiles: de lunes a viernes, que no sean festivos no laborables
+        var diasHabiles = diasDelMes
+            .Where(fecha =>
+                fecha.DayOfWeek != DayOfWeek.Saturday &&
+                fecha.DayOfWeek != DayOfWeek.Sunday &&
+                (!fechasImportantes.ContainsKey(fecha) || !fechasImportantes[fecha].EsNoLaboral))
+            .ToList();
+
+        totalDiasHabiles = diasHabiles.Count;
+        diasActivosContados = diasHabiles.Count(d => diasActivos.Contains(d));
+        diasDesactivadosManualmente = totalDiasHabiles - diasActivosContados;
+
+        // Días festivos no laborables del mes (sean hábiles o no)
+        diasNoLaborables = diasDelMes
+            .Where(fecha => fechasImportantes.TryGetValue(fecha, out var info) && info.EsNoLaboral)
+            .Count();
     }
 
     private void CambiarMes(int offset)
@@ -85,17 +242,25 @@
         CargarFechasImportantes();
         fechaEditando = null;
         nuevaEtiqueta = "";
+
+        CalcularResumen();
     }
 
     private void AlternarDia(DateTime dia)
     {
         if (dia < DateTime.Today) return;
 
+        if (fechasImportantes.TryGetValue(dia, out var info) && info.EsNoLaboral)
+            return; // No se puede modificar
+
         if (diasActivos.Contains(dia))
             diasActivos.Remove(dia);
         else
             diasActivos.Add(dia);
+
+        CalcularResumen();
     }
+
 
     private async Task GuardarCambios()
     {
@@ -122,7 +287,13 @@
     private string ObtenerClaseDia(DateTime dia)
     {
         if (dia < DateTime.Today) return "dia pasado";
-        if (fechasImportantes.ContainsKey(dia)) return "dia importante";
+
+        if (fechasImportantes.TryGetValue(dia, out var info) && info.EsNoLaboral)
+            return "dia no-laboral";
+
+        if (fechasImportantes.ContainsKey(dia))
+            return "dia importante";
+
         return EstaActivo(dia) ? "dia activo" : "dia inactivo";
     }
 
@@ -146,51 +317,3 @@
     }
 }
 
-<div class="calendario-nav">
-    <button @onclick="() => CambiarMes(-1)" class="nav-btn">← Anterior</button>
-    <span class="month-name">@currentMonth.ToString("MMMM yyyy")</span>
-    <button @onclick="() => CambiarMes(1)" class="nav-btn">Siguiente →</button>
-</div>
-
-<div class="calendario">
-    @foreach (var dayName in new[] { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" })
-    {
-        <div class="dia encabezado">@dayName</div>
-    }
-
-    @for (int i = 0; i < ((int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek == 0 ? 6 : (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 1); i++)
-    {
-        <div class="dia vacio"></div>
-    }
-
-    @foreach (var day in Enumerable.Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month)))
-    {
-        var fecha = new DateTime(currentMonth.Year, currentMonth.Month, day);
-        <div class="@ObtenerClaseDia(fecha)" @onclick="() => AlternarDia(fecha)">
-            @fecha.Day
-
-            @if (fechasImportantes.ContainsKey(fecha))
-            {
-                <span class="etiqueta importante">@fechasImportantes[fecha]</span>
-            }
-
-            @if (etiquetas.ContainsKey(fecha))
-            {
-                <span class="etiqueta-personal" @onclick="() => EditarEtiqueta(fecha)">
-                    @etiquetas[fecha]
-                </span>
-            }
-
-            @if (fechaEditando == fecha)
-            {
-                <input type="text"
-                       @bind="nuevaEtiqueta"
-                       @onblur="() => AsignarEtiqueta(fecha)"
-                       class="input-etiqueta"
-                       placeholder="Nueva etiqueta" />
-            }
-        </div>
-    }
-</div>
-
-<button @onclick="GuardarCambios" class="guardar-btn">Guardar Cambios</button>

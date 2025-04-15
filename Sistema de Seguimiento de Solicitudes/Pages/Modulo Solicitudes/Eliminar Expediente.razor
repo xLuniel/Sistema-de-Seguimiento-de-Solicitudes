@@ -19,38 +19,40 @@
 
 <h3>Eliminacion de Expedientes</h3>
 
-<table class="table">
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>FOLIO</th>
-			<th>NOMBRE</th>
-			<th>FECHA DE INICIO</th>
-			<th>ESTATUS</th>
-			<th>ELIMINAR</th>
-		</tr>	
-	</thead>
-    <tbody>
-        @if (listaExpedientes != null)
-        {
-            foreach (var expediente in listaExpedientes.OrderByDescending(e => e.Id))
+<div class="table-responsive">
+    <table class="table">
+	    <thead>
+		    <tr>
+			    <th>ID</th>
+			    <th>FOLIO</th>
+			    <th>NOMBRE</th>
+			    <th>FECHA DE INICIO</th>
+			    <th>ESTATUS</th>
+			    <th>ELIMINAR</th>
+		    </tr>	
+	    </thead>
+        <tbody>
+            @if (listaExpedientes != null)
             {
-                <tr>
-                    <td>@expediente.Id</td>
-                    <td>@expediente.Folio</td>
-                    <td>@expediente.NombreSolicitante</td>
-                    <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                    <td>@expediente.Estado</td>
-                    <td>
-                        <button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
-                            <i class="bi bi-trash">Eliminar</i>
-                        </button>
-                    </td>
-                </tr>
+                foreach (var expediente in listaExpedientes.OrderByDescending(e => e.Id))
+                {
+                    <tr>
+                        <td>@expediente.Id</td>
+                        <td>@expediente.Folio</td>
+                        <td>@expediente.NombreSolicitante</td>
+                        <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@expediente.Estado</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
+                                <i class="bi bi-trash">Eliminar</i>
+                            </button>
+                        </td>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 @code {
 	[Parameter]

@@ -91,6 +91,25 @@ body {
         font-weight: bold;
     }
 
+/* Dias no laborables */
+    .dia.no-laboral {
+        background-color: #ffd6d6; /* rojo claro */
+        color: #a33;
+        cursor: not-allowed;
+        font-weight: bold;
+    }
+
+        .dia.no-laboral:hover {
+            background-color: #ffc2c2;
+        }
+
+.etiqueta.no-laboral {
+    font-size: 0.7em;
+    color: #a00;
+    font-weight: bold;
+}
+
+
 /* Etiqueta */
 .etiqueta {
     display: block;
@@ -148,6 +167,57 @@ body {
         background-color: #45a049;
     }
 
+/* Resumen */
+.resumen-calendario {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    font-family: "Segoe UI", sans-serif;
+}
+
+    .resumen-calendario p {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .resumen-calendario strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    /* Colores por tipo de información */
+    .resumen-calendario p:nth-child(1) strong {
+        color: #0078D4;
+    }    /* azul */
+
+
+    .resumen-calendario p:nth-child(2) strong {
+        color: #a33;
+    }    /* verde */
+
+    .resumen-calendario p:nth-child(3) strong {
+        color: #28a745;
+    }    /* gris */
+
+    .resumen-calendario p:nth-child(4) strong {
+        color: darkslategrey;
+    }    /* rojo */
+
+
 /* Responsividad */
 @media (max-width: 768px) {
     .calendario {
@@ -156,7 +226,7 @@ body {
     }
 
     .dia {
-        padding: 10px;
+        padding: 8px;
         font-size: 14px;
     }
 
@@ -172,5 +242,10 @@ body {
 
     .month-name {
         font-size: 20px;
+        text-align: center;
+    }
+
+    .resumen-calendario {
+        grid-template-columns: 1fr;
     }
 }
