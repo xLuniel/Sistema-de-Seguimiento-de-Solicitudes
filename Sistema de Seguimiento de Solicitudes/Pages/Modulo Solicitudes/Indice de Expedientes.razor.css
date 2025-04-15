@@ -111,7 +111,7 @@
 /* Truncar el texto con "..." */
 .truncate {
     display: inline-block;
-    max-width: 650px;
+    max-width: 350px;
     white-space: nowrap;
     vertical-align: middle;
     text-overflow: ellipsis;

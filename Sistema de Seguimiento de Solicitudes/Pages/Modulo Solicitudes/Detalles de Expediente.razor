@@ -406,13 +406,13 @@
 
     [Parameter]
     public string Folio { get; set; } = string.Empty;
-
+     
     private Expediente Expediente { get; set; } = new Expediente();
 
     List<ExpedienteDTO>? listaExpedientes = null;
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
-    private ExpedienteDTO ExpedienteDTO { get; set; } = new ExpedienteDTO();
 
+    private ExpedienteDTO ExpedienteDTO { get; set; } = new ExpedienteDTO();
     private ExpedienteDTO NuevoExpediente { get; set; } = new ExpedienteDTO();
 
     // Lista para almacenar las temáticas específicas actuales
