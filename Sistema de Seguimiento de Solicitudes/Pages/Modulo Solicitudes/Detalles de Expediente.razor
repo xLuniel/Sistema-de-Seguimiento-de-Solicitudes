@@ -1,5 +1,11 @@
 ﻿@page "/indice-expedientes/detalles/{id:int}/{folio}"
 
+@* Este atributo indica que la página requiere que el usuario esté autenticado *@
+@attribute [Authorize]
+
+@* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
+@using Microsoft.AspNetCore.Authorization
+
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @using System.Collections.Generic
 @using SolicitudesShared

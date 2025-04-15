@@ -26,6 +26,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
+builder.Services.AddAuthorizationCore(); // Para Blazor WASM
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
 // Add authorization services
 builder.Services.AddAuthorizationCore();
 

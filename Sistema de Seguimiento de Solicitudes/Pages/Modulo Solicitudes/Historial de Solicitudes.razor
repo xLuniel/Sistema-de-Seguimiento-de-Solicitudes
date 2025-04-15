@@ -1,12 +1,17 @@
 ﻿@page "/historial-solicitudes"
 
-@inject IExpedienteService ExpedienteService
-@inject NavigationManager Navigation
-@inject HttpClient Http
+@* Este atributo indica que la página requiere que el usuario esté autenticado *@
+@attribute [Authorize]
 
+@* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
+@using Microsoft.AspNetCore.Authorization
 
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using SolicitudesShared
+
+@inject IExpedienteService ExpedienteService
+@inject NavigationManager Navigation
+@inject HttpClient Http
 
 <div class="historial-container">
     <h3>📁 Historial de Solicitudes</h3>

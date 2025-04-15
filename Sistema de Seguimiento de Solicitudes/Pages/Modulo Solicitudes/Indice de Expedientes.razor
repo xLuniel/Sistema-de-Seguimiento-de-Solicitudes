@@ -1,5 +1,11 @@
 ﻿@page "/indice-expedientes"
 
+@* Este atributo indica que la página requiere que el usuario esté autenticado *@
+@attribute [Authorize]
+
+@* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
+@using Microsoft.AspNetCore.Authorization
+
 <link href="css/app.css" rel="stylesheet" />
 
 @using System.Collections.Generic
