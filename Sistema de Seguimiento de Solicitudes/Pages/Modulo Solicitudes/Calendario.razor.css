@@ -1,4 +1,4 @@
-﻿/* Estilo base */
+﻿/* Reset y estilos base */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,8 +7,9 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
+    background-color: #f5f5f5;
     color: #333;
+    line-height: 1.6;
     padding: 20px;
 }
 
@@ -23,229 +24,328 @@ body {
 
 .nav-btn {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #2e7d32;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.2s ease;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    text-align: center;
 }
 
     .nav-btn:hover {
-        background-color: #45a049;
+        background-color: #1b5e20;
+        transform: translateY(-1px);
+    }
+
+    .nav-btn:active {
+        transform: translateY(0);
     }
 
 .month-name {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: bold;
     text-transform: capitalize;
+    min-width: 200px;
+    text-align: center;
 }
 
-/* Calendario */
+/* Estructura del calendario */
 .calendario {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 5px;
-    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
 }
 
+/* Estilos de los días */
 .dia {
-    padding: 15px;
+    padding: 15px 5px;
     text-align: center;
-    font-size: 16px;
-    border-radius: 6px;
+    font-size: 0.95rem;
+    border-radius: 4px;
     border: 1px solid #e0e0e0;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.2s ease;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
 }
 
+    /* Encabezados de día (L, M, X...) */
     .dia.encabezado {
         font-weight: bold;
         background-color: #e0e0e0;
         color: #333;
         border: none;
         cursor: default;
+        padding: 10px 5px;
+        aspect-ratio: unset;
     }
 
-    /* Días activos e inactivos */
+    /* Estados de los días */
     .dia.activo {
-        background-color: #4CAF50;
+        background-color: #2e7d32;
         color: white;
-    }
-
-    .dia.inactivo {
-        background-color: #f0f0f0;
-        color: #777;
-    }
-
-    .dia.pasado {
-        background-color: #e0e0e0;
-        color: #bbb;
-        cursor: not-allowed;
-    }
-
-    /* Días importantes */
-    .dia.importante {
-        background-color: #FFEB3B;
         font-weight: bold;
     }
 
-/* Dias no laborables */
+    .dia.inactivo {
+        background-color: #f5f5f5;
+        color: #757575;
+    }
+
+    .dia.pasado {
+        background-color: #eeeeee;
+        color: #9e9e9e;
+        cursor: not-allowed;
+    }
+
+    .dia.importante {
+        background-color: #ffeb3b;
+        font-weight: bold;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .dia.importante::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff9800;
+            border-radius: 50%;
+        }
+
     .dia.no-laboral {
-        background-color: #ffd6d6; /* rojo claro */
-        color: #a33;
+        background-color: #ffebee;
+        color: #c62828;
         cursor: not-allowed;
         font-weight: bold;
     }
 
         .dia.no-laboral:hover {
-            background-color: #ffc2c2;
+            background-color: #ffcdd2;
         }
 
-.etiqueta.no-laboral {
-    font-size: 0.7em;
-    color: #a00;
-    font-weight: bold;
-}
-
-
-/* Etiqueta */
+/* Etiquetas */
 .etiqueta {
     display: block;
-    font-size: 12px;
-    color: #555;
-    margin-top: 5px;
+    font-size: 0.7rem;
+    color: #616161;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+    .etiqueta.no-laboral {
+        color: #c62828;
+        font-weight: bold;
+    }
 
 .etiqueta-personal {
     display: inline-block;
-    background-color: #FF9800;
+    background-color: #ff9800;
     color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.7rem;
     transition: background-color 0.2s ease;
+    margin-top: 3px;
 }
 
     .etiqueta-personal:hover {
-        background-color: #e68900;
+        background-color: #fb8c00;
     }
 
-/* Campo para etiquetas */
+/* Formularios */
 .input-etiqueta {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid #bdbdbd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.9rem;
     outline: none;
     transition: border-color 0.2s ease;
 }
 
     .input-etiqueta:focus {
-        border-color: #4CAF50;
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
     }
 
-/* Botón de guardar */
 .guardar-btn {
     padding: 12px;
-    background-color: #4CAF50;
+    background-color: #2e7d32;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
     margin-top: 20px;
     width: 100%;
-    transition: background-color 0.2s ease;
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.2s ease;
 }
 
     .guardar-btn:hover {
-        background-color: #45a049;
+        background-color: #1b5e20;
+        transform: translateY(-1px);
     }
 
-/* Resumen */
+    .guardar-btn:active {
+        transform: translateY(0);
+    }
+
+/* Resumen del calendario */
 .resumen-calendario {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 12px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     padding: 20px;
-    margin-top: 20px;
-    max-width: 600px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    font-family: "Segoe UI", sans-serif;
+    margin: 20px;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
     .resumen-calendario p {
         margin: 0;
-        font-size: 16px;
-        color: #333;
-        background-color: #fff;
+        font-size: 0.95rem;
+        color: #424242;
+        background-color: #fafafa;
         border: 1px solid #e0e0e0;
-        padding: 12px 16px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        padding: 12px;
+        border-radius: 6px;
     }
 
     .resumen-calendario strong {
         display: block;
         font-weight: 600;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        font-size: 1rem;
     }
 
-    /* Colores por tipo de información */
+    /* Colores del resumen */
     .resumen-calendario p:nth-child(1) strong {
-        color: #0078D4;
-    }    /* azul */
-
+        color: #0d47a1;
+    }
 
     .resumen-calendario p:nth-child(2) strong {
-        color: #a33;
-    }    /* verde */
+        color: #c62828;
+    }
 
     .resumen-calendario p:nth-child(3) strong {
-        color: #28a745;
-    }    /* gris */
+        color: #2e7d32;
+    }
 
     .resumen-calendario p:nth-child(4) strong {
-        color: darkslategrey;
-    }    /* rojo */
+        color: #37474f;
+    }
 
-
-/* Responsividad */
+/* Responsive */
 @media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
     .calendario {
-        grid-template-columns: repeat(7, 1fr);
-        gap: 4px;
+        gap: 3px;
     }
 
     .dia {
-        padding: 8px;
-        font-size: 14px;
+        padding: 10px 2px;
+        font-size: 0.85rem;
     }
 
     .guardar-btn {
-        font-size: 14px;
+        font-size: 0.9rem;
         padding: 10px;
     }
 
     .nav-btn {
-        font-size: 14px;
-        padding: 8px;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        min-width: 80px;
     }
 
     .month-name {
-        font-size: 20px;
-        text-align: center;
+        font-size: 1.2rem;
+        min-width: 150px;
     }
 
     .resumen-calendario {
         grid-template-columns: 1fr;
+        padding: 15px;
     }
 }
+
+@media (max-width: 480px) {
+    .calendario-nav {
+        gap: 10px;
+    }
+
+    .dia {
+        font-size: 0.75rem;
+        padding: 8px 1px;
+    }
+
+    .etiqueta {
+        font-size: 0.6rem;
+    }
+}
+
+/* Solicitudes */
+.solicitud-item {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    padding: 2px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+
+/* Tooltip */
+.expediente-badge {
+    position: relative;
+    cursor: help;
+}
+
+    .expediente-badge::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translate(8px, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: pre-line;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 100;
+    }
+
+    .expediente-badge:hover::after {
+        opacity: 1;
+    }

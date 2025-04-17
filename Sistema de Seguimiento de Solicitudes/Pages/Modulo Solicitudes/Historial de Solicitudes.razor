@@ -10,6 +10,7 @@
 @using SolicitudesShared
 
 @inject IExpedienteService ExpedienteService
+@inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
 @inject HttpClient Http
 
@@ -18,6 +19,7 @@
 
     <div class="row mb-3">
         <div class="col-md-6">
+            <!-- Campo de Busqueda -->
             <input type="text" class="form-control" placeholder="🔍 Buscar por nombre o folio..." @bind="busqueda" @bind:event="oninput" />
         </div>
         <div class="col-md-4">
@@ -72,12 +74,36 @@
             </tbody>
         </table>
     </div>
+    <div class="d-flex justify-content-center align-items-center mt-3" style="padding-bottom: 16px">
+        <button class="btn btn-primary mx-2" @onclick="PrevPage" disabled="@(currentPage <= 1)">
+            Anterior
+        </button>
+        <span>Página @currentPage de @totalPages</span>
+        <button class="btn btn-primary mx-2" @onclick="NextPage" disabled="@(currentPage >= totalPages)">
+            Siguiente
+        </button>
+    </div>
 </div>
 
 @code {
+    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
     private List<ExpedienteDTO> SolicitudesHistorial = new();
     private string busqueda = string.Empty;
     private string estadoSeleccionado = string.Empty;
+
+    private int currentPage = 1;
+    private int pageSize = 12; // Cantidad de solicitudes por pagina
+    private int totalPages => (ExpedientesFiltrados.Count + pageSize - 1) / pageSize;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Invoca la función global definida en pagsize.js
+            pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
+            StateHasChanged();
+        }
+    }
 
     private IEnumerable<ExpedienteDTO> SolicitudesFiltradas =>
         SolicitudesHistorial.Where(s =>
@@ -111,5 +137,18 @@
             "CANCELADA" => "badge-warning",
             _ => "badge-secondary"
         };
+    }
+
+    // Métodos para la paginación
+    private void PrevPage()
+    {
+        if (currentPage > 1)
+            currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+            currentPage++;
     }
 }
