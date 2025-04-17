@@ -79,6 +79,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Contenido de la solicitud
         public string ContenidoSolicitud { get; set; } = string.Empty;
 
+
         // Área que posee la información
         public string AreaInformacion { get; set; } = string.Empty;
 
