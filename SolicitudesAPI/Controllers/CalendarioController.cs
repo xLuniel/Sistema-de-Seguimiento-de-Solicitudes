@@ -1,23 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sistema_de_Seguimiento_de_Solicitudes.Models;
+using SolicitudesAPI.Models;
 using System.Collections.Generic;
 
 [ApiController]
 [Route("api/[controller]")]
 public class CalendarioController : ControllerBase
 {
-    private static List<CalendarioDTO> DiasActivos = new();
+    private readonly SistemaSolicitudesContext _context;
 
-    [HttpGet]
-    public ActionResult<List<CalendarioDTO>> Get()
+    public CalendarioController(SistemaSolicitudesContext context)
     {
-        return Ok(DiasActivos);
+        _context = context;
     }
+    // Simulando una base de datos en memoria
+    //private static List<CalendarioDTO> DiasActivos = new();
 
-    [HttpPost]
-    public IActionResult Post(List<CalendarioDTO> diasActivos)
-    {
-        DiasActivos = diasActivos;
-        return Ok();
-    }
+    //[HttpGet]
+    //public ActionResult<List<CalendarioDTO>> Get()
+    //{
+    //    return Ok(DiasActivos);
+    //}
+
+    //[HttpPost]
+    //public IActionResult Post(List<CalendarioDTO> diasActivos)
+    //{
+    //    DiasActivos = diasActivos;
+    //    return Ok();
+    //}
 }

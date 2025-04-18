@@ -19,7 +19,7 @@ namespace SolicitudesAPI.Controllers
 
         private readonly IConfiguration _configuration;
 
- 
+
 
         public AuthController(SistemaSolicitudesContext context, IConfiguration configuration)
         {
@@ -50,10 +50,10 @@ namespace SolicitudesAPI.Controllers
             }
             catch (Exception ex)
             {
-                responseApi.Exito = false; 
+                responseApi.Exito = false;
                 responseApi.Mensaje = ex.Message;
             }
-             return Ok(responseApi);
+            return Ok(responseApi);
         }
 
         [HttpPost("register")]
@@ -104,7 +104,7 @@ namespace SolicitudesAPI.Controllers
                 var token = GenerarToken(authClaims);
 
                 //return Ok(new { token });
-                return Ok(new LoginResponse { Token = token, Flag = true, Message = "Login successful"});
+                return Ok(new LoginResponse { Token = token, Flag = true, Message = "Login successful" });
             }
             else
             {
@@ -126,6 +126,6 @@ namespace SolicitudesAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        
+
     }
 }

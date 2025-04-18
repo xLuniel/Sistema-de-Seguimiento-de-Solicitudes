@@ -1,19 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
-namespace SolicitudesAPI.Models
+namespace SolicitudesAPI.Models;
+
+public partial class Usuario
 {
-    public class Usuario
-    {
-        [Key]
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        public required string NombreUsuario { get; set; }
+    public string NombreUsuario { get; set; } = null!;
 
-        [Required]
-        public required string password { get; set; }
+    public string password { get; set; } = null!;
 
-        public required string Rol { get; set; }
-    }
+    public string Rol { get; set; } = null!;
 }

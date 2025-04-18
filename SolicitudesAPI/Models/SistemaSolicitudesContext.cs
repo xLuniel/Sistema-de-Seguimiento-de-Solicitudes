@@ -15,9 +15,9 @@ public partial class SistemaSolicitudesContext : DbContext
     {
     }
 
-    public virtual DbSet<Expediente> Expedientes { get; set; }
+    public virtual DbSet<Calendario> Calendarios { get; set; }
 
-    public virtual DbSet<ExpedienteDto> ExpedienteDtos { get; set; }
+    public virtual DbSet<Expediente> Expedientes { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
@@ -25,23 +25,13 @@ public partial class SistemaSolicitudesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //modelBuilder.Ignore<Expediente>();
-        modelBuilder.Ignore<ExpedienteDto>();
-        modelBuilder.Ignore<Usuario>();
-
-        modelBuilder.Entity<Usuario>(entity =>
+        modelBuilder.Entity<Calendario>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Usuarios__3214EC27AA69A3A2");
-            entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.NombreUsuario)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.password)
-                .HasMaxLength(4000)
-                .IsUnicode(false);
-            entity.Property(e => e.Rol)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+            entity.ToTable("Calendario");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("ID");
         });
 
         modelBuilder.Entity<Expediente>(entity =>
@@ -63,11 +53,21 @@ public partial class SistemaSolicitudesContext : DbContext
             entity.Property(e => e.SubsanaPrevencionReinicoTramite).HasColumnName("SubsanaPrevencion_ReinicoTramite");
         });
 
-        modelBuilder.Entity<ExpedienteDto>(entity =>
+        modelBuilder.Entity<Usuario>(entity =>
         {
-            entity.ToTable("ExpedienteDTO");
+            entity.HasKey(e => e.Id).HasName("PK__Usuarios__3214EC27AA69A3A2");
 
-            entity.Property(e => e.SubsanaPrevencionReinicoTramite).HasColumnName("SubsanaPrevencion_ReinicoTramite");
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.NombreUsuario)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.password)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("password");
+            entity.Property(e => e.Rol)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

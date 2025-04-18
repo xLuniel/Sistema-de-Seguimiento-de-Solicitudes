@@ -235,7 +235,7 @@ namespace SolicitudesAPI.Controllers
                         }
                     }
 
-                        _context.Expedientes.Update(dbExpediente);
+                    _context.Expedientes.Update(dbExpediente);
                     await _context.SaveChangesAsync();
 
                     responseApi.Exito = true;
@@ -394,7 +394,6 @@ namespace SolicitudesAPI.Controllers
             }
         }
 
-        
+
     }
 }
- 
