@@ -15,7 +15,7 @@ public partial class SistemaSolicitudesContext : DbContext
     {
     }
 
-    public virtual DbSet<Calendario> Calendarios { get; set; }
+    public virtual DbSet<Calendario> Calendario { get; set; }
 
     public virtual DbSet<Expediente> Expedientes { get; set; }
 

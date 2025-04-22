@@ -15,13 +15,13 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 
         public async Task<List<CalendarioDTO>> ObtenerDiasActivos()
         {
-            var response = await _http.GetFromJsonAsync<List<CalendarioDTO>>("api/calendario");
+            var response = await _http.GetFromJsonAsync<List<CalendarioDTO>>("/api/Calendario/Obtener_dias");
             return response ?? new List<CalendarioDTO>();
         }
 
         public async Task<bool> GuardarDiasActivos(List<CalendarioDTO> diasActivos)
         {
-            var response = await _http.PostAsJsonAsync("api/calendario", diasActivos);
+            var response = await _http.PostAsJsonAsync("/api/Calendario/Guardar_dia", diasActivos);
             return response.IsSuccessStatusCode;
         }
     }
