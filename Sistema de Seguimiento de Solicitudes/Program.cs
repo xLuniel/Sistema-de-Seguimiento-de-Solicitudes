@@ -6,6 +6,7 @@ using Sistema_de_Seguimiento_de_Solicitudes.Services;
 using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices;
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components.Authorization;
+using Radzen;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -34,5 +35,8 @@ builder.Services.AddAuthorizationCore();
 
 
 builder.Services.AddSweetAlert2();
+
+builder.Services.AddRadzenComponents();
+
 
 await builder.Build().RunAsync();
