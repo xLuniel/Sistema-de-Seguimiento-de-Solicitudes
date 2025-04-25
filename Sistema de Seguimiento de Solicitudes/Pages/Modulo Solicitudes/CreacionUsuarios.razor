@@ -1,0 +1,379 @@
+﻿@page "/CreacionUsuarios"
+
+@using System.Collections.Generic
+@using CurrieTechnologies.Razor.SweetAlert2
+@using SolicitudesShared
+@using System.Text.Json
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+
+@inject IUsuarioService UsuarioService
+@inject SweetAlertService Swal
+@inject IJSRuntime JSRuntime
+
+
+
+<h3>CreacionUsuarios</h3>
+
+<div class="d-flex align-items-center gap-2 mb-3">
+    <input type="text" class="form-control" placeholder="🔍 Buscar por Nombre, Id, Rol..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
+
+    <!-- Botón para agregar nuevo Usuario -->
+    <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nuevo Usuario </button>
+</div>
+
+<!-- Modal de formulario para creación de usuarios -->
+@if (MostrarFormularioModal)
+{
+    <div class="modal">
+        <div class="modal-contenido">
+            <h4>Nuevo Usuario</h4>
+            <EditForm Model="NuevoUsuario" OnValidSubmit="GuardarUsuario">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div>
+                    <label for="Nombre">Nombre del usuario: </label>
+                    <InputText id="Nombre" @bind-Value="NuevoUsuario.NombreUsuario" />
+
+                    <label for="password">Contraseña: </label>
+                    <InputText id="password" @bind-Value="NuevoUsuario.password" />
+
+                    <label for="Rol">Rol: </label>
+                    <InputSelect id="Rol" @bind-Value="NuevoUsuario.Rol">
+                        <option value="" disabled selected>Selecciona una opción:</option>
+                        @foreach (var Rol in ListaRoles)
+                        {
+                            <option value="@Rol">@Rol</option>
+                        }
+                    </InputSelect>
+
+                </div>
+
+
+                <button type="submit">Guardar</button>
+                <button @onclick="CerrarFormulario">Cancelar</button>
+            </EditForm>
+        </div>
+    </div>
+}  
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NOMBRE</th>
+                <th>ROL</th>
+                <th>ACCIONES</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (UsuariosFiltrados != null && UsuariosFiltrados.Any())
+            {
+                @foreach (var usuario in PagedUsuarios)
+                {
+                    <tr>
+                        @* <td>
+                            <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
+                        </td> *@
+
+                        <td>@usuario.Id</td>
+                        <td>@usuario.NombreUsuario</td>
+                        <td>@usuario.Rol</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(usuario.Id)">
+                                <i class="bi bi-trash">Eliminar</i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" style="text-align: center; font-size: 30px; font-weight: bold; color: #ff0000; padding: 15px; background-color: #ffecec; border: 1px solid #ffaaaa;">
+                        No se encontraron resultados.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-center align-items-center mt-3" style="padding-bottom: 16px">
+    <button class="btn btn-primary mx-2" style="width: 90px" @onclick="PrevPage" disabled="@(currentPage <= 1)">
+        Anterior
+    </button>
+    <span>Página @currentPage de @totalPages</span>
+    <button class="btn btn-primary mx-2" style="width: 90px" @onclick="NextPage" disabled="@(currentPage >= totalPages)">
+        Siguiente
+    </button>
+</div>
+
+@code {
+    private bool MostrarModal { get; set; } = false;
+    private bool MostrarFormularioModal { get; set; } = false;
+    private string MensajeError { get; set; } = string.Empty;
+    private bool MostrarMensajeError { get; set; } = false;
+
+    private string _filtro = string.Empty;
+    private string Filtro
+    {
+        get => _filtro;
+        set
+        {
+            if (_filtro != value)
+            {
+                _filtro = value;
+                FiltrarUsuarios(); // Aquí ejecutamos el filtro
+            }
+        }
+    }
+
+    List<UsuariosDTO>? ListaUsuarios { get; set; } = null;
+    private List<UsuariosDTO> UsuariosFiltrados { get; set; } = new();
+	private UsuariosDTO NuevoUsuario { get; set; } = new()
+		{
+			NombreUsuario = string.Empty,
+			password = string.Empty,
+			Rol = string.Empty
+		};
+
+    private int currentPage = 1;
+    private int pageSize = 12; // Cantidad de usuarios por pagina
+    private int totalPages => (UsuariosFiltrados.Count + pageSize - 1) / pageSize;
+
+    // Lista paginada
+    private IEnumerable<UsuariosDTO> PagedUsuarios => UsuariosFiltrados
+        .OrderByDescending(e => e.Id)
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Invoca la función global definida en pagsize.js
+            pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Inicializa la lista de usuarios
+        ListaUsuarios = await UsuarioService.Lista_Usuarios();
+        UsuariosFiltrados = new List<UsuariosDTO>(ListaUsuarios.OrderByDescending(e => e.Id));
+
+    }
+
+    //Filtro de busqueda
+    private void FiltrarUsuarios()
+    {
+        UsuariosFiltrados = ListaUsuarios!
+            .Where(e =>
+                string.IsNullOrWhiteSpace(Filtro) ||
+                (e.Rol != null && e.Rol.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                (e.NombreUsuario != null && e.NombreUsuario.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
+                e.Id.ToString().Contains(Filtro)
+            )
+            .ToList();
+
+        StateHasChanged();
+    }
+
+	private async Task Eliminar(int id)
+	{
+		// Mostrar mensaje de confirmación
+		var resultado = await Swal.FireAsync(new SweetAlertOptions
+			{
+				Title = "¿Estás seguro?",
+				Text = "No podrás revertir esto.",
+				Icon = SweetAlertIcon.Warning,
+				ShowCancelButton = true,
+				ConfirmButtonText = "Sí, eliminar",
+				CancelButtonText = "Cancelar"
+			});
+		// Lógica para eliminar el usuario
+		if (resultado.IsConfirmed)
+		{
+			var eliminado = await UsuarioService.Eliminar(id);
+			
+			if (eliminado)
+			{
+				// Mostrar mensaje de éxito
+				await Swal.FireAsync(new SweetAlertOptions
+					{
+						Title = "Eliminado",
+						Text = "El usuario ha sido eliminado.",
+						Icon = SweetAlertIcon.Success
+					});
+                
+                // Actualizar la lista de usuarios
+                ListaUsuarios = await UsuarioService.Lista_Usuarios();
+			}
+			else
+			{
+				// Mostrar mensaje de error
+				await Swal.FireAsync(new SweetAlertOptions
+					{
+						Title = "Error",
+						Text = "No se pudo eliminar el usuario.",
+						Icon = SweetAlertIcon.Error
+					});
+			}
+		}
+		
+		
+		
+		// Filtrar la lista después de eliminar
+		FiltrarUsuarios();
+	}
+
+
+    private List<string> ListaRoles = new()
+    {
+        "ADMINISTRADOR","CAPTURISTA","OBSERVADOR"
+    };
+
+    private void MostrarFormulario()
+    {
+        MostrarFormularioModal = true;
+    }
+
+    private void CerrarFormulario()
+    {
+        MostrarFormularioModal = false;
+    }
+
+    private async Task GuardarUsuario()
+    {
+        if (ListaUsuarios!.Any(e => e.NombreUsuario == NuevoUsuario.NombreUsuario))
+        {
+            // Mostrar mensaje de error: el usuario ya existe
+            await MostrarAlerta("El usuario ya existe");
+            return;
+        }
+
+        // Guardar el nuevo usuario
+        await UsuarioService.Register(NuevoUsuario);
+
+        // Actualizar la lista de usuarios
+        ListaUsuarios = await UsuarioService.Lista_Usuarios();
+
+        StateHasChanged();
+
+        // Cerrar el formulario
+        MostrarFormularioModal = false;
+
+    }
+
+    private async Task MostrarAlerta(string mensaje)
+    {
+        MensajeError = mensaje;
+        MostrarMensajeError = true;
+
+        await Task.Delay(4000);
+
+        MostrarMensajeError = false;
+        StateHasChanged();
+    }
+
+     // Métodos para la paginación
+    private void PrevPage()
+    {
+        if (currentPage > 1)
+            currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+            currentPage++;
+    }
+}
+
+<style>
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-contenido {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 600px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+        .modal-contenido h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .modal-contenido label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .modal-contenido input,
+        .modal-contenido select,
+        .modal-contenido textarea {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+            .modal-contenido input:focus,
+            .modal-contenido select:focus,
+            .modal-contenido textarea:focus {
+                border-color: #007bff;
+                outline: none;
+            }
+
+        .modal-contenido button {
+            margin-top: 1.5rem;
+            margin-right: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+            .modal-contenido button:hover {
+                background-color: #0056b3;
+            }
+
+            .modal-contenido button:last-of-type {
+                background-color: #6c757d;
+            }
+
+                .modal-contenido button:last-of-type:hover {
+                    background-color: #5a6268;
+                }
+</style>

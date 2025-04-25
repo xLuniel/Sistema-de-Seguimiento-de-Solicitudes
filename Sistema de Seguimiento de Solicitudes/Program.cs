@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICalendarioService, CalendarioService>();
 // Registrando los servicios
 builder.Services.AddScoped<IExpedienteService, ExpedienteService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 // Register CustomAuthenticationStateProvider
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();

@@ -113,6 +113,75 @@ namespace SolicitudesAPI.Controllers
             }
         }
 
+        [HttpGet("Buscar/{id}")]
+        public async Task<ActionResult> Buscar(int id)
+        {
+            var responseApi = new ResponseAPI<UsuariosDTO>();
+            //var UsuariosDTO = new UsuariosDTO();
+
+            try
+            {
+                var dbUsuarios = await _context.Usuarios.FirstOrDefaultAsync(e => e.Id == id);
+
+                if (dbUsuarios != null)
+                {
+                    var UsuariosDTO = new UsuariosDTO
+                    {
+                        NombreUsuario = dbUsuarios.NombreUsuario,
+                        password = dbUsuarios.password,
+                        Rol = dbUsuarios.Rol
+                    };
+
+                    responseApi.Exito = true;
+                    responseApi.Data = UsuariosDTO;
+                }
+                else
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se encontró el expediente";
+                }
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+        }
+
+        [HttpDelete("Eliminar/{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var responseApi = new ResponseAPI<int>();
+
+            try
+            {
+                var dbUsuario = await _context.Usuarios.FirstOrDefaultAsync(e => e.Id == id);
+
+                if (dbUsuario != null)
+                {
+                    _context.Usuarios.Remove(dbUsuario);
+                    await _context.SaveChangesAsync();
+
+                    responseApi.Exito = true;
+                }
+                else
+                {
+                    responseApi.Exito = false;
+                    responseApi.Mensaje = "No se pudo encontrar el expediente";
+                }
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+        }
+
+
         private string GenerarToken(List<Claim> claims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]!));
