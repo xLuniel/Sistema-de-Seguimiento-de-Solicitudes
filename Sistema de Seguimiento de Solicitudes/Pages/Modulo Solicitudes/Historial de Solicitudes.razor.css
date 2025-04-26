@@ -64,6 +64,24 @@ h3 {
     min-width: 90px;
 }
 
+.badge-info {
+    background-color: #17a2b8; /* Azul claro */
+}
+
+.badge-primary {
+    background-color: #007bff; /* Azul */
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.badge-light {
+    background-color: #f39c12; /* Naranja */
+    color: #333;
+}
+
 .badge-success {
     background-color: #28a745;
 }
@@ -72,13 +90,8 @@ h3 {
     background-color: #dc3545;
 }
 
-.badge-warning {
-    background-color: #ffc107;
-    color: #333;
-}
-
-.badge-secondary {
-    background-color: #6c757d;
+.badge-dark {
+    background-color: #343a40; /* Gris oscuro */
 }
 
 /* Responsividad */
