@@ -1,8 +1,11 @@
 ﻿@page "/historial-solicitudes"
+
 @attribute [Authorize]
+
 @using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using SolicitudesShared
+
 @inject IExpedienteService ExpedienteService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation

@@ -1,0 +1,136 @@
+﻿.parent {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 8px;
+    padding: 16px;
+}
+
+.module-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+    .module-card:hover {
+        background-color: #e0f7fa;
+        transform: translateY(-5px);
+    }
+
+.module-title {
+    font-size: 18px;
+    color: #00796b;
+}
+
+/* Opcional: mejora el resto de los divs */
+.parent > div:not(.module-card) {
+    background-color: #eeeeee;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+    .parent div {
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+/* Tarjetas individuales */
+.div1, .div2, .div3, .div4,
+.div5, .div6, .div7, .div8,
+.div9, .div10, .div11, .div12,
+.div13, .div14, .div15, .div16 {
+    grid-column: span 2 / span 2;
+    grid-row: span 2 / span 2;
+}
+
+/* Posicionamiento específico */
+.div2 {
+    grid-column-start: 3;
+}
+
+.div3 {
+    grid-column-start: 5;
+}
+
+.div4 {
+    grid-column-start: 7;
+}
+
+.div5 {
+    grid-row-start: 3;
+}
+
+.div6 {
+    grid-column-start: 3;
+    grid-row-start: 3;
+}
+
+.div7 {
+    grid-column-start: 5;
+    grid-row-start: 3;
+}
+
+.div8 {
+    grid-column-start: 7;
+    grid-row-start: 3;
+}
+
+.div9 {
+    grid-row-start: 5;
+}
+
+.div10 {
+    grid-column-start: 3;
+    grid-row-start: 5;
+}
+
+.div11 {
+    grid-column-start: 5;
+    grid-row-start: 5;
+}
+
+.div12 {
+    grid-column-start: 7;
+    grid-row-start: 5;
+}
+
+.div13 {
+    grid-row-start: 7;
+}
+
+.div14 {
+    grid-column-start: 3;
+    grid-row-start: 7;
+}
+
+.div15 {
+    grid-column-start: 5;
+    grid-row-start: 7;
+}
+
+.div16 {
+    grid-column-start: 7;
+    grid-row-start: 7;
+}
+
+/* Efecto hover bonito */
+.parent div:hover {
+    background-color: #e0f7fa;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
