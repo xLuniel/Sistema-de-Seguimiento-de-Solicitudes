@@ -1,7 +1,8 @@
-﻿@page "/inicio-solicitudes"
+﻿@page "/menu/modulo-solicitudes/inicio-solicitudes"
 
 @* Este atributo indica que la página requiere que el usuario esté autenticado *@
 @attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
 @using Microsoft.AspNetCore.Authorization
@@ -12,11 +13,13 @@
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json 
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IExpedienteService ExpedienteService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Inicio</PageTitle>
 
@@ -220,6 +223,14 @@
         }
     }
 
+    // Usuario Observador
+    private async Task<bool> UsuarioEsSoloObservador()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        return user.IsInRole("OBSERVADOR") && !user.IsInRole("ADMINISTRADOR") && !user.IsInRole("CAPTURISTA");
+    }
+
     private int CalcularDiasHabiles(DateTime fechaInicio)
     {
         int diasHabiles = 0;
@@ -263,7 +274,7 @@
             if (expediente != null)
             {
                 // Asegúrate de que la ruta esté correcta
-                Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+                Navigation.NavigateTo($"/menu/modulo-solicitudes/indice-expedientes/detalles/{id}/{expediente.Folio}");
             }
         }
         else

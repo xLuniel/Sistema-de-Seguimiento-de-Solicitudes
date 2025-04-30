@@ -1,7 +1,8 @@
-﻿@page "/indice-expedientes/detalles/{id:int}/{folio}"
+﻿@page "/menu/modulo-solicitudes/indice-expedientes/detalles/{id:int}/{folio}"
 
 @* Este atributo indica que la página requiere que el usuario esté autenticado *@
 @attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
 @using Microsoft.AspNetCore.Authorization
@@ -22,7 +23,7 @@
 <PageTitle>Detalles</PageTitle>
 
 <div class="container mt-4">
-    <h3 class="text-center">Detalles de Expediente @Expediente.Folio</h3>
+    <h3 class="text-center">Detalles de Expediente @Expediente.Folio - @Expediente.Nombre </h3>
 
     @if (Expediente != null)
     {
@@ -485,7 +486,7 @@
         else
         {
             // Redirigir si no se encuentra el expediente (opcional)
-            Navigation.NavigateTo("/indice-expedientes");
+            Navigation.NavigateTo("/menu/modulo-solicitudes/indice-expedientes");
         }
 
 

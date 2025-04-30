@@ -1,0 +1,197 @@
+﻿/* Estilos generales */
+.module-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.module-header {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+}
+
+.module-subtitle {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+/* Grid de tarjetas */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Estilos base de tarjetas */
+.module-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 200px;
+    border: 1px solid #e0e0e0;
+}
+
+    .module-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: inherit;
+}
+
+.module-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: inherit;
+}
+
+.module-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: auto;
+}
+
+/* Colores de tarjetas */
+.card-blue {
+    color: #2980b9;
+    border-top: 4px solid #2980b9;
+}
+
+.card-green {
+    color: #27ae60;
+    border-top: 4px solid #27ae60;
+}
+
+.card-purple {
+    color: #8e44ad;
+    border-top: 4px solid #8e44ad;
+}
+
+.card-orange {
+    color: #d35400;
+    border-top: 4px solid #d35400;
+}
+
+.card-red {
+    color: #c0392b;
+    border-top: 4px solid #c0392b;
+}
+
+.card-teal {
+    color: #16a085;
+    border-top: 4px solid #16a085;
+}
+
+.card-indigo {
+    color: #6610f2;
+    border-top: 4px solid #6610f2;
+}
+
+.card-pink {
+    color: #e83e8c;
+    border-top: 4px solid #e83e8c;
+}
+
+.card-cyan {
+    color: #17a2b8;
+    border-top: 4px solid #17a2b8;
+}
+
+.card-deep-orange {
+    color: #fd7e14;
+    border-top: 4px solid #fd7e14;
+}
+
+.card-lime {
+    color: #94c83d;
+    border-top: 4px solid #94c83d;
+}
+
+.card-brown {
+    color: #7b4f3d;
+    border-top: 4px solid #7b4f3d;
+}
+
+/* Efectos hover */
+.card-blue:hover {
+    background-color: #ebf5fb;
+}
+
+.card-green:hover {
+    background-color: #e8f8f5;
+}
+
+.card-purple:hover {
+    background-color: #f5eef8;
+}
+
+.card-orange:hover {
+    background-color: #fbeee6;
+}
+
+.card-red:hover {
+    background-color: #fdedec;
+}
+
+.card-teal:hover {
+    background-color: #e8f6f3;
+}
+
+.card-indigo:hover {
+    background-color: #f0e6ff;
+}
+
+.card-pink:hover {
+    background-color: #ffebf2;
+}
+
+.card-cyan:hover {
+    background-color: #e7f6f8;
+}
+
+.card-deep-orange:hover {
+    background-color: #fff3e8;
+}
+
+.card-lime:hover {
+    background-color: #f7fce9;
+}
+
+.card-brown:hover {
+    background-color: #f5eee9;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

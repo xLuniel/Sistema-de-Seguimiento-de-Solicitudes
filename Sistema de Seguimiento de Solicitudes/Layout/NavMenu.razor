@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Seguimiento de Solicitudes</a>
+        <a class="navbar-brand" href="/menu">Transparencia</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,12 +10,12 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column"> 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/modulos">@* Match="NavLinkMatch.All" *@
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Modulos
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes">@* Match="NavLinkMatch.All" *@
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Modulo Solicitudes
             </NavLink>
         </div>
         <div class="nav-item px-3">
-			<NavLink class="nav-link" href="/inicio-solicitudes">@* Match="NavLinkMatch.All" *@
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes/inicio-solicitudes">@* Match="NavLinkMatch.All" *@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio de Solicitudes
             </NavLink>
         </div>
@@ -25,29 +25,28 @@
             </NavLink>
         </div>*@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/CalendarioRadzen">
-                <span class="bi bi-calendar-month" aria-hidden="true"></span> Calendario
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/indice-expedientes">
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes/indice-expedientes">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Índice de Solicitudes
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Elim/{id}">
-                <span class="bi bi-trash" aria-hidden="true"></span> Eliminar Solicitudes
-            </NavLink>
-        </div>
-        
-         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/historial-solicitudes">
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes/historial-solicitudes">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Historial de Solicitudes
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/CreacionUsuarios">
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes/CalendarioRadzen">
+                <span class="bi bi-calendar-month" aria-hidden="true"></span> Calendario
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/menu/modulo-solicitudes/CreacionUsuarios">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Usuarios
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/{id?}">
+                <span class="bi bi-trash" aria-hidden="true"></span> Eliminar Solicitudes
             </NavLink>
         </div>
     </nav>

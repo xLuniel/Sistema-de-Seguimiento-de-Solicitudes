@@ -1,5 +1,10 @@
-﻿@page "/CreacionUsuarios"
+﻿@page "/menu/modulo-solicitudes/CreacionUsuarios"
 
+@attribute [Authorize]
+
+@*@attribute [Authorize(Roles = "ADMINISTRADOR, Admin")]*@
+
+@using Microsoft.AspNetCore.Authorization
 @using System.Collections.Generic
 @using CurrieTechnologies.Razor.SweetAlert2
 @using SolicitudesShared
@@ -9,10 +14,14 @@
 @inject IUsuarioService UsuarioService
 @inject SweetAlertService Swal
 @inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@inject IExpedienteService ExpedienteService
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
 
+<h3>Creacion de Usuarios</h3>
 
-
-<h3>CreacionUsuarios</h3>
+<PageTitle>Crear Usuario</PageTitle>
 
 <div class="d-flex align-items-center gap-2 mb-3">
     <input type="text" class="form-control" placeholder="🔍 Buscar por Nombre, Id, Rol..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
@@ -293,4 +302,7 @@
             currentPage++;
     }
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> Se agrega seccion de Menu y Modulo de Solicitudes

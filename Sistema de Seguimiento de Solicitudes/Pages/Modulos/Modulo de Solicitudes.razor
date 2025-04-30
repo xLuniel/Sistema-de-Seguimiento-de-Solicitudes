@@ -1,0 +1,95 @@
+﻿@page "/menu/modulo-solicitudes"
+
+@attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
+
+@using Microsoft.AspNetCore.Authorization
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using SolicitudesShared
+
+@inject NavigationManager Navigation
+@inject IExpedienteService ExpedienteService
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+<PageTitle>Módulo de Solicitudes</PageTitle>
+
+<div class="module-container">
+    <h1 class="module-header">Módulo de Solicitudes</h1>
+    <p class="module-subtitle">Seleccione una opción para continuar</p>
+
+    <div class="cards-grid">
+        <div class="module-card card-blue" @onclick="NavigateToInicioSolicitudes">
+            <i class="fas fa-file-alt card-icon"></i>
+            <span class="module-title">Inicio de Solicitudes</span>
+            <span class="module-description">Crear y gestionar nuevas solicitudes</span>
+        </div>
+
+        <div class="module-card card-blue" @onclick="NavigateToIndiceExpedientes">
+            <i class="fas fa-folder-open card-icon"></i>
+            <span class="module-title">Índice de Expedientes</span>
+            <span class="module-description">Consultar y administrar expedientes</span>
+        </div>
+
+        <div class="module-card card-blue" @onclick="NavigateToHistorialSolicitudes">
+            <i class="fas fa-history card-icon"></i>
+            <span class="module-title">Historial de Solicitudes</span>
+            <span class="module-description">Ver el historial completo</span>
+        </div>
+
+        <div class="module-card card-blue" @onclick="NavigateToCalendarioRadzen">
+            <i class="fas fa-calendar-alt card-icon"></i>
+            <span class="module-title">Calendario</span>
+            <span class="module-description">Gestión de fechas importantes</span>
+        </div>
+
+        <div class="module-card card-blue" @onclick="NavigateToCreacionUsuarios">
+            <i class="fas fa-user-plus card-icon"></i>
+            <span class="module-title">Creación de Usuarios</span>
+            <span class="module-description">Administrar cuentas de usuario</span>
+        </div>
+
+        <div class="module-card card-blue" @onclick="() => NavigateToEliminarExpediente()">
+            <i class="fas fa-trash-alt card-icon"></i>
+            <span class="module-title">Eliminar Expediente</span>
+            <span class="module-description">Eliminar expedientes completos del sistema de manera <strong class="warning-text">permanente</strong></span>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task ShowComingSoon()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "Esta funcionalidad estará disponible próximamente");
+    }
+
+    private void NavigateToInicioSolicitudes()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes/inicio-solicitudes");
+    }
+
+    private void NavigateToIndiceExpedientes()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes/indice-expedientes");
+    }
+
+    private void NavigateToHistorialSolicitudes()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes/historial-solicitudes");
+    }
+
+    private void NavigateToCalendarioRadzen()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes/CalendarioRadzen");
+    }
+
+    private void NavigateToCreacionUsuarios()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes/CreacionUsuarios");
+    }
+
+    private void NavigateToEliminarExpediente()
+    {
+        Navigation.NavigateTo("/{id?}");
+    }
+}
