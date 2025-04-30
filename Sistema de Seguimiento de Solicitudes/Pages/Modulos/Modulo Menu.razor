@@ -1,0 +1,56 @@
+﻿@page "/menu"
+@attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
+
+@using Microsoft.AspNetCore.Authorization
+@using Sistema_de_Seguimiento_de_Solicitudes.Services
+@using SolicitudesShared
+
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+<PageTitle>Menú Principal</PageTitle>
+
+<div class="module-container">
+    <h1 class="module-header">Menú Principal</h1>
+    <p class="module-subtitle">Seleccione un módulo para continuar</p>
+
+    <div class="cards-grid">
+        <!-- Tarjeta activa -->
+        <div class="module-card card-blue" @onclick="NavigateToModuloSolicitudes">
+            <i class="fas fa-file-signature card-icon"></i>
+            <span class="module-title">Módulo de Solicitudes</span>
+            <span class="module-description">Gestión completa de solicitudes y expedientes</span>
+        </div>
+
+        <!-- Tarjetas inactivas -->
+        @for (int i = 2; i <= 12; i++)
+        {
+            <div class="module-card @GetCardColor(i)" @onclick="() => ShowComingSoon()">
+                <i class="fas fa-plus-circle card-icon"></i>
+                <span class="module-title">Nuevo Módulo</span>
+                <span class="module-description">Próximamente...</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string GetCardColor(int index)
+    {
+        string[] colors = { "card-green", "card-purple", "card-orange", "card-red", "card-teal",
+                           "card-indigo", "card-pink", "card-cyan", "card-deep-orange", "card-lime", "card-brown" };
+        return colors[(index - 2) % colors.Length];
+    }
+
+    private async Task ShowComingSoon()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "Esta funcionalidad estará disponible próximamente");
+    }
+
+    private void NavigateToModuloSolicitudes()
+    {
+        Navigation.NavigateTo("/menu/modulo-solicitudes");
+    }
+}

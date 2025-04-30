@@ -1,7 +1,8 @@
-﻿@page "/indice-expedientes"
+﻿@page "/menu/modulo-solicitudes/indice-expedientes"
 
 @* Este atributo indica que la página requiere que el usuario esté autenticado *@
 @attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
 @using Microsoft.AspNetCore.Authorization
@@ -229,7 +230,7 @@
         var expediente = listaExpedientes!.FirstOrDefault(e => e.Id == id);
         if (expediente != null)
         {
-            Navigation.NavigateTo($"/indice-expedientes/detalles/{id}/{expediente.Folio}");
+            Navigation.NavigateTo($"/menu/modulo-solicitudes/indice-expedientes/detalles/{id}/{expediente.Folio}");
         }
     }
 

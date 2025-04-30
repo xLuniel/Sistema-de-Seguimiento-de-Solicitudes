@@ -1,5 +1,9 @@
-﻿@page "/CalendarioRadzen"
+﻿@page "/menu/modulo-solicitudes/CalendarioRadzen"
 
+@attribute [Authorize]
+@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
+
+@using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using Radzen

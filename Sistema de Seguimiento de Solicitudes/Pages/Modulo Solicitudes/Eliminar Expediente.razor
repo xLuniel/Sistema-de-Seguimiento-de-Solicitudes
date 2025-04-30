@@ -1,11 +1,10 @@
-﻿@page "/Elim/{id?}"
+﻿@page "/{id?}"
 
-@* Este atributo indica que la página requiere que el usuario esté autenticado *@
 @attribute [Authorize]
 
-@* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
-@using Microsoft.AspNetCore.Authorization
+@*@attribute [Authorize(Roles = "ADMINISTRADOR")]*@
 
+@using Microsoft.AspNetCore.Authorization
 @using SolicitudesShared
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using CurrieTechnologies.Razor.SweetAlert2
@@ -15,65 +14,82 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
+<PageTitle>Eliminar Expedientes</PageTitle>
 
+<div class="container-eliminar">
+    <div class="header-section">
+        <h3 class="title">Eliminación de Expedientes</h3>
+        <div class="search-box">
+            <input type="text" class="search-input" 
+                   placeholder="🔍 Buscar por nombre, folio, fecha, año..." 
+                   @bind="Filtro" @bind:event="oninput" />
+        </div>
+    </div>
 
-<PageTitle>Eliminar</PageTitle>
-
-<h3>Eliminacion de Expedientes</h3>
-
-<!-- Campo de Busqueda -->
-<div class="d-flex align-items-center gap-2 mb-3">
-    <input type="text" class="form-control" placeholder="🔍 Buscar por nombre, folio, fecha, año..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
-</div>
-
-<div class="table-responsive">
-    <table class="table">
-	    <thead>
-		    <tr>
-			    <th>ID</th>
-			    <th>FOLIO</th>
-			    <th>NOMBRE</th>
-			    <th>FECHA DE INICIO</th>
-			    <th>ESTATUS</th>
-			    <th>ELIMINAR</th>
-		    </tr>	
-	    </thead>
-        <tbody>
-            @if (ExpedientesFiltrados != null && ExpedientesFiltrados.Any())
-            {
-                foreach (var expediente in PagedExpedientes.OrderByDescending(e => e.Id))
-                {
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="expedientes-table">
+                <thead>
                     <tr>
-                        <td>@expediente.Id</td>
-                        <td>@expediente.Folio</td>
-                        <td>@expediente.NombreSolicitante</td>
-                        <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                        <td>@expediente.Estado</td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="() => Eliminar(expediente.Id)">
-                                <i class="bi bi-trash">Eliminar</i>
-                            </button>
-                        </td>
+                        <th>ID</th>
+                        <th>FOLIO</th>
+                        <th>NOMBRE</th>
+                        <th>FECHA DE INICIO</th>
+                        <th>ESTATUS</th>
+                        <th>ACCIÓN</th>
                     </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="text-center">No se encontraron expedientes.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (ExpedientesFiltrados != null && ExpedientesFiltrados.Any())
+                    {
+                        foreach (var expediente in PagedExpedientes.OrderByDescending(e => e.Id))
+                        {
+                            <tr class="@((expediente.Estado?.ToLower() == "eliminado") ? "deleted-row" : "")">
+                                <td data-label="ID">@expediente.Id</td>
+                                <td data-label="Folio">@expediente.Folio</td>
+                                <td data-label="Nombre">@expediente.NombreSolicitante</td>
+                                <td data-label="Fecha">@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                <td data-label="Estatus">
+                                    <span class="status-badge @expediente.Estado?.ToLower()">@expediente.Estado</span>
+                                </td>
+                                <td data-label="Acción">
+                                    @if (expediente.Estado?.ToLower() != "eliminado")
+                                    {
+                                        <button class="btn-delete" @onclick="() => Eliminar(expediente.Id)">
+                                            <i class="bi bi-trash-fill"></i> Eliminar
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="already-deleted">Eliminado</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="no-results text-center">
+                                <div style="padding: 1rem; font-size: 1.1rem;">
+                                    <i class="bi bi-search"></i> No se encontraron expedientes
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <div class="d-flex justify-content-center align-items-center mt-3" style="padding-bottom: 16px">
-        <button class="btn btn-primary mx-2" @onclick="PrevPage" disabled="@(currentPage <= 1)">
-            Anterior
-        </button>
-        <span>Página @currentPage de @totalPages</span>
-        <button class="btn btn-primary mx-2" @onclick="NextPage" disabled="@(currentPage >= totalPages)">
-            Siguiente
-        </button>
+        <div class="pagination-controls">
+            <button class="btn-pagination" @onclick="PrevPage" disabled="@(currentPage <= 1)">
+                <i class="bi bi-chevron-left"></i> Anterior
+            </button>
+            <span class="page-indicator">Página @currentPage de @totalPages</span>
+            <button class="btn-pagination" @onclick="NextPage" disabled="@(currentPage >= totalPages)">
+                Siguiente <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -127,7 +143,7 @@
         var randomNumber = new Random().Next(1000, 9999);
         var guidPart = Guid.NewGuid().ToString().Substring(0, 4); // Solo los primeros 4 caracteres
         Id = $"{randomNumber}-{guidPart}";
-        NavigationManager.NavigateTo($"/Elim/{Id}");
+        NavigationManager.NavigateTo($"/{Id}");
 
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
     }
