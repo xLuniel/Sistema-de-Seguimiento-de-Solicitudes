@@ -5,6 +5,10 @@
 @code {
     protected override void OnInitialized()
     {
-        Navigation.NavigateTo("/", true); // Redirige al login
+		if (!Navigation.Uri.EndsWith("/"))
+		{
+			Navigation.NavigateTo("/", true); // Redirige al login
+		}
+        
     }
 }

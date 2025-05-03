@@ -5,14 +5,22 @@
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+				<Authorizing>
+					<div class="auth-loading">
+						<p>Autenticando...</p>
+					</div>
+				</Authorizing>
                 <NotAuthorized Context="authContext">
                     @if (!authContext.User.Identity?.IsAuthenticated ?? false)
                     {
-                        <Sistema_de_Seguimiento_de_Solicitudes.Services.RedirectToLogin />
+						
+
+						<Sistema_de_Seguimiento_de_Solicitudes.Services.RedirectToLogin />
                     }
                     else
                     {
-                        <p>No tienes permiso para acceder a esta página.</p>
+						<p>No tienes permiso para acceder a esta página.</p>
+						
                     }
                 </NotAuthorized>
             </AuthorizeRouteView>

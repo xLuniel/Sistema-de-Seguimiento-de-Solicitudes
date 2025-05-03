@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/login"
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
@@ -72,7 +72,7 @@
             response.Flag = true;
             IsLoading = false;
 
-            NavigationManager.NavigateTo("/menu");
+
 
             if (!response.Flag)
             {
@@ -81,7 +81,15 @@
             else
             {
                 await CustomAuthStateProvider.SetToken(response.Token);
+
+                //var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+
+                 NavigationManager.NavigateTo("/menu", forceLoad: true);
+                
+				
             }
+            
+           
         }
         catch (Exception ex)
         {

@@ -1,9 +1,9 @@
-<<<<<<< HEAD
-﻿
+/*<<<<<<< HEAD
+﻿*/
 /* Modal */
-=======
-﻿/* Modal */
->>>>>>> Se agrega seccion de Menu y Modulo de Solicitudes
+/*=======
+﻿*//* Modal */
+/*>>>>>>> Se agrega seccion de Menu y Modulo de Solicitudes*/
 .modal {
     position: fixed;
     top: 0;
@@ -86,9 +86,9 @@
                 background-color: #5a6268;
             }
 
-<<<<<<< HEAD
+/*<<<<<<< HEAD
 
-=======
+=======*/
 /* Boton para Agregar Usuarios */
 .btn-agregar {
     background-color: #28a745;
@@ -112,4 +112,4 @@
         outline: none;
         box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.4);
     }
->>>>>>> Se agrega seccion de Menu y Modulo de Solicitudes
+/*>>>>>>> Se agrega seccion de Menu y Modulo de Solicitudes*/

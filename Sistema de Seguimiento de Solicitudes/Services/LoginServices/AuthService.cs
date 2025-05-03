@@ -47,6 +47,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
             if (result.Flag)
             {
                 await _authStateProvider.SetToken(result.Token);
+                
             }
             //if (result != null)
             //{

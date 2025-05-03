@@ -19,6 +19,8 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
+            Console.WriteLine("Obteniendo estado de autenticación...");
+
             var token = await _jSRuntime.InvokeAsync<string>("localStorage.getItem", _tokenKey);
             if (!string.IsNullOrEmpty(token))
             {
@@ -45,7 +47,10 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
                 await _jSRuntime.InvokeVoidAsync("localStorage.setItem", _tokenKey, token);
             }
 
+
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            await Task.Yield();
         }
 
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)

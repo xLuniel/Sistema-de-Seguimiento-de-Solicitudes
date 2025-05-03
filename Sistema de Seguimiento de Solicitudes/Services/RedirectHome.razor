@@ -1,0 +1,25 @@
+﻿@page "/"
+
+@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
+
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider 
+
+<h3>Redirigiendo</h3>
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		if (user.Identity?.IsAuthenticated ?? false)
+		{
+			Navigation.NavigateTo("/menu");
+		}
+		else
+		{
+			Navigation.NavigateTo("/login");
+		}
+	}
+}
