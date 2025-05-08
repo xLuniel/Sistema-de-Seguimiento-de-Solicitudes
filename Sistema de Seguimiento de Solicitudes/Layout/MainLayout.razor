@@ -19,7 +19,9 @@
     <main>
         <div class="top-row px-4">
             @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
-            <button class="btn btn-danger" @onclick="LogoutClicked">Logout</button>
+            <button class="btn-primary" @onclick="MainMenuClicked">Menú Principal</button>
+
+            <button class="btn btn-danger" @onclick="LogoutClicked">Cerrar sesión</button>
         </div>
 
         <article class="content px-4">
@@ -29,11 +31,17 @@
 </div>
 
 @code {
-	
 
-	private async Task LogoutClicked()
-	{
-		await AuthService.Logout();
-		NavigationManager.NavigateTo("/Login", forceLoad: true);
-	}
+
+    private async Task LogoutClicked()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/Login", forceLoad: true);
+    }
+
+    private void MainMenuClicked()
+    {
+         NavigationManager.NavigateTo("/menu");
+        
+    }
 }
