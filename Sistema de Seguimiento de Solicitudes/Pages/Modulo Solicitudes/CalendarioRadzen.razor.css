@@ -1,0 +1,12 @@
+﻿/* Responsive */
+@media (max-width: 768px) {
+    .controls-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .rz-scheduler-appointment::after {
+        display: none;
+    }
+}
