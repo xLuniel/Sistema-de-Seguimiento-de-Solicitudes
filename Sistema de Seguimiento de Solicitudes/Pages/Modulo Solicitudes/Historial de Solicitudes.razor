@@ -1,7 +1,6 @@
 ﻿@page "/menu/modulo-solicitudes/historial-solicitudes"
 
 @attribute [Authorize]
-@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
@@ -9,6 +8,7 @@
 
 @inject IExpedienteService ExpedienteService
 @inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 @inject HttpClient Http
 
@@ -21,7 +21,7 @@
         </div>
         <div class="col-md-4">
             <select class="form-control" @bind="estadoSeleccionado">
-                <option value="">🗂️ Todos los Estados</option>
+                <option value="">🗂️ Todos los estados</option>
                 <option value="INICIO">🟦 Inicio</option>
                 <option value="PROCESO">🔄 Proceso</option>
                 <option value="EN PREVENCIÓN">📋 En Prevención</option>
@@ -30,6 +30,12 @@
                 <option value="DESECHADA">❌ Desechada</option>
                 <option value="CANCELADA">⚠️ Cancelada</option>
             </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-success w-100" @onclick="DescargarExcel">
+                📤 Descargar Excel
+            </button>
+
         </div>
     </div>
 
@@ -46,7 +52,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (SolicitudesFiltradas != null && SolicitudesFiltradas.Any())
+                @if (SolicitudesFiltradas.Any())
                 {
                     @foreach (var solicitud in PagedExpedientes)
                     {
@@ -88,31 +94,12 @@
 </div>
 
 @code {
-    private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
     private List<ExpedienteDTO> SolicitudesHistorial = new();
     private string busqueda = string.Empty;
     private string estadoSeleccionado = string.Empty;
 
     private int currentPage = 1;
-    private int pageSize = 12; // Cantidad de solicitudes por pagina
-
-    // Lista paginada
-    private IEnumerable<ExpedienteDTO> PagedExpedientes => SolicitudesFiltradas
-        .OrderByDescending(e => e.Id)
-        .Skip((currentPage - 1) * pageSize)
-        .Take(pageSize);
-
-    private int totalPages => SolicitudesFiltradas.Any() ? (SolicitudesFiltradas.Count() + pageSize - 1) / pageSize : 1;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Invoca la función global definida en pagsize.js
-            pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
-            StateHasChanged();
-        }
-    }
+    private int pageSize = 12;
 
     private IEnumerable<ExpedienteDTO> SolicitudesFiltradas =>
         SolicitudesHistorial.Where(s =>
@@ -123,20 +110,31 @@
             (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado == estadoSeleccionado)
         );
 
+    private IEnumerable<ExpedienteDTO> PagedExpedientes =>
+        SolicitudesFiltradas
+            .OrderByDescending(e => e.Id)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize);
+
+    private int totalPages =>
+        SolicitudesFiltradas.Any() ? (SolicitudesFiltradas.Count() + pageSize - 1) / pageSize : 1;
+
     protected override async Task OnInitializedAsync()
     {
         var todas = await ExpedienteService.Lista();
         SolicitudesHistorial = todas
-            .Where(e =>
-                e.Estado == "INICIO" ||
-                e.Estado == "PROCESO" ||
-                e.Estado == "EN PREVENCIÓN" ||
-                e.Estado == "EN AMPLIACIÓN" ||
-                e.Estado == "TERMINADA" ||
-                e.Estado == "DESECHADA" ||
-                e.Estado == "CANCELADA")
+            .Where(e => new[] { "INICIO", "PROCESO", "EN PREVENCIÓN", "EN AMPLIACIÓN", "TERMINADA", "DESECHADA", "CANCELADA" }.Contains(e.Estado))
             .OrderByDescending(e => e.FechaInicio)
             .ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
+            StateHasChanged();
+        }
     }
 
     private void VerDetalle(int id, string folio)
@@ -144,27 +142,112 @@
         Navigation.NavigateTo($"/menu/modulo-solicitudes/indice-expedientes/detalles/{id}/{folio}");
     }
 
-    private string GetEstadoClass(string estado)
+    private string GetEstadoClass(string estado) => estado switch
     {
-        return estado switch
-        {
-            "INICIO" => "badge-info",
-            "PROCESO" => "badge-primary",
-            "EN PREVENCIÓN" => "badge-warning",
-            "EN AMPLIACIÓN" => "badge-light",
-            "TERMINADA" => "badge-success",
-            "DESECHADA" => "badge-danger",
-            "CANCELADA" => "badge-dark",
-            _ => "badge-secondary" 
-        };
+        "INICIO" => "badge-info",
+        "PROCESO" => "badge-primary",
+        "EN PREVENCIÓN" => "badge-warning",
+        "EN AMPLIACIÓN" => "badge-light",
+        "TERMINADA" => "badge-success",
+        "DESECHADA" => "badge-danger",
+        "CANCELADA" => "badge-dark",
+        _ => "badge-secondary"
+    };
+
+    private async Task DescargarExcel()
+    {
+        var estado = string.IsNullOrWhiteSpace(estadoSeleccionado) ? "TODOS LOS ESTADOS" : estadoSeleccionado.Replace(" ", "_");
+        var hora = DateTime.Now.ToString("HH꞉mm꞉ss");
+        var nombre = $"Reporte_{estado}_{DateTime.Now:dd-MM-yyyy}_{hora}.xlsx";
+        var base64 = await ObtenerExcelComoBase64();
+        await JS.InvokeVoidAsync("excelFunctions.descargarExcel", nombre, base64);
     }
+
+
+    private async Task<string> ObtenerExcelComoBase64()
+    {
+        using var workbook = new ClosedXML.Excel.XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Solicitudes");
+
+        // Encabezados
+        var headers = new[]
+        {
+        "ID", "Folio", "Año Admisión", "Mes Admisión", "Tipo Solicitud", "Tipo Derecho", "Nombre Solicitante",
+        "Fecha Inicio", "Fecha Límite 10 días", "Ampliación", "Sesión Ampliación", "Fecha Sesión Ampliación",
+        "Fecha Límite 20 días", "Estado", "Fecha Respuesta", "Promedio Días", "Prevención", "Subsanación",
+        "Fecha Límite Prevención", "Recibida/Registrada", "Medio Recepción Manual",
+        "Modo de Respuesta Deseado", "Correo", "Contenido Solicitud", "Área Poseedora",
+        "Materia", "Ciudad", "Temática", "Temática Específica", "Sentido Respuesta",
+        "Precisión Sentido", "Modalidad Entrega", "Cobro", "Recurso Revisión",
+        "N° Recurso", "Datos Recurso", "Nota"
+    };
+
+        for (int i = 0; i < headers.Length; i++)
+        {
+            worksheet.Cell(1, i + 1).Value = headers[i];
+            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+        }
+
+        int row = 2;
+        foreach (var s in SolicitudesFiltradas)
+        {
+            worksheet.Cell(row, 1).Value = s.Id;
+            worksheet.Cell(row, 2).Value = s.Folio;
+            worksheet.Cell(row, 3).Value = s.AnoAdmision;
+            worksheet.Cell(row, 4).Value = s.MesAdmision;
+            worksheet.Cell(row, 5).Value = s.TipoSolicitud;
+            worksheet.Cell(row, 6).Value = s.TipoDerecho;
+            worksheet.Cell(row, 7).Value = s.NombreSolicitante;
+            worksheet.Cell(row, 8).Value = s.FechaInicio.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 9).Value = s.FechaLimiteRespuesta10dias?.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 10).Value = s.Ampliacion;
+            worksheet.Cell(row, 11).Value = s.NumeroSesionComiteAmpliacion;
+            worksheet.Cell(row, 12).Value = s.FechaSesionComiteAmpliacion?.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 13).Value = s.FechaLimiteRespuesta20dias?.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 14).Value = s.Estado;
+            worksheet.Cell(row, 15).Value = s.FechaRespuesta?.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 16).Value = s.PromedioDiasRespuesta;
+            worksheet.Cell(row, 17).Value = s.Prevencion ? "Sí" : "No";
+            worksheet.Cell(row, 18).Value = s.SubsanaPrevencionReinicoTramite;
+            worksheet.Cell(row, 19).Value = s.FechaLimitePrevencion10dias?.ToString("dd/MM/yyyy");
+            worksheet.Cell(row, 20).Value = s.RecibidaRegistrada;
+            worksheet.Cell(row, 21).Value = s.MedioRecepcionSolicitudManual;
+            worksheet.Cell(row, 22).Value = s.ComoDeseaRecibirRespuestaPersonaSolicitante;
+            worksheet.Cell(row, 23).Value = s.CorreoElectronicoSolicitante;
+            worksheet.Cell(row, 24).Value = s.ContenidoSolicitud;
+            worksheet.Cell(row, 25).Value = s.AreaPoseedoraInformacion;
+            worksheet.Cell(row, 26).Value = s.Materia;
+            worksheet.Cell(row, 27).Value = s.CiudadSolicitante;
+            worksheet.Cell(row, 28).Value = s.Tematica;
+            worksheet.Cell(row, 29).Value = s.TematicaEspecifica;
+            worksheet.Cell(row, 30).Value = s.SentidoRespuesta;
+            worksheet.Cell(row, 31).Value = s.PrecisionSentidoRespuesta;
+            worksheet.Cell(row, 32).Value = s.ModalidadEntrega;
+            worksheet.Cell(row, 33).Value = s.Cobro;
+            worksheet.Cell(row, 34).Value = s.RecursoRevision;
+            worksheet.Cell(row, 35).Value = s.NumeroRecursoRevision;
+            worksheet.Cell(row, 36).Value = s.DatosRecursoRevision;
+            worksheet.Cell(row, 37).Value = s.Nota;
+
+            row++;
+        }
+
+        worksheet.Columns().AdjustToContents(); // Ajusta ancho automáticamente
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Seek(0, SeekOrigin.Begin);
+        return Convert.ToBase64String(stream.ToArray());
+    }
+
+
 
     private void PrevPage()
     {
         if (currentPage > 1)
         {
             currentPage--;
-            StateHasChanged(); // Forzar actualización de la interfaz
+            StateHasChanged();
         }
     }
 
@@ -173,7 +256,7 @@
         if (currentPage < totalPages)
         {
             currentPage++;
-            StateHasChanged(); // Forzar actualización de la interfaz
+            StateHasChanged();
         }
     }
 }
