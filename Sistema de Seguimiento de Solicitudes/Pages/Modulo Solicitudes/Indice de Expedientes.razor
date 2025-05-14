@@ -43,25 +43,29 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div>
+                <div style="display: grid; grid-template-columns: 1fr;">
                     <label for="NumeroFolio">Folio: </label>
                     <InputText id="Folio" @bind-Value="NuevoExpediente.Folio" maxlength="20" />
-                    
+
                     <label for="Nombre">Nombre: </label>
                     <InputText id="Nombre" @bind-Value="NuevoExpediente.NombreSolicitante" />
+                </div>
 
-                    <label for="FechaInicioTramite">Fecha de Inicio: </label>
-                    <InputDate id="FechaInicioTramite" @bind-Value="NuevoExpediente.FechaInicio" />
-
-                    <label for="Estatus">Estatus: </label>
-                    <InputSelect id="Estatus" @bind-Value="NuevoExpediente.Estado">
-                        <option value="" disabled selected>Selecciona una opción:</option>
-                        @foreach (var estado in ListaEstados)
-                        {
-                            <option value="@estado">@estado</option>
-                        }
-                    </InputSelect>
-
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label for="FechaInicioTramite">Fecha de Inicio: </label>
+                        <InputDate id="FechaInicioTramite" @bind-Value="NuevoExpediente.FechaInicio" />
+                    </div>
+                    <div>
+                        <label for="Estatus">Estatus: </label>
+                        <InputSelect id="Estatus" @bind-Value="NuevoExpediente.Estado" style="padding: 3px;">
+                            <option value="" disabled selected>Selecciona una opción:</option>
+                            @foreach (var estado in ListaEstados)
+                            {
+                                <option value="@estado">@estado</option>
+                            }
+                        </InputSelect>
+                    </div>
                 </div>
 
                 <div>
@@ -237,7 +241,7 @@
 
     private List<string> ListaEstados = new()
     {
-        "INICIO", "PROCESO", "EN PREVENCION", "EN AMPLIACION", "TERMINADA", "DESECHADA"
+        "INICIO", "PROCESO", "EN PREVENCION", "EN AMPLIACION", "TERMINADA", "DESECHADA", "CANCELADA"
     };
 
     private void MostrarFormulario()
