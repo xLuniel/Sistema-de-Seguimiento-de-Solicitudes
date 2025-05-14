@@ -23,7 +23,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         public string TipoDerecho { get; set; } = string.Empty;
 
         // Fecha de inicio del trámite
-        public DateTime FechaInicioTramite { get; set; }
+        public DateTime FechaInicioTramite { get; set; } = DateTime.Now;
 
         // Fecha límite de respuesta (10 días hábiles)
         public DateTime? FechaLimiteRespuesta10 { get; set; }

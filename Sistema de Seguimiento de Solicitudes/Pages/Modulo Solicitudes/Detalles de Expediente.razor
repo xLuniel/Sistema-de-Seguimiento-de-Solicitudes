@@ -49,7 +49,7 @@
                             </tr>
                             <tr>
                                 <th>Año de Admisión</th>
-                                <td><InputNumber class="form-control text-center" @bind-Value="Expediente.AnoAdmision" disabled /></td>
+                                <td>@Expediente.AnoAdmision</td>
                             </tr>
                             <tr>
                                 <th>Mes de Admisión</th>
@@ -104,7 +104,7 @@
                             </tr>
                             <tr>
                                 <th>Fecha de Inicio del Trámite</th>
-                                <td>@Expediente.FechaInicioTramite</td>
+                                <td>@Expediente.FechaInicioTramite.ToString("dd/MM/yyyy  -  HH:mm:ss")</td>
                             </tr>
                             <tr>
                                 <th>Fecha Límite de Respuesta (10 días hábiles)</th>

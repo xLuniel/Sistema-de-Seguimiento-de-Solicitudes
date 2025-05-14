@@ -90,15 +90,22 @@
             }).ToList();
     }
 
-    // Lista de días festivos (debes completarla con los días específicos de tu país/región)
+    // Lista de días festivos
     private readonly List<DateTime> diasFestivos = new List<DateTime>
     {
-        new DateTime(DateTime.Now.Year, 1, 1),   // Año Nuevo
-        new DateTime(DateTime.Now.Year, 2, 5),   // Día Constitución (ejemplo)
-        new DateTime(DateTime.Now.Year, 3, 21),  // Natalicio Benito Juárez (ejemplo)
-        new DateTime(DateTime.Now.Year, 5, 1),   // Día del Trabajo
-        new DateTime(DateTime.Now.Year, 9, 16),  // Día Independencia
-        new DateTime(DateTime.Now.Year, 12, 25)  // Navidad
+        new DateTime(DateTime.Now.Year, 1, 1),    // Año Nuevo
+        new DateTime(DateTime.Now.Year, 2, 5),    // Día de la Constitución
+        new DateTime(DateTime.Now.Year, 3, 21),   // Natalicio de Benito Juárez
+        new DateTime(DateTime.Now.Year, 5, 1),    // Día del Trabajo
+        new DateTime(DateTime.Now.Year, 9, 16),   // Día de la Independencia
+        new DateTime(DateTime.Now.Year, 11, 2),   // Día de Muertos  
+        new DateTime(DateTime.Now.Year, 11, 20),  // Día de la Revolución Mexicana
+        new DateTime(DateTime.Now.Year, 12, 12),  // Día de la Virgen de Guadalupe 
+        new DateTime(DateTime.Now.Year, 12, 25),  // Navidad
+
+        // Días comunes en la administración pública:
+        new DateTime(DateTime.Now.Year, 12, 24),  // Nochebuena
+        new DateTime(DateTime.Now.Year, 12, 31)   // Fin de año
     };
 
     // Método para determinar si una fecha es laborable
@@ -114,13 +121,28 @@
     private int CalcularDiasHabiles(DateTime inicio, DateTime fin)
     {
         int dias = 0;
-        for (DateTime fecha = inicio; fecha <= fin; fecha = fecha.AddDays(1))
+
+        if (inicio <= fin)
         {
-            if (EsDiaLaborable(fecha))
+            for (DateTime fecha = inicio; fecha <= fin; fecha = fecha.AddDays(1))
             {
-                dias++;
+                if (EsDiaLaborable(fecha))
+                {
+                    dias++;
+                }
             }
         }
+        else
+        {
+            for (DateTime fecha = inicio; fecha >= fin; fecha = fecha.AddDays(-1))
+            {
+                if (EsDiaLaborable(fecha))
+                {
+                    dias--;
+                }
+            }
+        }
+
         return dias;
     }
 
@@ -192,31 +214,34 @@
     // }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
+{
+    string clases = "";
+
+    // 1. Día actual
+    if (args.Start.Date == DateTime.Today.Date)
     {
-        // Highlight today in month view
-        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
-        {
-            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-        }
-
-        // Highlight working hours (9-18)
-        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
-        {
-            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-        }
-
-        // Resaltar días no laborables
-        if (!EsDiaLaborable(args.Start.Date))
-        {
-            args.Attributes["class"] = "rz-scheduler-non-working-time-cell";
-        }
-
-        // Resaltar el día actual
-        if (args.Start.Date == DateTime.Today.Date)
-        {
-            args.Attributes["class"] = (args.Attributes.ContainsKey("class") ? args.Attributes["class"] + " " : "") + "dia-actual";
-        }
+        clases += " dia-actual";
     }
+
+    // 2. Día no laborable
+    if (!EsDiaLaborable(args.Start.Date))
+    {
+        clases += " rz-scheduler-non-working-time-cell";
+    }
+
+    // 3. Estilo solo para vistas Day y Week (horarios laborales)
+    if ((args.View.Text == "Week" || args.View.Text == "Day") &&
+        args.Start.Hour > 8 && args.Start.Hour < 19)
+    {
+        args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+    }
+
+    if (!string.IsNullOrWhiteSpace(clases))
+    {
+        args.Attributes["class"] = (args.Attributes.ContainsKey("class") ? args.Attributes["class"] + " " : "") + clases.Trim();
+    }
+}
+
 
     // async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     // {
@@ -404,7 +429,7 @@
         }
 
     .event-especial {
-        background-color: #e2d4f0 !important;
+        background-color: #d4edda !important;
         border-left-color: #6f42c1 !important;
     }
 
