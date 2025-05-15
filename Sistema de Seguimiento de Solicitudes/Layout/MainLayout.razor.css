@@ -36,6 +36,13 @@ main {
         text-overflow: ellipsis;
     }
 
+.btn-primary {
+    padding: 0.32rem 0.7rem;
+    margin-right: auto;
+    border-radius: .25rem;
+    border-color: transparent;
+}
+
 @media (max-width: 640.98px) {
     .top-row {
         justify-content: space-between;
