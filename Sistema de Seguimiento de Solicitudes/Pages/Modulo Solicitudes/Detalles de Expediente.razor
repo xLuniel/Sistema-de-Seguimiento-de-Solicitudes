@@ -23,7 +23,7 @@
 <PageTitle>Detalles</PageTitle>
 
 <div class="container mt-4">
-    <h3 class="text-center">Detalles de Expediente @Expediente.Folio - @Expediente.Nombre </h3>
+    <h3 class="text-center">Detalles de Solicitud @Expediente.Folio - @Expediente.Nombre </h3>
 
     @if (Expediente != null)
     {
@@ -761,7 +761,7 @@
             if (response.Exito )
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Cambios guardados correctamente.");
-                Navigation.NavigateTo("/indice-expedientes");
+                Navigation.NavigateTo("/menu/modulo-solicitudes/indice-expedientes");
             }
             else
             {
