@@ -1,10 +1,10 @@
 ﻿@page "/menu/modulo-solicitudes/CreacionUsuarios"
 
 @attribute [Authorize]
-
-@*@attribute [Authorize(Roles = "ADMINISTRADOR, Admin")]*@
+@attribute [Authorize(Roles = "ADMINISTRADOR")]
 
 @using Microsoft.AspNetCore.Authorization
+@using System.ComponentModel.DataAnnotations
 @using System.Collections.Generic
 @using CurrieTechnologies.Razor.SweetAlert2
 @using SolicitudesShared
@@ -16,7 +16,6 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
 @inject IExpedienteService ExpedienteService
-@inject IJSRuntime JSRuntime
 @inject HttpClient Http
 
 <h3>Creacion de Usuarios</h3>
@@ -64,17 +63,51 @@
                         }
                     </InputSelect>
 
+                    @if (!string.IsNullOrEmpty(DescripcionRolSeleccionado))
+                    {
+                        <p style="font-size: 0.85rem; color: #555; margin-top: 0.25rem;">
+                            @DescripcionRolSeleccionado
+                        </p>
+                    }
                 </div>
 
-
                 <button type="submit">Guardar</button>
-                <button @onclick="CerrarFormulario">Cancelar</button>
+                <button type="button" @onclick="CerrarFormulario">Cancelar</button>
             </EditForm>
         </div>
     </div>
-}  
+}
 
-<div class="table-responsive">
+<!-- Modal de formulario para cambio de contraseña -->
+@if (MostrarModalCambioContrasena)
+{
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-contenido" role="document">
+            <h4>Cambiar contraseña - @UsuarioCambioContrasena.NombreUsuario</h4>
+            <EditForm Model="CambioContrasenaModel" OnValidSubmit="GuardarCambioContrasena">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <label for="nuevaPass">Nueva contraseña:</label>
+                <div class="password-container">
+                    <InputText id="nuevaPass"
+                               class="form-control input-password"
+                               type="@(_mostrarPasswordCambio ? "text" : "password")"
+                               @bind-Value="CambioContrasenaModel.NuevaContrasena"
+                               autocomplete="new-password" />
+                    <button type="button" class="toggle-password" @onclick="() => _mostrarPasswordCambio = !_mostrarPasswordCambio" aria-label="Mostrar/Ocultar contraseña">
+                        <i class="bi @(_mostrarPasswordCambio ? "bi-eye-slash" : "bi-eye")"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                <button type="button" class="btn btn-secondary mt-3" @onclick="CerrarModalCambioContrasena">Cancelar</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div class="table-responsive" style="text-align: center;">
     <table class="table">
         <thead>
             <tr>
@@ -90,16 +123,15 @@
                 @foreach (var usuario in PagedUsuarios)
                 {
                     <tr>
-                        @* <td>
-                            <button @onclick="() => VerDetalle(expediente.Id)">Ver</button>
-                        </td> *@
-
                         <td>@usuario.Id</td>
                         <td>@usuario.NombreUsuario</td>
                         <td>@usuario.Rol</td>
                         <td>
+                            <button class="btn btn-primary me-2" @onclick="() => AbrirModalCambioContrasena(usuario)">
+                                <i class="bi bi-key-fill"></i> Cambiar Contraseña
+                            </button>
                             <button class="btn btn-danger" @onclick="() => Eliminar(usuario.Id)">
-                                <i class="bi bi-trash">Eliminar</i>
+                                <i class="bi bi-trash"></i> Eliminar
                             </button>
                         </td>
                     </tr>
@@ -128,11 +160,24 @@
 </div>
 
 @code {
+    // Modelo para cambio de contraseña
+    public class CambioContrasenaModelClass
+    {
+        [Required(ErrorMessage = "La nueva contraseña es requerida")]
+        [MinLength(8, ErrorMessage = "Debe tener al menos 8 caracteres")]
+        public string NuevaContrasena { get; set; } = string.Empty;
+    }
+
     private bool MostrarModal { get; set; } = false;
     private bool MostrarFormularioModal { get; set; } = false;
     private string MensajeError { get; set; } = string.Empty;
     private bool MostrarMensajeError { get; set; } = false;
 
+    private bool MostrarModalCambioContrasena { get; set; } = false;
+    private UsuariosDTO UsuarioCambioContrasena { get; set; } = null!;
+    private CambioContrasenaModelClass CambioContrasenaModel { get; set; } = new();
+
+    private bool _mostrarPasswordCambio = false;
 
     private bool _mostrarPassword = false;
     private string _filtro = string.Empty;
@@ -151,12 +196,12 @@
 
     List<UsuariosDTO>? ListaUsuarios { get; set; } = null;
     private List<UsuariosDTO> UsuariosFiltrados { get; set; } = new();
-	private UsuariosDTO NuevoUsuario { get; set; } = new()
-		{
-			NombreUsuario = string.Empty,
-			password = string.Empty,
-			Rol = string.Empty
-		};
+    private UsuariosDTO NuevoUsuario { get; set; } = new()
+        {
+            NombreUsuario = string.Empty,
+            password = string.Empty,
+            Rol = string.Empty
+        };
 
     private int currentPage = 1;
     private int pageSize = 12; // Cantidad de usuarios por pagina
@@ -172,7 +217,6 @@
     {
         if (firstRender)
         {
-            // Invoca la función global definida en pagsize.js
             pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
             StateHasChanged();
         }
@@ -185,13 +229,53 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Inicializa la lista de usuarios
         ListaUsuarios = await UsuarioService.Lista_Usuarios();
         UsuariosFiltrados = new List<UsuariosDTO>(ListaUsuarios.OrderByDescending(e => e.Id));
-
     }
 
-    //Filtro de busqueda
+    // Abrir modal cambio contraseña
+    private void AbrirModalCambioContrasena(UsuariosDTO usuario)
+    {
+        UsuarioCambioContrasena = usuario;
+        CambioContrasenaModel = new CambioContrasenaModelClass();
+        _mostrarPasswordCambio = false;
+        MostrarModalCambioContrasena = true;
+    }
+
+    private void CerrarModalCambioContrasena()
+    {
+        MostrarModalCambioContrasena = false;
+        CambioContrasenaModel = new CambioContrasenaModelClass();
+    }
+
+    private async Task GuardarCambioContrasena()
+    {
+        if (string.IsNullOrWhiteSpace(CambioContrasenaModel.NuevaContrasena))
+        {
+            await Swal.FireAsync("Error", "La nueva contraseña no puede estar vacía.", SweetAlertIcon.Error);
+            return;
+        }
+
+        if (CambioContrasenaModel.NuevaContrasena.Length < 6)
+        {
+            await Swal.FireAsync("Error", "La contraseña debe tener al menos 6 caracteres.", SweetAlertIcon.Error);
+            return;
+        }
+
+        var resultado = await UsuarioService.CambiarContrasena(UsuarioCambioContrasena.Id, CambioContrasenaModel.NuevaContrasena);
+
+        if (resultado)
+        {
+            await Swal.FireAsync("Éxito", "Contraseña actualizada correctamente.", SweetAlertIcon.Success);
+            CerrarModalCambioContrasena();
+        }
+        else
+        {
+            await Swal.FireAsync("Error", "No se pudo actualizar la contraseña.", SweetAlertIcon.Error);
+        }
+    }
+
+    // Filtro de búsqueda
     private void FiltrarUsuarios()
     {
         UsuariosFiltrados = ListaUsuarios!
@@ -206,59 +290,62 @@
         StateHasChanged();
     }
 
-	private async Task Eliminar(int id)
-	{
-		// Mostrar mensaje de confirmación
-		var resultado = await Swal.FireAsync(new SweetAlertOptions
-			{
-				Title = "¿Estás seguro?",
-				Text = "No podrás revertir esto.",
-				Icon = SweetAlertIcon.Warning,
-				ShowCancelButton = true,
-				ConfirmButtonText = "Sí, eliminar",
-				CancelButtonText = "Cancelar"
-			});
-		// Lógica para eliminar el usuario
-		if (resultado.IsConfirmed)
-		{
-			var eliminado = await UsuarioService.Eliminar(id);
-			
-			if (eliminado)
-			{
-				// Mostrar mensaje de éxito
-				await Swal.FireAsync(new SweetAlertOptions
-					{
-						Title = "Eliminado",
-						Text = "El usuario ha sido eliminado.",
-						Icon = SweetAlertIcon.Success
-					});
-                
-                // Actualizar la lista de usuarios
-                ListaUsuarios = await UsuarioService.Lista_Usuarios();
-			}
-			else
-			{
-				// Mostrar mensaje de error
-				await Swal.FireAsync(new SweetAlertOptions
-					{
-						Title = "Error",
-						Text = "No se pudo eliminar el usuario.",
-						Icon = SweetAlertIcon.Error
-					});
-			}
-		}
-		
-		
-		
-		// Filtrar la lista después de eliminar
-		FiltrarUsuarios();
-	}
-
-
-    private List<string> ListaRoles = new()
+    private async Task Eliminar(int id)
     {
-        "ADMINISTRADOR","CAPTURISTA","OBSERVADOR"
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Estás seguro?",
+                Text = "No podrás revertir esto.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, eliminar",
+                CancelButtonText = "Cancelar"
+            });
+
+        if (resultado.IsConfirmed)
+        {
+            var eliminado = await UsuarioService.Eliminar(id);
+
+            if (eliminado)
+            {
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Eliminado",
+                        Text = "El usuario ha sido eliminado.",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                ListaUsuarios = await UsuarioService.Lista_Usuarios();
+            }
+            else
+            {
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error",
+                        Text = "No se pudo eliminar el usuario.",
+                        Icon = SweetAlertIcon.Error
+                    });
+            }
+        }
+
+        FiltrarUsuarios();
+    }
+
+    // Roles con su descripción
+    private Dictionary<string, string> RolesDescripcion = new()
+    {
+        { "CONSULTA", "Tiene acceso a consultar la información registrada en cada uno de los módulos del sistema, así como a la sección de reportes." },
+        { "CAPTURA", "Adicional a los derechos del rol de CONSULTA, este tipo de usuario se le permite el registro y modificación de la información contenida en cada uno de los módulos del sistema." },
+        { "SUPERVISIÓN", "Adicional a los derechos del rol de CAPTURA, este tipo de usuario ejerce las funciones de seguimiento definidas en el módulo 3 (Comité de Transparencia)." },
+        { "ADMINISTRADOR", "Adicional a los derechos del rol de CAPTURA, este tipo de usuario tiene el control de los catálogos del sistema así como de los accesos y usuarios." }
     };
+
+    private List<string> ListaRoles => RolesDescripcion.Keys.ToList();
+
+    private string DescripcionRolSeleccionado =>
+        NuevoUsuario?.Rol != null && RolesDescripcion.ContainsKey(NuevoUsuario.Rol)
+            ? RolesDescripcion[NuevoUsuario.Rol]
+            : string.Empty;
 
     private void MostrarFormulario()
     {
@@ -274,23 +361,17 @@
     {
         if (ListaUsuarios!.Any(e => e.NombreUsuario == NuevoUsuario.NombreUsuario))
         {
-            // Mostrar mensaje de error: el usuario ya existe
             await MostrarAlerta("El usuario ya existe");
             return;
         }
 
-        // Guardar el nuevo usuario
         await UsuarioService.Register(NuevoUsuario);
 
-        // Actualizar la lista de usuarios
         ListaUsuarios = await UsuarioService.Lista_Usuarios();
 
-		FiltrarUsuarios();
+        FiltrarUsuarios();
 
-
-        // Cerrar el formulario
         MostrarFormularioModal = false;
-
     }
 
     private async Task MostrarAlerta(string mensaje)
@@ -304,7 +385,6 @@
         StateHasChanged();
     }
 
-     // Métodos para la paginación
     private void PrevPage()
     {
         if (currentPage > 1)
@@ -318,7 +398,6 @@
     }
 }
 
-
 <style>
     /* Modal general */
     .modal {
@@ -327,13 +406,12 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+        background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
     }
-
     /* Contenido del modal */
     .modal-contenido {
         background-color: #fff;
@@ -365,6 +443,7 @@
             width: 100%;
             padding: 0.6rem;
             margin-top: 0.3rem;
+            margin-bottom: .5rem;
             border: 1px solid #ccc;
             border-radius: 0.5rem;
             box-sizing: border-box;
@@ -380,8 +459,7 @@
             }
 
         .modal-contenido button {
-            margin-top: 1.5rem;
-            margin-right: 0.5rem;
+            margin: auto;
             padding: 0.6rem 1.2rem;
             border: none;
             border-radius: 0.5rem;

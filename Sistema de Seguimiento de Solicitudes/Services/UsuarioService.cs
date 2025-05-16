@@ -89,5 +89,29 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception("Error al procesar la respuesta del servidor", jsonEx);
             }
         }
+
+        public async Task<bool> CambiarContrasena(int usuarioId, string nuevaContrasena)
+        {
+            var data = new { UsuarioId = usuarioId, NuevaContrasena = nuevaContrasena };
+            var response = await _http.PostAsJsonAsync("api/Auth/CambiarContrasena", data);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error HTTP: {response.StatusCode}, Detalles: {errorContent}");
+            }
+
+            var contentString = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ResponseAPI<bool>>(contentString);
+
+            if (result == null)
+                throw new Exception("Respuesta inválida del servidor.");
+
+            if (!result.Exito)
+                throw new Exception(result.Mensaje);
+
+            return result.Data;
+        }
+
     }
 }

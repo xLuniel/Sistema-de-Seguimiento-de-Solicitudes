@@ -8,6 +8,8 @@ using System.Text;
 using SolicitudesAPI.Models;
 using SolicitudesShared;
 using Microsoft.EntityFrameworkCore;
+using Sistema_de_Seguimiento_de_Solicitudes.Models;
+using static Sistema_de_Seguimiento_de_Solicitudes.Models.CambiarContrasena;
 
 namespace SolicitudesAPI.Controllers
 {
@@ -182,6 +184,21 @@ namespace SolicitudesAPI.Controllers
             return Ok(responseApi);
         }
 
+        [HttpPost("CambiarContrasena")]
+        public async Task<IActionResult> CambiarContrasena([FromBody] CambiarContrasenaRequest request)
+        {
+            var usuario = await _context.Usuarios.FindAsync(request.UsuarioId);
+            if (usuario == null)
+                return NotFound(new ResponseAPI<bool> { Exito = false, Mensaje = "Usuario no encontrado." });
+
+            var passwordHasher = new PasswordHasher<Usuario>();
+            usuario.password = passwordHasher.HashPassword(usuario, request.NuevaContrasena);
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseAPI<bool> { Exito = true, Data = true, Mensaje = "Contraseña actualizada correctamente." });
+        }
 
         private string GenerarToken(List<Claim> claims)
         {
