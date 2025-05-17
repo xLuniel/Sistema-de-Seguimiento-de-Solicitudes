@@ -5,19 +5,22 @@
 @*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
-@using Microsoft.AspNetCore.Authorization
 
+@using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @using System.Collections.Generic
 @using SolicitudesShared
 @using MudBlazor
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IExpedienteService ExpedienteService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 <PageTitle>Detalles</PageTitle>
@@ -27,11 +30,15 @@
 
     @if (Expediente != null)
     {
+        <div class="alert alert-warning text-center" hidden="@(EsSoloConsulta == false)" style="font-size: 24px">
+            Solo tienes permisos de lectura. No puedes editar este expediente.
+        </div>
+
         <EditForm Model="@Expediente" OnValidSubmit="HandleValidSubmit" style="padding-bottom: 100px;">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <div class="row">
+            <div class="row" disabled="@EsSoloConsulta">
                 <!-- Barra de Etapa -->
                 <div class="etapas">
                     <div class="etapa etapa-inicial"><h3>Etapa Inicial</h3></div>
@@ -54,7 +61,7 @@
                             <tr>
                                 <th>Mes de Admisión</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.MesAdmision" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione el mes de admisión --</option>
                                         @foreach (var mes in Catalogos.MesesAdmision)
                                         {
@@ -66,7 +73,7 @@
                             <tr>
                                 <th>Tipo de Solicitud</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="_TipoSolicitudBind">
+                                    <InputSelect class="form-control" @bind-Value="_TipoSolicitudBind" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione el tipo de solicitud --</option>
                                         @foreach (var tipoSolicitud in Catalogos.TiposSolicitud)
                                         {
@@ -79,7 +86,7 @@
                                 <th>Tipo de Derecho</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
-                                    disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud))">
+                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud) || EsSoloConsulta)">
                                         @if (Expediente.TipoSolicitud == "ARCO")
                                         {
 
@@ -108,12 +115,12 @@
                             </tr>
                             <tr>
                                 <th>Fecha Límite de Respuesta (10 días hábiles)</th>
-                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta10" /></td>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta10" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Ampliación</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="_AmpliacionBind">
+                                    <InputSelect class="form-control" @bind-Value="_AmpliacionBind" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var ampliacion in Catalogos.Ampliacion)
                                         {
@@ -124,20 +131,20 @@
                             </tr>
                             <tr>
                                 <th>Número de Sesión del Comité</th>
-                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroSesionComiteAmpliacion" /></td>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroSesionComiteAmpliacion"  disabled="@EsSoloConsulta"/></td>
                             </tr>
                             <tr>
                                 <th>Fecha de Sesión del Comité</th>
-                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaSesionComiteAmpliacion" /></td>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaSesionComiteAmpliacion" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Fecha Límite de Respuesta (20 días hábiles)</th>
-                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta20" /></td>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta20" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Estatus</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Estatus">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Estatus" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione un estado --</option>
                                         @foreach (var estatus in Catalogos.Estatuses)
                                         {
@@ -148,11 +155,11 @@
                             </tr>
                             <tr>
                                 <th>Fecha de Respuesta</th>
-                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaRespuesta" /></td>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaRespuesta" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Promedio de Días de Respuesta</th>
-                                <td><InputNumber class="form-control" @bind-Value="Expediente.PromedioDiasRespuesta" /></td>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.PromedioDiasRespuesta" disabled="@EsSoloConsulta" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -163,13 +170,13 @@
                         <tbody>
                             <tr>
                                 <th>Prevención</th>
-                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="_prevencionBind" class="prevencion-checkbox" /></td>
+                                <td><InputCheckbox id="prevencionCheckbox" @bind-Value="_prevencionBind" class="prevencion-checkbox" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Subsana Prevención y Reinicio del Trámite</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion"
-                                    disabled="@(!Expediente.Prevencion)">
+                                                 disabled="@(!Expediente.Prevencion  || EsSoloConsulta)">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
@@ -182,13 +189,13 @@
                             </tr>
                             <tr>
                                 <th>Fecha Límite para Prevención (10 días hábiles)</th>
-                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimitePrevencion" /></td>
+                                <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimitePrevencion" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Cómo fue Recibida/Registrada en la PNT</th>
                                 <td>
                                     <InputSelect class="form-control"
-                                                 @bind-Value="_RecibidaRegistradaBind">
+                                                 @bind-Value="_RecibidaRegistradaBind" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var recibida in Catalogos.ComoFueRecibida)
                                         {
@@ -201,7 +208,7 @@
                                 <th>Medio de Recepción en Solicitud Manual</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual"
-                                                 disabled="@(!HabilitarMedioRecepcion)">
+                                                 disabled="@(!HabilitarMedioRecepcion  || EsSoloConsulta)">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var medioRecepcion in Catalogos.MedioRecepcionSolicitudManual)
@@ -215,7 +222,7 @@
                             <tr>
                                 <th>Como desea recibir la respuesta la persona solicitante</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.ComoDeseaRecibirRespuestaPersonaSolicitante" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var opciones in Catalogos.ComoDeseaRecibirRespuesta)
                                         {
@@ -226,17 +233,17 @@
                             </tr>
                             <tr>
                                 <th>Nombre</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.Nombre" /></td>
+                                <td><InputText class="form-control" @bind-Value="Expediente.Nombre" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Correo Electrónico</th>
-                                <InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" type="email" />
+                                <InputText class="form-control" @bind-Value="Expediente.CorreoElectronico" type="email" disabled="@EsSoloConsulta" />
                                 <ValidationMessage For="@(() => Expediente.CorreoElectronico)" />
                             </tr>
                             <tr>
                                 <th>Contenido de la Solicitud</th>
                                 <td>
-                                    <InputTextArea class="form-control" rows="10" @bind-Value="Expediente.ContenidoSolicitud">@Expediente.ContenidoSolicitud</InputTextArea>
+                                    <InputTextArea class="form-control" rows="10" @bind-Value="Expediente.ContenidoSolicitud" disabled="@EsSoloConsulta">@Expediente.ContenidoSolicitud</InputTextArea>
                                 </td>
                             </tr>
                         </tbody>
@@ -253,7 +260,7 @@
                             <tr>
                                 <th>Área que Posee la Información</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.AreaInformacion" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione el área --</option>
                                         @foreach (var area in Catalogos.AreaPoseedoraInformacion)
                                         {
@@ -276,7 +283,7 @@
                             <tr>
                                 <th>Materia</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Materia">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Materia" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione la materia --</option>
                                         @foreach (var materia in Catalogos.Materia)
                                         {
@@ -288,7 +295,7 @@
                             <tr>
                                 <th>Ciudad</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Ciudad">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Ciudad" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione la ciudad --</option>
                                         @foreach (var ciudad in Catalogos.Ciudades)
                                         {
@@ -300,7 +307,7 @@
                             <tr>
                                 <th>Temática</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-value="TematicaBind">
+                                    <InputSelect class="form-control" @bind-value="TematicaBind" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una temática --</option>
                                         @foreach (var tematica in Catalogos.Tematica)
                                         {
@@ -313,8 +320,8 @@
                                 <th>Temática Específica</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TematicaEspecifica"
-                                    disabled="@(string.IsNullOrEmpty(Expediente.Tematica))">
-                                        <option disabled selected value="">-- Seleccione una temática específica --</option> 
+                                                 disabled="@(string.IsNullOrEmpty(Expediente.Tematica) || EsSoloConsulta)">
+                                        <option disabled selected value="">-- Seleccione una temática específica --</option>
                                         @foreach (var tematicaEspecifica in TematicasEspecificasActuales)
                                         {
                                             <option value="@tematicaEspecifica">@tematicaEspecifica</option>
@@ -325,7 +332,7 @@
                             <tr>
                                 <th>Sentido de Respuesta</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.SentidoRespuesta">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.SentidoRespuesta" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione el sentido de respuesta --</option>
                                         @foreach (var sentidoRespuesta in Catalogos.SentidoRespuesta)
                                         {
@@ -336,12 +343,12 @@
                             </tr>
                             <tr>
                                 <th>Precisión del Sentido de Respuesta</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.PrecisionSentidoRespuesta" /></td>
+                                <td><InputText class="form-control" @bind-Value="Expediente.PrecisionSentidoRespuesta" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Modalidad de Entrega</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.ModalidadEntrega">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.ModalidadEntrega" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione la modalidad de entrega --</option>
                                         @foreach (var modalidadEntrega in Catalogos.ModalidadEntrega)
                                         {
@@ -361,7 +368,7 @@
                             <tr>
                                 <th>Cobro</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.Cobro">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.Cobro" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una opción de cobro --</option>
                                         @foreach (var cobro in Catalogos.Cobros)
                                         {
@@ -373,7 +380,7 @@
                             <tr>
                                 <th>Recurso de Revisión</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.RecursoRevision">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.RecursoRevision" disabled="@EsSoloConsulta">
                                         @foreach (var recursoRevision in Catalogos.RecursoRevision)
                                         {
                                             <option value="@recursoRevision">@recursoRevision</option>
@@ -383,22 +390,25 @@
                             </tr>
                             <tr>
                                 <th>Número de Recurso de Revisión</th>
-                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroRecursoRevision" /></td>
+                                <td><InputNumber class="form-control" @bind-Value="Expediente.NumeroRecursoRevision" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
                                 <th>Datos del Recurso de Revisión</th>
-                                <td><InputText class="form-control" @bind-Value="Expediente.DatosRecursoRevision" /></td>
+                                <td><InputText class="form-control" @bind-Value="Expediente.DatosRecursoRevision"  disabled="@EsSoloConsulta"/></td>
                             </tr>
                             <tr>
                                 <th>Nota</th>
-                                <td><InputTextArea class="form-control" @bind-Value="Expediente.Nota" rows="4" /></td>
+                                <td><InputTextArea class="form-control" @bind-Value="Expediente.Nota" rows="4" disabled="@EsSoloConsulta" /></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            @if (!EsSoloConsulta)
+            {
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            }
         </EditForm>
     }
     else
@@ -413,6 +423,9 @@
 
     [Parameter]
     public string Folio { get; set; } = string.Empty;
+
+    private ClaimsPrincipal Usuario;
+    private bool EsSoloConsulta => Usuario?.IsInRole("CONSULTA") ?? false;
      
     private Expediente Expediente { get; set; } = new Expediente();
 
@@ -428,6 +441,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var estado = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        Usuario = estado.User;
+
         // Obtener todos los expedientes
         listaExpedientes = await ExpedienteService.Lista();
 
@@ -491,7 +507,6 @@
 
 
         Expediente.AnoAdmision = DateTime.Now.Year;
-
         ActualizarTematicasEspecificas();
     }
 
