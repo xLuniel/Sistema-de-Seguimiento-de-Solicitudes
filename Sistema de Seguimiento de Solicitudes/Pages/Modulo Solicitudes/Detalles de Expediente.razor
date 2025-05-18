@@ -672,22 +672,32 @@
     private void ActualizarTematicasEspecificas()
     {
 
-        Expediente.TematicaEspecifica = string.Empty; // Limpiamos la selección anterior
-
-        if (Expediente.Tematica != null && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica,
-            out var tematicas))
+        if (Expediente.Tematica != null
+         && MapeoTematicasEspecificas.TryGetValue(Expediente.Tematica, out var tematicas))
         {
             TematicasEspecificasActuales = tematicas;
 
-            // Si solo hay una opción que coincide con la temática general
-            if (tematicas.Count == 1 && tematicas[0] == Expediente.Tematica)
+            // Si la selección anterior sigue siendo válida, la conservamos
+            if (tematicas.Contains(Expediente.TematicaEspecifica))
             {
-                Expediente.TematicaEspecifica = Expediente.Tematica; // Auto-seleccionar
+                // no hacemos nada; conserva la selección recuperada de BD
+            }
+            else if (tematicas.Count == 1 && tematicas[0] == Expediente.Tematica)
+            {
+                // auto‑selección cuando solo hay una opción
+                Expediente.TematicaEspecifica = Expediente.Tematica;
+            }
+            else
+            {
+                // limpia porque ya no es válida en este nuevo set
+                Expediente.TematicaEspecifica = string.Empty;
             }
         }
         else
         {
+            // si la temática no mapea, vaciamos lista y selección
             TematicasEspecificasActuales = new List<string>();
+            Expediente.TematicaEspecifica = string.Empty;
         }
 
         // Opcional: Forzar actualización de la UI si es necesario
