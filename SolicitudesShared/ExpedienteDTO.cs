@@ -34,7 +34,7 @@ namespace SolicitudesShared
         public string? NombreSolicitante { get; set; }
 
         // Fecha de inicio del trámite
-        public DateTime FechaInicio { get; set; }
+        public DateTime FechaInicio { get; set; } = DateTime.Now;
 
         // Fecha límite de respuesta (10 días hábiles)
         public DateTime? FechaLimiteRespuesta10dias { get; set; }

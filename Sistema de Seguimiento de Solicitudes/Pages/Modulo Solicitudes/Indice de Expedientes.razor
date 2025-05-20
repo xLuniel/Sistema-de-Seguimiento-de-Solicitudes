@@ -105,7 +105,7 @@
                         <td>@expediente.Id</td>
                         <td>@expediente.Folio</td>
                         <td>@expediente.NombreSolicitante</td>
-                        <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@(expediente.FechaInicio.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</td>
                         <td>@expediente.Estado</td>
                         <td style="padding-left: 8px; padding-right: 8px; width: 518px;">
                             <span class="truncate">
@@ -256,9 +256,12 @@
 
     private async Task GuardarExpediente()
     {
+        // Asignar fecha y hora actuales al crear el expediente
+        NuevoExpediente.FechaInicio = DateTime.Now;
+
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
-            await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
+            await MostrarAlerta("ERROR: EL FOLIO YA EXISTE."); 
             return;
         }
 
