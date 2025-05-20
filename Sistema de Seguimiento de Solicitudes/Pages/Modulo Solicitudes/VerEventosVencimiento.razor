@@ -1,0 +1,161 @@
+﻿@inherits ComponentBase
+
+@using Sistema_de_Seguimiento_de_Solicitudes.Models
+@using System.Text
+@using System
+
+@inject IJSRuntime JS
+
+
+<RadzenCard Class="vencimiento-modal">
+    <h3>Solicitudes próximas a vencer</h3>
+
+    @if (Eventos.Any())
+    {
+        <RadzenButton Text="Exportar a Excel"
+                      Icon="file_download"
+                      Class="btn-exportar"
+                      Click="@ExportarExcel" />
+
+        <div class="vencimiento-grid">
+            <RadzenDataGrid Data="@Eventos"
+                            TItem="EventoSolicitud"
+                            ShowPagingSummary="true"
+                            PageSize="20"
+                            Responsive="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="EventoSolicitud" Title="N°" >
+                        <Template Context="evento">
+                            @(Eventos.IndexOf(evento) + 1)
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="EventoSolicitud" Property="Title" Title="Folio / Solicitante" />
+                    <RadzenDataGridColumn TItem="EventoSolicitud" Property="TipoSolicitud" Title="Tipo" />
+                    <RadzenDataGridColumn TItem="EventoSolicitud" Property="End" Title="Límite"  />
+                    <RadzenDataGridColumn TItem="EventoSolicitud" Title="Días restantes">
+                        <Template Context="evento">
+                            @CalcularDiasHabiles(DateTime.Now.Date, evento.End.Date)
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    }
+    else
+    {
+        <p>No hay eventos próximos a vencer.</p>
+    }
+</RadzenCard>
+
+@code {
+    [Parameter] public List<EventoSolicitud> Eventos { get; set; } = new();
+
+    private async Task ExportarExcel()
+    {
+        var hora = DateTime.Now.ToString("HH꞉mm꞉ss");
+        var nombre = $"Solicitudes_Vencimiento_{DateTime.Now:dd-MM-yyyy}_{hora}.xlsx";
+
+        var xlsx = new StringBuilder();
+        xlsx.AppendLine("N°,Folio / Solicitante,Tipo,Límite,Días Restantes");
+
+        for (int i = 0; i < Eventos.Count; i++)
+        {
+            var e = Eventos[i];
+            var dias = CalcularDiasHabiles(DateTime.Now.Date, e.End.Date);
+            xlsx.AppendLine($"{i + 1},\"{e.Title}\",\"{e.TipoSolicitud}\",\"{e.End:yyyy-MM-dd}\",{dias}");
+        }
+
+        var xlsxBytes = Encoding.UTF8.GetBytes(xlsx.ToString());
+        var base64 = Convert.ToBase64String(xlsxBytes);
+        await JS.InvokeVoidAsync("downloadFileFromBytes", nombre, base64);
+    }
+
+    private int CalcularDiasHabiles(DateTime inicio, DateTime fin)
+    {
+        int dias = 0;
+        int signo = Math.Sign((fin - inicio).Days);
+        DateTime fecha = inicio;
+
+        while (fecha != fin.AddDays(signo))
+        {
+            if (fecha.DayOfWeek != DayOfWeek.Saturday &&
+                fecha.DayOfWeek != DayOfWeek.Sunday &&
+                !diasFestivos.Contains(fecha.Date))
+            {
+                dias += signo;
+            }
+            fecha = fecha.AddDays(signo);
+        }
+
+        return dias;
+    }
+
+    private readonly List<DateTime> diasFestivos = new()
+    {
+        new DateTime(DateTime.Now.Year, 1, 1),
+        new DateTime(DateTime.Now.Year, 2, 5),
+        new DateTime(DateTime.Now.Year, 3, 21),
+        new DateTime(DateTime.Now.Year, 5, 1),
+        new DateTime(DateTime.Now.Year, 9, 16),
+        new DateTime(DateTime.Now.Year, 11, 2),
+        new DateTime(DateTime.Now.Year, 11, 20),
+        new DateTime(DateTime.Now.Year, 12, 12),
+        new DateTime(DateTime.Now.Year, 12, 24),
+        new DateTime(DateTime.Now.Year, 12, 25),
+        new DateTime(DateTime.Now.Year, 12, 31),
+    };
+}
+
+
+<style>
+    .vencimiento-modal {
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+    }
+
+        .vencimiento-modal h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+    .btn-exportar {
+        margin-bottom: 1rem;
+        background-color: #198754;
+        color: white;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+    }
+
+        .btn-exportar:hover {
+            background-color: #157347;
+        }
+
+    .vencimiento-grid .rz-datagrid {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background-color: white;
+        border: 1px solid #dee2e6;
+    }
+
+    .vencimiento-grid th {
+        background-color: #e9ecef;
+        font-weight: bold;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: #495057;
+    }
+
+    .vencimiento-grid td {
+        font-size: 0.875rem;
+        padding: 0.75rem;
+        color: #212529;
+    }
+
+    .vencimiento-grid tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+</style>
