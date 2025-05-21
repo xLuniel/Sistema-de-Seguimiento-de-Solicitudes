@@ -1,6 +1,30 @@
-﻿@inherits LayoutComponentBase
+﻿@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
-<body class="col-12">
-	<br /><br />
-	@Body
-</body>
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject AuthService AuthService
+
+<div class="page">
+   
+    <main>
+        <div class="top-row px-4">
+
+            <button class="btn btn-danger" @onclick="LogoutClicked">Cerrar sesión</button>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+
+    private async Task LogoutClicked()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/Login", forceLoad: true);
+    }
+
+}
