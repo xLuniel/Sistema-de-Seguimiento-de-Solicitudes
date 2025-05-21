@@ -1,16 +1,18 @@
 ﻿@page "/menu/modulo-solicitudes"
 
 @attribute [Authorize]
-@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
 @using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using SolicitudesShared
+@using Microsoft.AspNetCore.Components.Authorization
+
 
 @inject NavigationManager Navigation
 @inject IExpedienteService ExpedienteService
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Módulo de Solicitudes</PageTitle>
 
@@ -43,17 +45,18 @@
             <span class="module-description">Gestión de fechas importantes</span>
         </div>
 
-        <div class="module-card card-blue" @onclick="NavigateToCreacionUsuarios">
+        <div class="module-card card-blue" @onclick="NavigateToCreacionUsuarios" style="@(EsAdministrador ? "" : "display:none")">
             <i class="fas fa-user-plus card-icon"></i>
             <span class="module-title">Creación de Usuarios</span>
             <span class="module-description">Administrar cuentas de usuario</span>
         </div>
 
-        <div class="module-card card-blue" @onclick="() => NavigateToEliminarExpediente()">
+        <div class="module-card card-blue" @onclick="() => NavigateToEliminarExpediente()" style="@(EsAdministrador ? "" : "display:none")">
             <i class="fas fa-trash-alt card-icon"></i>
             <span class="module-title">Eliminar Expediente</span>
             <span class="module-description">Eliminar expedientes completos del sistema de manera <strong class="warning-text">permanente</strong></span>
         </div>
+
     </div>
 </div>
 
@@ -92,4 +95,16 @@
     {
         Navigation.NavigateTo("/{id?}");
     }
+
+    private bool EsAdministrador = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Verifica si el usuario tiene el rol de 'ADMINISTRADOR'
+        EsAdministrador = user.IsInRole("ADMINISTRADOR");
+    }
+
 }

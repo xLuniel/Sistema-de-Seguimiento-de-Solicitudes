@@ -1,8 +1,8 @@
 ﻿@page "/menu/modulo-solicitudes/indice-expedientes"
 
 @* Este atributo indica que la página requiere que el usuario esté autenticado *@
-@attribute [Authorize]
-@*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
+@attribute [Authorize(Roles = "CONSULTA,CAPTURA,SUPERVISIÓN,ADMINISTRADOR")]
+
 
 @* Se importa el espacio de nombres necesario para usar el atributo [Authorize] *@
 @using Microsoft.AspNetCore.Authorization
@@ -13,7 +13,9 @@
 @using SolicitudesShared
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -29,8 +31,12 @@
 <div class="d-flex align-items-center gap-2 mb-3">
     <input type="text" class="form-control" placeholder="🔍 Buscar por nombre, folio, contenido, fecha, año..." @bind="Filtro" @bind:event="oninput" style="flex: 1;" />
 
-    <!-- Botón para agregar nuevo expediente -->
-    <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nueva Solicitud </button>
+    <!-- Mostrar botón solo si el usuario tiene el rol adecuado -->
+    @if (PuedeCapturar)
+    {
+        <!-- Botón para agregar nuevo expediente -->
+        <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nueva Solicitud </button>
+    }
 </div>
 
 <!-- Modal de formulario para creación de expediente -->
@@ -179,6 +185,10 @@
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
     private ExpedienteDTO NuevoExpediente { get; set; } = new();
     
+    // Roles
+    private bool PuedeCapturar = false;
+
+    //Paginacion
     private int currentPage = 1;
     private int pageSize = 12; // Cantidad de solicitudes por pagina
     private int totalPages => (ExpedientesFiltrados.Count + pageSize - 1) / pageSize;
@@ -199,8 +209,16 @@
         }
     }
 
+
     protected override async Task OnInitializedAsync()
     {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Verifica si el usuario tiene uno de estos roles que permiten agregar expedientes
+        PuedeCapturar = user.IsInRole("CAPTURA") || user.IsInRole("SUPERVISIÓN") || user.IsInRole("ADMINISTRADOR");
+
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
 
