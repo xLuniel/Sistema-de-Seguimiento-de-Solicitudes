@@ -222,7 +222,6 @@
         listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
 
-        NuevoExpediente.FechaInicio = DateTime.Now;
     }
 
     //Filtro de busqueda
@@ -274,8 +273,8 @@
 
     private async Task GuardarExpediente()
     {
-        // Asignar fecha y hora actuales al crear el expediente
-        NuevoExpediente.FechaInicio = DateTime.Now;
+        // Asignar fecha seleccionada y hora actuales al crear el expediente
+        NuevoExpediente.FechaInicio = NuevoExpediente.FechaInicio.Date.Add(DateTime.Now.TimeOfDay);
 
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {

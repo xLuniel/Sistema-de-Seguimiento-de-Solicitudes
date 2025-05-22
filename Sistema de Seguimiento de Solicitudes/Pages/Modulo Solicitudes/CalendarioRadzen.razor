@@ -28,7 +28,7 @@
 
     <RadzenScheduler @ref="@scheduler"
                      SlotRender="@OnSlotRender"
-                     style="height: 768px;"
+                     style="height: 720px;"
                      TItem="EventoSolicitud"
                      Data="@eventos"
                      StartProperty="Start"
@@ -95,7 +95,7 @@
             .OrderBy(e => CalcularDiasHabiles(hoy, e.End.Date))
             .ToList();
 
-        await DialogService.OpenAsync<VerEventosVencimiento>("Vencimiento", new Dictionary<string, object>
+        await DialogService.OpenAsync<VerEventosVencimiento>("Vencimiento de Solicitudes", new Dictionary<string, object>
     {
         { "Eventos", eventosVencidos }
     }, new DialogOptions { Width = "1000px", Height = "700px" });
@@ -182,11 +182,13 @@
         var diasHabilesRestantes = CalcularDiasHabiles(DateTime.Now.Date, args.Data.End.Date);
 
         // Determinar clase según tipo de solicitud
-        string tipoClase = args.Data.TipoSolicitud switch
+        string tipo = args.Data.TipoSolicitud?.ToUpperInvariant()?.Trim() ?? "";
+        string tipoClase = tipo switch
         {
-            "ARCO" => "event-arco",
-            "DAI" => "event-dai",
-            _ => "event-especial"
+            "ARCO" => "event-arco tooltip-arco tooltip-wrapper",
+            "DAI" => "event-dai tooltip-dai tooltip-wrapper",
+            "" => "event-sintipo tooltip-sintipo tooltip-wrapper", // tipo vacío
+            _ => "event-especial" // sin tooltip
         };
 
         // Determinar clase según urgencia
@@ -199,14 +201,25 @@
             _ => tipoClase
         };
 
-        args.Attributes["class"] = estadoClase;
+        // Tipo de tooltip según tipo de solicitud
+        string tooltipClase = tipo switch
+        {
+            "ARCO" => "tooltip-arco",
+            "DAI" => "tooltip-dai",
+            "" => "tooltip-sintipo",
+            _ => ""
+        };
+        
+        args.Attributes["class"] = $"{estadoClase} tooltip-wrapper {tooltipClase}";
+
 
         // Tooltip con información detallada
-        args.Attributes["title"] = $"{args.Data.Title}\n" +
-                                 $"Tipo: {args.Data.TipoSolicitud}\n" +
-                                 $"Inicio: {args.Data.Start:dd/MM/yyyy}\n" +
-                                 $"Fin: {args.Data.End:dd/MM/yyyy}\n" +
-                                 $"Días hábiles restantes: {diasHabilesRestantes}";
+        args.Attributes["data-tooltip"] = $"{args.Data.Title}\n" +
+                                  $"Tipo: {args.Data.TipoSolicitud}\n" +
+                                  $"Inicio: {args.Data.Start:dd/MM/yyyy}\n" +
+                                  $"Fin: {args.Data.End:dd/MM/yyyy}\n" +
+                                  $"Días hábiles restantes: {diasHabilesRestantes}";
+
     }
 
 
@@ -369,11 +382,10 @@
         position: relative;
         background-color: rgba(13, 110, 253, 0.15) !important;
         z-index: 2;
+        pointer-events: none;
         border-right: 1px solid #0d6efd !important;
         border-left: 1px solid #0d6efd !important;
     }
-
-
 
     /* Días no laborables (festivos y fines de semana) */
     .rz-scheduler-non-working-time-cell {
@@ -396,128 +408,107 @@
             pointer-events: none;
         }
 
-    /* Eventos - Estilo base con degradado superior */
-    .rz-scheduler-appointment {
-        position: relative;
-        border-radius: 0.375rem !important;
-        padding: 0.25rem 0.5rem !important;
-        font-size: 0.875rem !important;
-        font-weight: 500 !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-        transition: all 0.2s !important;
-        border-left-width: 4px !important;
-        border-left-style: solid !important;
-        color: #212529 !important;
-        overflow: hidden;
+    .rz-dialog-content,
+    .rz-dialog {
+        overflow: visible !important;
     }
 
-        .rz-scheduler-appointment::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 20%;
-            background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
-            z-index: 1;
-        }
-
-    /* Colores según tipo de solicitud con degradado */
-    /* ARCO - Azul */
-    .event-arco {
-        background-color: #d1e7ff !important; /* azul claro */
-        border-left-color: #0d6efd !important; /* azul fuerte */
-    }
-
-        .event-arco::before {
-            background: linear-gradient(180deg, rgba(13,110,253,0.4) 0%, rgba(13,110,253,0.1) 100%);
-        }
-
-
-    /* DAI - Morado */
-    .event-dai {
-        background-color: #e2d9f3 !important; /* lavanda claro */
-        border-left-color: #6f42c1 !important; /* morado fuerte */
-    }
-
-        .event-dai::before {
-            background: linear-gradient(180deg, rgba(111,66,193,0.4) 0%, rgba(111,66,193,0.1) 100%);
-        }
-
-
-    /* ESPECIAL - Verde */
-    .event-especial {
-        background-color: #ccf9f7 !important; /* cian claro como fondo */
-        border-left-color: #0ee5dd !important; /* cian fuerte como borde */
-    }
-
-        .event-especial::before {
-            background: linear-gradient(180deg, rgba(14,229,221,0.4) 0%, rgba(14,229,221,0.1) 100%);
-        }
-
-
-
-    /* Estados de vencimiento (sobreescriben el tipo de solicitud) */
-    /* VERDE - Correcto visualmente (verde suave) */
+    /* Estados de vencimiento */
+    /* VERDE */
     .event-verde {
         background-color: #d4edda !important;
         border-left-color: #28a745 !important;
     }
 
-        .event-verde::before {
-            background: linear-gradient(180deg, rgba(40,167,69,0.4) 0%, rgba(40,167,69,0.1) 100%);
-        }
-
-    /* AMARILLO - Ya estaba bien */
+    /* AMARILLO */
     .event-amarilla {
         background-color: #fff3cd !important;
         border-left-color: #ffc107 !important;
     }
 
-        .event-amarilla::before {
-            background: linear-gradient(180deg, rgba(255,193,7,0.4) 0%, rgba(255,193,7,0.1) 100%);
-        }
-
-    /* ROJO - Bien */
+    /* ROJO */
     .event-roja {
         background-color: #f8d7da !important;
         border-left-color: #dc3545 !important;
     }
 
-        .event-roja::before {
-            background: linear-gradient(180deg, rgba(220,53,69,0.4) 0%, rgba(220,53,69,0.1) 100%);
-        }
-
-    /* GRIS - Bien */
+    /* GRIS */
     .event-gris {
         background-color: #e2e3e5 !important;
         border-left-color: #6c757d !important;
     }
 
-        .event-gris::before {
-            background: linear-gradient(180deg, rgba(108,117,125,0.4) 0%, rgba(108,117,125,0.1) 100%);
-        }
-
-    /* Tooltips mejorados */
-    .rz-scheduler-appointment::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #495057;
-        color: white;
-        padding: 0.5rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s;
-        z-index: 1000;
-        min-width: 250px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    /* Eventos - Estilo base con degradado superior */
+    .tooltip-wrapper {
+        position: relative;
     }
 
+        .tooltip-wrapper::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: block;
+            background-color: #495057;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            white-space: pre-line;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            min-width: 250px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip-wrapper::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #495057 transparent;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 999;
+        }
+
+        /* Mostrar tooltip al pasar el mouse */
+        .tooltip-wrapper:hover::after,
+        .tooltip-wrapper:hover::before {
+            opacity: 1;
+        }
+
+        /* Colores dinámicos por tipo */
+        .tooltip-wrapper.tooltip-arco::after {
+            background-color: #387fe7;
+        }
+
+        .tooltip-wrapper.tooltip-arco::before {
+            border-color: transparent transparent #0d6efd transparent;
+        }
+
+        .tooltip-wrapper.tooltip-dai::after {
+            background-color: #7841dd;
+        }
+
+        .tooltip-wrapper.tooltip-dai::before {
+            border-color: transparent transparent #6f42c1 transparent;
+        }
+
+        .tooltip-wrapper.tooltip-sintipo::after {
+            background-color: #575656;
+        }
+
+        .tooltip-wrapper.tooltip-sintipo::before {
+            border-color: transparent transparent #dadada transparent;
+        }
+
+    
 </style>
