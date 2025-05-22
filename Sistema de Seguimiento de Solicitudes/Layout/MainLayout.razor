@@ -1,15 +1,19 @@
 ﻿@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
 @inherits LayoutComponentBase
+
+@implements IDisposable
+
 @inject NavigationManager NavigationManager
 @inject AuthService AuthService
+@inject CustomAuthenticationStateProvider CustomAuthStateProvider
+@inject IJSRuntime JS
 
 <HeadContent>
     <RadzenTheme Theme="material" />
 </HeadContent>
 
 <RadzenComponents />
-
 
 <div class="page">
     <div class="sidebar">
@@ -18,9 +22,7 @@
 
     <main>
         <div class="top-row px-4">
-            @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
             <button class="btn-primary" @onclick="MainMenuClicked">Menú Principal</button>
-
             <button class="btn btn-danger" @onclick="LogoutClicked">Cerrar sesión</button>
         </div>
 
@@ -31,17 +33,37 @@
 </div>
 
 @code {
+    private DotNetObjectReference<MainLayout>? objRef;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("startInactivityWatcher", objRef);
+        }
+    }
 
     private async Task LogoutClicked()
     {
-        await AuthService.Logout();
-        NavigationManager.NavigateTo("/Login", forceLoad: true);
+        await AuthService.Logout(); 
+        NavigationManager.NavigateTo("/login", true);
     }
 
     private void MainMenuClicked()
     {
-         NavigationManager.NavigateTo("/menu");
-        
+        NavigationManager.NavigateTo("/menu");
+    }
+
+    [JSInvokable]
+    public async Task CerrarSesionAuto()
+    {
+        await CustomAuthStateProvider.RemoveToken();
+        NavigationManager.NavigateTo("/login", true);
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
     }
 }

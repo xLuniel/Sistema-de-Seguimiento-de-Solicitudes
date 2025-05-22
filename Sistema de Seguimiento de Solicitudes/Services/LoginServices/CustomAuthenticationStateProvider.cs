@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
@@ -47,10 +46,15 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
                 await _jSRuntime.InvokeVoidAsync("localStorage.setItem", _tokenKey, token);
             }
 
-
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-
             await Task.Yield();
+        }
+
+        public async Task RemoveToken()
+        {
+            await _jSRuntime.InvokeVoidAsync("localStorage.removeItem", _tokenKey);
+            _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
