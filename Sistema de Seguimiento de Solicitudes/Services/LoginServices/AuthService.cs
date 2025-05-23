@@ -23,11 +23,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
         public async Task<LoginResponse> Login(LoginDTO model)
         {
-            //var token = await _http.GetFromJsonAsync<LoginResponse>("api/auth/login");
-            //if ( token is null)
-            //{
-            //    throw new Exception();
-            //}
+
             var response = await _http.PostAsJsonAsync("https://localhost:7123/api/Auth/login", model );
 
             //if (!response.IsSuccessStatusCode)
@@ -49,12 +45,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
                 await _authStateProvider.SetToken(result.Token);
                 
             }
-            //if (result != null)
-            //{
-            //    await _authStateProvider.SetToken(result.Token);
-            //    //return true;
-            //}
-            //await LocalStorage.SetAsync("auth_token", result.Token);
+
 
             //((CustomAuthenticationStateProvider)_authStateProvider).MarkUserAsAuthenticated(username);
             return result!;
@@ -64,15 +55,8 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
         public async Task Logout()
         {
             await _authStateProvider.SetToken(null);
-           // await LocalStorage.RemoveAsync("auth_token");
-            //((CustomAuthenticationStateProvider)_authStateProvider).MarkUserAsLoggedOut();
         }
 
-        //public class LoginResponse
-        //{
-        //    public string Token { get; set; }
-        //    public bool Flag = false;
-           
-        //}
+
     }
 }

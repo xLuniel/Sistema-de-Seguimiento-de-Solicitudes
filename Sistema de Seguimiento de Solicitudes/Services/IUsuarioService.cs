@@ -10,7 +10,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
         Task<bool> Eliminar(int id);
         Task<UsuariosDTO> Buscar(int id);
 
-        //Task<ResponseAPI<int>> Editar(UsuariosDTO usuariosDTO);
+
 
         Task<bool> CambiarContrasena(int usuarioId, string nuevaContrasena);
 

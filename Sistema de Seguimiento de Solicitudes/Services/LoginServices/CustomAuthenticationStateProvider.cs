@@ -18,7 +18,6 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            Console.WriteLine("Obteniendo estado de autenticación...");
 
             var token = await _jSRuntime.InvokeAsync<string>("localStorage.getItem", _tokenKey);
             if (!string.IsNullOrEmpty(token))

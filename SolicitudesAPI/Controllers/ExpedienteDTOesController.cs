@@ -170,92 +170,7 @@ namespace SolicitudesAPI.Controllers
             return Ok(responseApi);
         }
 
-        // PUT: api/Expedientes/5
-        [HttpPut("Editar/{id}")]
-        public async Task<ActionResult> Editar(ExpedienteDTO expediente, int id)
-        {
-            var responseApi = new ResponseAPI<int>();
-
-            try
-            {
-                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (dbExpediente != null)
-                {
-                    //dbExpediente.Folio = expediente.Folio;
-                    //dbExpediente.NombreSolicitante = expediente.NombreSolicitante;
-                    //dbExpediente.FechaInicio = expediente.FechaInicio;
-                    //dbExpediente.Estado = expediente.Estado;
-                    //dbExpediente.ContenidoSolicitud = expediente.ContenidoSolicitud;
-
-                    //foreach (var prop in typeof(ExpedienteDTO).GetProperties())
-                    //{
-                    //    var dbProp = typeof(Expediente).GetProperty(prop.Name);
-                    //    if (dbProp != null && dbProp.CanWrite)
-                    //    {
-                    //        dbProp.SetValue(dbExpediente, prop.GetValue(expediente));
-                    //    }
-                    //}
-
-                    foreach (var propDto in typeof(ExpedienteDTO).GetProperties())
-                    {
-                        var propExpediente = typeof(Expediente).GetProperty(propDto.Name);
-
-                        if (propExpediente != null && propExpediente.CanWrite)
-                        {
-                            var value = propDto.GetValue(expediente);
-
-                            try
-                            {
-                                // 🔥 Conversión de tipos si es necesario
-                                if (propExpediente.PropertyType == typeof(string) && value is DateTime dateTimeValue)
-                                {
-                                    propExpediente.SetValue(dbExpediente, dateTimeValue.ToString("dd-MM-yyyy"));
-                                }
-                                else if (propExpediente.PropertyType == typeof(DateTime) && value is string stringValue)
-                                {
-                                    if (DateTime.TryParse(stringValue, out DateTime parsedDate))
-                                    {
-                                        propExpediente.SetValue(dbExpediente, parsedDate);
-                                    }
-                                }
-                                else if (propExpediente.PropertyType == propDto.PropertyType)
-                                {
-                                    propExpediente.SetValue(dbExpediente, value);
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"⚠️ No se pudo asignar {propDto.Name} ({propDto.PropertyType} → {propExpediente.PropertyType})");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"❌ Error al asignar {propDto.Name}: {ex.Message}");
-                            }
-                        }
-                    }
-
-                    _context.Expedientes.Update(dbExpediente);
-                    await _context.SaveChangesAsync();
-
-                    responseApi.Exito = true;
-                    responseApi.Data = dbExpediente.Id;
-                }
-                else
-                {
-                    responseApi.Exito = false;
-                    responseApi.Mensaje = "No se pudo encontrar el expediente";
-                }
-            }
-            catch (Exception ex)
-            {
-                responseApi.Exito = false;
-                responseApi.Mensaje = ex.Message;
-            }
-
-            return Ok(responseApi);
-        }
-
+        
         // POST: api/Expedientes/add
         [HttpPost("Crear")]
         public async Task<ActionResult> Crear(ExpedienteDTO expediente)
@@ -328,6 +243,7 @@ namespace SolicitudesAPI.Controllers
             return Ok(responseApi);
         }
 
+        // PUT: api/Expedientes/5
         [HttpPut("Actualizar/{id}")]
         public async Task<IActionResult> Actualizar(int id, [FromBody] ExpedienteDTO expediente)
         {

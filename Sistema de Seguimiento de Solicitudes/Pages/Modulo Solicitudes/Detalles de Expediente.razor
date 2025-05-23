@@ -380,7 +380,8 @@
                             <tr>
                                 <th>Recurso de Revisión</th>
                                 <td>
-                                    <InputSelect class="form-control" @bind-Value="Expediente.RecursoRevision" disabled="@EsSoloConsulta">
+                                    <InputSelect class="form-control" @bind-Value="Expediente.RecursoRevision" disabled="@EsSoloConsulta">                                      
+                                        <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var recursoRevision in Catalogos.RecursoRevision)
                                         {
                                             <option value="@recursoRevision">@recursoRevision</option>
@@ -775,9 +776,7 @@
                     Nota = Expediente.Nota
                 };
 
-            Console.WriteLine($"Enviando expediente: {JsonSerializer.Serialize(expedienteDTO)}");
-
-            await JSRuntime.InvokeVoidAsync("console.log", Expediente.TematicaEspecifica);
+            
 
 
             // Llamar al servicio para actualizar el expediente

@@ -66,7 +66,7 @@
         var expedienteList = await ExpedienteService.Lista();
 
         eventos = expedienteList
-            .Where(expediente => expediente.FechaInicio != null)
+            .Where(expediente => expediente?.FechaInicio != null)
             .Select(expediente =>
             {
                 DateTime end = expediente.TipoSolicitud == "ARCO"
@@ -78,7 +78,7 @@
                         Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
                         Start = expediente.FechaInicio,
                         End = end,
-                        TipoSolicitud = expediente.TipoSolicitud,
+                        TipoSolicitud = expediente.TipoSolicitud!,
                         TienePrevencion = false, // Valor por defecto
                         EsUrgente = false // Valor por defecto
                     };
