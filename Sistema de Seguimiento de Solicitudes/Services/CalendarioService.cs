@@ -24,5 +24,50 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             var response = await _http.PostAsJsonAsync("/api/Calendario/Guardar_dia", diasActivos);
             return response.IsSuccessStatusCode;
         }
+
+        public async Task<List<DiaInhabilManualDTO>> ObtenerDiasInhabiles()
+        {
+            var response = await _http.GetFromJsonAsync<List<DiaInhabilManualDTO>>("/api/Calendario/Get_DiasInhabiles");
+            return response ?? new List<DiaInhabilManualDTO>();
+        }
+
+        public async Task GuardarDiaInhabil(DiaInhabilManualDTO diaInhabil)
+        {
+            var result = await _http.PostAsJsonAsync("/api/Calendario/Guardar_DiasInhabiles", diaInhabil);
+            //var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                var mensaje = await result.Content.ReadAsStringAsync();
+                throw new Exception($"Error al guardar día inhábil: {mensaje}");
+            }
+
+
+            //if (response!.Exito)
+            //{
+            //    return response.Data!;
+            //}
+            //else
+            //    throw new Exception(response.Mensaje);
+        }
+
+        public async Task EliminarDiaInhabil(DateTime fecha)
+        {
+            var fechaUrl = fecha.ToString("yyyy-MM-dd");
+            var response = await _http.DeleteAsync($"api/Calendario/Eliminar_DiaInhabil/{fechaUrl}");
+            //var response = await result.Content.ReadFromJsonAsync<ResponseAPI<DateTime>>();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error al eliminar día inhábil: {error}");
+            }
+            //if (response!.Exito)
+            //{
+            //    return response.Exito!;
+            //}
+            //else
+            //    throw new Exception(response.Mensaje);
+        }
     }
 }

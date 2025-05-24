@@ -21,10 +21,15 @@ public partial class SistemaSolicitudesContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
+    public virtual DbSet<DiaInhabilManual> DiaInhabilManual { get; set; }
+
+    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.Entity<Calendario>(entity =>
         {
             entity.ToTable("Calendario");
@@ -71,7 +76,13 @@ public partial class SistemaSolicitudesContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+
+        // ignorar entidades a las que no se les necesita hacer migraciones
+        //modelBuilder.Ignore<Usuario>();
+        //modelBuilder.Ignore<Expediente>();
+        //modelBuilder.Ignore<Calendario>();
     }
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -8,9 +8,11 @@
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using Radzen
 @using System.Text.Json
+@using SolicitudesShared
 
 @inject DialogService DialogService
 @inject IExpedienteService ExpedienteService
+@inject ICalendarioService CalendarioService
 
 
 <PageTitle>Calendario</PageTitle>
@@ -23,6 +25,11 @@
                       Style="background-color: #0d6efd; color: white;"
                       Click="@MostrarEventosPorVencimiento"
                       Icon="event" />
+
+        <RadzenDatePicker @bind-Value="@fechaSeleccionada" Style="width: 200px;" />
+        <RadzenButton Text="Activar/Desactivar día"
+                      Style="background-color: #198754; color: white;"
+                      Click="@ToggleDiaManual" />
 
     </div>
 
@@ -61,9 +68,17 @@
 
     private List<EventoSolicitud> eventos = new List<EventoSolicitud>();
 
+    // datepickker variables
+    DateTime? fechaSeleccionada;
+    List<DateTime> diasApagadosManualmente = new();
+
     protected override async Task OnInitializedAsync()
     {
         var expedienteList = await ExpedienteService.Lista();
+
+        diasApagadosManualmente = (await CalendarioService.ObtenerDiasInhabiles())
+            .Select(d => d.Fecha.Date)
+            .ToList();
 
         eventos = expedienteList
             .Where(expediente => expediente?.FechaInicio != null)
@@ -83,6 +98,28 @@
                         EsUrgente = false // Valor por defecto
                     };
             }).ToList();
+    }
+
+    // Método para habilitar/deshabilitar un día específico
+    async Task ToggleDiaManual()
+    {
+        if (fechaSeleccionada.HasValue)
+        {
+            var fecha = fechaSeleccionada.Value.Date;
+
+            if (diasApagadosManualmente.Contains(fecha))
+            {
+                diasApagadosManualmente.Remove(fecha); // lo vuelve laborable
+                await CalendarioService.EliminarDiaInhabil(fecha); // eliminar el día inhabil
+            }
+            else
+            {
+                diasApagadosManualmente.Add(fecha); // lo marca como apagado
+                await CalendarioService.GuardarDiaInhabil(new DiaInhabilManualDTO { Fecha = fecha }); // guardar el día inhabil
+            }
+
+			scheduler?.Reload(); // Recargar el calendario para reflejar los cambios
+        }
     }
 
     // Mostrar Eventos por Vencimiento
@@ -240,33 +277,33 @@
     // }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
-{
-    string clases = "";
-
-    // 1. Día actual
-    if (args.Start.Date == DateTime.Today.Date)
     {
-        clases += " dia-actual";
-    }
+        string clases = "";
 
-    // 2. Día no laborable
-    if (!EsDiaLaborable(args.Start.Date))
-    {
-        clases += " rz-scheduler-non-working-time-cell";
-    }
+        // 1. Día actual
+        if (args.Start.Date == DateTime.Today.Date)
+        {
+            clases += " dia-actual";
+        }
 
-    // 3. Estilo solo para vistas Day y Week (horarios laborales)
-    if ((args.View.Text == "Week" || args.View.Text == "Day") &&
-        args.Start.Hour > 8 && args.Start.Hour < 19)
-    {
-        args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255jose,220,40,.2));";
-    }
+        // 2. Día no laborable
+        if (!EsDiaLaborable(args.Start.Date) || diasApagadosManualmente.Contains(args.Start.Date))
+        {
+            clases += " rz-scheduler-non-working-time-cell";
+        }
 
-    if (!string.IsNullOrWhiteSpace(clases))
-    {
-        args.Attributes["class"] = (args.Attributes.ContainsKey("class") ? args.Attributes["class"] + " " : "") + clases.Trim();
+        // 3. Estilo solo para vistas Day y Week (horarios laborales)
+        if ((args.View.Text == "Week" || args.View.Text == "Day") &&
+            args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255jose,220,40,.2));";
+        }
+
+        if (!string.IsNullOrWhiteSpace(clases))
+        {
+            args.Attributes["class"] = (args.Attributes.ContainsKey("class") ? args.Attributes["class"] + " " : "") + clases.Trim();
+        }
     }
-}
 
 
     // async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)

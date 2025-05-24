@@ -72,4 +72,94 @@ public class CalendarioController : ControllerBase
 
         return Ok(new { mensaje = "Dias guardados correctamente"});
     }
+
+    
+    //public async Task<ActionResult<IEnumerable<DateTime>>> Get_DiasInhabiles()
+    //{
+    //    var dias = await _context.DiaInhabilManual
+    //        .Select(d => d.Fecha.Date)
+    //        .ToListAsync();
+
+    //    return Ok(dias);
+    //}
+    //[HttpGet]
+
+    [HttpGet ("Get_DiasInhabiles")]
+    public async Task<ActionResult<List<DiaInhabilManualDTO>>> ObtenerDiasInhabiles()
+    {
+        var dias = await _context.DiaInhabilManual
+            .Select(d => new DiaInhabilManualDTO
+            {
+                Fecha = d.Fecha.Date
+            })
+            .ToListAsync();
+
+        return Ok(dias);
+    }
+
+    // guardar dia uno por uno
+    [HttpPost ("Guardar_DiasInhabiles")]
+    public async Task<IActionResult> Guardar_DiaInhabil([FromBody] DiaInhabilManualDTO diaInhabil)
+    {
+        //fecha = fecha.Date;
+
+        if (diaInhabil == null || diaInhabil == default)
+        {
+            return BadRequest("La fecha es requerida.");
+        }
+
+        var fecha = diaInhabil.Fecha.Date;
+
+        if (!await _context.DiaInhabilManual.AnyAsync(d => d.Fecha == fecha))
+        {
+            _context.DiaInhabilManual.Add(new DiaInhabilManual { Fecha = fecha });
+            await _context.SaveChangesAsync();
+        }
+
+        return Ok(new { mensaje = "Día inhábil guardado correctamente." });
+    }
+
+    // guardar varios dias
+    //[HttpPost("Guardar_variosDiasInhabiles")]
+    //public async Task<IActionResult> PostVarios([FromBody] List<DateTime> fechas)
+    //{
+    //    var existentes = await _context.DiaInhabilManual
+    //        .Select(d => d.Fecha.Date)
+    //        .ToListAsync();
+
+    //    var nuevas = fechas
+    //        .Select(f => f.Date)
+    //        .Where(f => !existentes.Contains(f))
+    //        .Distinct()
+    //        .Select(f => new DiaInhabilManual { Fecha = f })
+    //        .ToList();
+
+    //    if (nuevas.Any())
+    //    {
+    //        _context.DiaInhabilManual.AddRange(nuevas);
+    //        await _context.SaveChangesAsync();
+    //    }
+
+    //    return NoContent();
+    //}
+
+    [HttpDelete("Eliminar_DiaInhabil/{fecha}")]
+    public async Task<IActionResult> Eliminar_DiaInhabil(DateTime fecha)
+    {
+        var fechaNormalizada = fecha.Date;
+
+        var diaInhabil = await _context.DiaInhabilManual
+            .FirstOrDefaultAsync(d => d.Fecha == fechaNormalizada);
+
+        if (diaInhabil == null)
+        {
+            return NotFound();
+        }
+
+        _context.DiaInhabilManual.Remove(diaInhabil);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
 }
