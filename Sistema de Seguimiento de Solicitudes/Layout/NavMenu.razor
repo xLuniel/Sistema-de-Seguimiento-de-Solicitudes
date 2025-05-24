@@ -53,11 +53,12 @@
 
             @* Solo para ADMINISTRADOR o SUPERVISOR *@
             <AuthorizeView Roles="ADMINISTRADOR, Admin">
-                <div class="nav-item px-3">
+                @* Opcion movida a dropdown del mainlayout *@
+                @* <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/menu/modulo-solicitudes/CreacionUsuarios">
                         <span class="bi bi-person-plus-fill me-2" aria-hidden="true"></span> Crear Usuarios
                     </NavLink>
-                </div>
+                </div> *@
 
                 @*Solo para ADMINISTRADOR *@
                 <div class="nav-item px-3">

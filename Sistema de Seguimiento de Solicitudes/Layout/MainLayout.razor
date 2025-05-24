@@ -1,4 +1,5 @@
-﻿@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
 
 @inherits LayoutComponentBase
 
@@ -23,7 +24,29 @@
     <main>
         <div class="top-row px-4">
             <button class="btn-primary" @onclick="MainMenuClicked">Menú Principal</button>
-            <button class="btn btn-danger" @onclick="LogoutClicked">Cerrar sesión</button>
+            @* <button class="btn btn-danger" @onclick="LogoutClicked">Cerrar sesión</button> *@
+            @* <AuthorizeView Context="UserContext">
+                <Authorized> *@
+                    <div class="dropdown me-3">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="userMenu"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            ⚙ Opciones
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <AuthorizeView Roles="ADMINISTRADOR">
+                                <li>
+                                    <a class="dropdown-item" href="/menu/modulo-solicitudes/CreacionUsuarios">Crear usuarios</a>
+                                </li>
+                                
+                            </AuthorizeView>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <a class="dropdown-item" @onclick="LogoutClicked">Cerrar sesión</a>
+                            </li>
+                        </ul>
+                    </div>
+                @* </Authorized>
+            </AuthorizeView> *@
         </div>
 
         <article class="content px-4">
