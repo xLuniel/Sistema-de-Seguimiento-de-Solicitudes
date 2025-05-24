@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavManager
 
 @attribute [Authorize]
 
@@ -15,60 +16,79 @@
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column"> 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/menu/modulo-solicitudes" Match="NavLinkMatch.All">@* Match="NavLinkMatch.All" *@
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Modulo Solicitudes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/menu/modulo-solicitudes/inicio-solicitudes">@* Match="NavLinkMatch.All" *@
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio de Solicitudes
-            </NavLink>
-        </div>
-        @*<div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Calendario">
-                <span class="bi bi-calendar-month" aria-hidden="true"></span> Calendario
-            </NavLink>
-        </div>*@
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/menu/modulo-solicitudes/indice-expedientes">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Índice de Solicitudes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/menu/modulo-solicitudes/historial-solicitudes">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Historial de Solicitudes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/menu/modulo-solicitudes/Calendario">
-                <span class="bi bi-calendar-month" aria-hidden="true"></span> Calendario
-            </NavLink>
-        </div>
-        
-        @* botones solo visibles para el administrador *@
-        <AuthorizeView Roles="ADMINISTRADOR, Admin">
+    <nav class="flex-column">
+
+        @* ---- Modulo de Solicitudes ---- *@
+        @if (EnModuloSolicitudes)
+        {
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/menu/modulo-solicitudes/CreacionUsuarios">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Usuarios
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes" Match="NavLinkMatch.All">
+                    <span class="bi bi-folder-fill me-2" aria-hidden="true"></span> Módulo Solicitudes
                 </NavLink>
-			  </div>
-		
+            </div>
+
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/{id?}">
-                    <span class="bi bi-trash" aria-hidden="true"></span> Eliminar Solicitudes
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/inicio-solicitudes">
+                    <span class="bi bi-inboxes-fill" aria-hidden="true"></span> Inicio de Solicitudes
                 </NavLink>
-			 </div>
-		</AuthorizeView>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/indice-expedientes">
+                    <span class="bi bi-journal-text me-2" aria-hidden="true"></span> Índice de Solicitudes
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/historial-solicitudes">
+                    <span class="bi bi-clock-history me-2" aria-hidden="true"></span> Historial de Solicitudes
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/Calendario">
+                    <span class="bi bi-calendar-event-fill me-2" aria-hidden="true"></span> Calendario
+                </NavLink>
+            </div>
+
+            @* Solo para ADMINISTRADOR o SUPERVISOR *@
+            <AuthorizeView Roles="ADMINISTRADOR, Admin">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/menu/modulo-solicitudes/CreacionUsuarios">
+                        <span class="bi bi-person-plus-fill me-2" aria-hidden="true"></span> Crear Usuarios
+                    </NavLink>
+                </div>
+
+                @*Solo para ADMINISTRADOR *@
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/{id?}">
+                        <span class="bi bi-trash-fill me-2" aria-hidden="true"></span> Eliminar Solicitudes
+                    </NavLink>
+                </div>
+            </AuthorizeView>
+        }
+
+        @* ---- Siguientes Modulos, usar la estructura de arriba, dependiendo la condicion se vera para 
+        el modulo seleccionado, igual se ocupa poner la ruta para el modulo en @code *@
+
+
+
+
+
+
+
+
     </nav>
 </div>
 
+
 @code {
+    // Ruta al modulo de solicitudes
+    private bool EnModuloSolicitudes => NavManager.Uri.Contains("/menu/modulo-solicitudes");
+
+
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;

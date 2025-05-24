@@ -5,6 +5,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using SolicitudesShared
+@using ClosedXML.Excel;
+@using System.Globalization;
+
 
 @inject IExpedienteService ExpedienteService
 @inject IJSRuntime JSRuntime
@@ -15,11 +18,11 @@
 <div class="historial-container">
     <h3>📁 Historial de Solicitudes</h3>
     <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <!-- Campo de Busqueda -->
             <input type="text" class="form-control" placeholder="🔍 Buscar por nombre o folio..." @bind="busqueda" @bind:event="oninput" />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <select class="form-control" @bind="estadoSeleccionado">
                 <option value="">🗂️ Todos los estados</option>
                 <option value="INICIO">🟦 Inicio</option>
@@ -29,6 +32,28 @@
                 <option value="TERMINADA">✅ Terminada</option>
                 <option value="DESECHADA">❌ Desechada</option>
                 <option value="CANCELADA">⚠️ Cancelada</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" type="date" @bind="filtroFechaDia" />
+        </div>
+        <div class="col-md-1">
+            <select class="form-control" @bind="filtroMes">
+                <option value="">Mes</option>
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m">@System.Globalization.CultureInfo.GetCultureInfo("es-MX").DateTimeFormat.GetMonthName(m)</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-1">
+            <select class="form-control" @bind="filtroAno">
+                <option value="">Año</option>
+                @foreach (var Ano in AnosDisponibles)
+                {
+                    <option value="@Ano">@Ano</option>
+                }
             </select>
         </div>
         <div class="col-md-2">
@@ -102,13 +127,19 @@
     private int pageSize = 12;
 
     private IEnumerable<ExpedienteDTO> SolicitudesFiltradas =>
-        SolicitudesHistorial.Where(s =>
-            (string.IsNullOrWhiteSpace(busqueda) ||
-                (!string.IsNullOrEmpty(s.NombreSolicitante) && s.NombreSolicitante.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrEmpty(s.Folio) && s.Folio.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
-            &&
-            (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado == estadoSeleccionado)
-        );
+    SolicitudesHistorial.Where(s =>
+        (string.IsNullOrWhiteSpace(busqueda) ||
+            (!string.IsNullOrEmpty(s.NombreSolicitante) && s.NombreSolicitante.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+            (!string.IsNullOrEmpty(s.Folio) && s.Folio.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
+        &&
+        (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado == estadoSeleccionado)
+        &&
+        (!filtroFechaDia.HasValue || s.FechaInicio.Date == filtroFechaDia.Value.Date)
+        &&
+        (!filtroMes.HasValue || s.FechaInicio.Month == filtroMes)
+        &&
+        (!filtroAno.HasValue || s.FechaInicio.Year == filtroAno)
+    );
 
     private IEnumerable<ExpedienteDTO> PagedExpedientes =>
         SolicitudesFiltradas
@@ -118,6 +149,18 @@
 
     private int totalPages =>
         SolicitudesFiltradas.Any() ? (SolicitudesFiltradas.Count() + pageSize - 1) / pageSize : 1;
+
+    // Seleccionar por dia, mes y año
+    private DateTime? filtroFechaDia;
+    private int? filtroMes;
+    private int? filtroAno;
+
+    private List<int> AnosDisponibles => SolicitudesHistorial
+        .Select(s => s.FechaInicio.Year)
+        .Distinct()
+        .OrderByDescending(x => x)
+        .ToList();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -156,39 +199,115 @@
 
     private async Task DescargarExcel()
     {
-        var estado = string.IsNullOrWhiteSpace(estadoSeleccionado) ? "TODOS LOS ESTADOS" : estadoSeleccionado.Replace(" ", "_");
+        var estado = string.IsNullOrWhiteSpace(estadoSeleccionado) ? "TODOS_LOS_ESTADOS" : estadoSeleccionado.Replace(" ", "_");
         var hora = DateTime.Now.ToString("HH꞉mm꞉ss");
-        var nombre = $"Reporte_{estado}_{DateTime.Now:dd-MM-yyyy}_{hora}.xlsx";
+
+        string fechaFiltro;
+
+        if (filtroFechaDia.HasValue)
+        {
+            fechaFiltro = filtroFechaDia.Value.ToString("dd-MM-yyyy");
+        }
+        else if (filtroMes.HasValue && filtroAno.HasValue)
+        {
+            var mesNombre = System.Globalization.CultureInfo.GetCultureInfo("es-MX").DateTimeFormat.GetMonthName(filtroMes.Value);
+            fechaFiltro = $"{mesNombre}-{filtroAno}";
+        }
+        else if (filtroAno.HasValue)
+        {
+            fechaFiltro = filtroAno.Value.ToString();
+        }
+        else
+        {
+            var mesNombreActual = System.Globalization.CultureInfo.GetCultureInfo("es-MX").DateTimeFormat.GetMonthName(DateTime.Now.Month);
+            fechaFiltro = $"{mesNombreActual}-{DateTime.Now.Year}";
+        }
+
+        var nombre = $"Reporte_{estado}_{fechaFiltro}_{hora}.xlsx";
         var base64 = await ObtenerExcelComoBase64();
+
         await JS.InvokeVoidAsync("excelFunctions.descargarExcel", nombre, base64);
     }
 
 
     private async Task<string> ObtenerExcelComoBase64()
     {
-        using var workbook = new ClosedXML.Excel.XLWorkbook();
+        using var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Solicitudes");
 
-        // Encabezados
-        var headers = new[]
-        {
+        AgregarTituloYEncabezado(worksheet);
+        AgregarDatosSolicitudes(worksheet);
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Seek(0, SeekOrigin.Begin);
+        return Convert.ToBase64String(stream.ToArray());
+    }
+
+    private void AgregarTituloYEncabezado(IXLWorksheet worksheet)
+    {
+        var estado = string.IsNullOrWhiteSpace(estadoSeleccionado) ? "TODOS LOS ESTADOS" : estadoSeleccionado;
+        string fechaFiltro;
+
+        if (filtroFechaDia.HasValue)
+            fechaFiltro = filtroFechaDia.Value.ToString("dd/MM/yyyy");
+        else if (filtroMes.HasValue && filtroAno.HasValue)
+            fechaFiltro = $"{CultureInfo.GetCultureInfo("es-MX").DateTimeFormat.GetMonthName(filtroMes.Value)} {filtroAno}";
+        else if (filtroAno.HasValue)
+            fechaFiltro = filtroAno.Value.ToString();
+        else
+            fechaFiltro = $"{CultureInfo.GetCultureInfo("es-MX").DateTimeFormat.GetMonthName(DateTime.Now.Month)} {DateTime.Now.Year}";
+
+        worksheet.Cell("A1").Value = $"📋 Reporte de Solicitudes - Estado: {estado} - Filtro: {fechaFiltro}";
+        worksheet.Range("A1:AK1").Merge().Style
+            .Font.SetBold()
+            .Font.SetFontSize(18)
+            .Font.SetFontColor(XLColor.White)
+            .Fill.SetBackgroundColor(XLColor.BlueGray)
+            .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+            .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+        worksheet.Cell("A2").Value = $"Generado el: {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+        worksheet.Range("A2:AK2").Merge().Style
+            .Font.SetItalic()
+            .Font.SetFontSize(11)
+            .Font.SetFontColor(XLColor.White)
+            .Fill.SetBackgroundColor(XLColor.BlueGray)
+            .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+        var headers = new[] {
         "ID", "Folio", "Año Admisión", "Mes Admisión", "Tipo Solicitud", "Tipo Derecho", "Nombre Solicitante",
-        "Fecha Inicio", "Fecha Límite 10 días", "Ampliación", "Sesión Ampliación", "Fecha Sesión Ampliación",
-        "Fecha Límite 20 días", "Estado", "Fecha Respuesta", "Promedio Días", "Prevención", "Subsanación",
-        "Fecha Límite Prevención", "Recibida/Registrada", "Medio Recepción Manual",
-        "Modo de Respuesta Deseado", "Correo", "Contenido Solicitud", "Área Poseedora",
-        "Materia", "Ciudad", "Temática", "Temática Específica", "Sentido Respuesta",
-        "Precisión Sentido", "Modalidad Entrega", "Cobro", "Recurso Revisión",
-        "N° Recurso", "Datos Recurso", "Nota"
+        "Fecha Inicio", "Límite 10 días", "Ampliación", "Sesión Ampliación", "Fecha Sesión",
+        "Límite 20 días", "Estado", "Fecha Respuesta", "Promedio Días", "¿Prevención?", "Subsanación",
+        "Límite Prevención", "Recibida", "Recepción Manual", "Modo Respuesta", "Correo", "Contenido",
+        "Área Poseedora", "Materia", "Ciudad", "Temática", "Temática Específica", "Sentido Respuesta",
+        "Precisión Sentido", "Entrega", "Cobro", "Recurso", "N° Recurso", "Datos Recurso", "Nota"
     };
 
+        var headerRow = worksheet.Row(4);
         for (int i = 0; i < headers.Length; i++)
         {
-            worksheet.Cell(1, i + 1).Value = headers[i];
-            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+            var cell = worksheet.Cell(4, i + 1);
+            cell.Value = headers[i];
+            cell.Style
+                .Font.SetBold()
+                .Font.SetFontSize(16)
+                .Font.SetFontColor(XLColor.White)
+                .Fill.SetBackgroundColor(XLColor.DarkBlue)
+                .Border.SetOutsideBorder(XLBorderStyleValues.Thin)
+                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
         }
 
-        int row = 2;
+        // Aplicar autofiltro a la fila de encabezados
+        worksheet.Range(4, 1, 4, headers.Length).SetAutoFilter();
+    }
+
+
+    private void AgregarDatosSolicitudes(IXLWorksheet worksheet)
+    {
+        int row = 5;
         foreach (var s in SolicitudesFiltradas)
         {
             worksheet.Cell(row, 1).Value = s.Id;
@@ -229,19 +348,17 @@
             worksheet.Cell(row, 36).Value = s.DatosRecursoRevision;
             worksheet.Cell(row, 37).Value = s.Nota;
 
+            // Borde a cada fila
+            for (int col = 1; col <= 37; col++)
+            {
+                worksheet.Cell(row, col).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            }
+
             row++;
         }
-
-        worksheet.Columns().AdjustToContents(); // Ajusta ancho automáticamente
-
-        using var stream = new MemoryStream();
-        workbook.SaveAs(stream);
-        stream.Seek(0, SeekOrigin.Begin);
-        return Convert.ToBase64String(stream.ToArray());
     }
 
-
-
+    // Paginacion
     private void PrevPage()
     {
         if (currentPage > 1)
