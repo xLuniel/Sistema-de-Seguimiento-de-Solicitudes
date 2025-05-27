@@ -114,6 +114,8 @@ public class CalendarioController : ControllerBase
         {
             _context.DiaInhabilManual.Add(new DiaInhabilManual { Fecha = fecha });
             await _context.SaveChangesAsync();
+
+            await RecalcularFechasLimiteEnSolicitudes();
         }
 
         return Ok(new { mensaje = "Día inhábil guardado correctamente." });
@@ -159,7 +161,56 @@ public class CalendarioController : ControllerBase
         _context.DiaInhabilManual.Remove(diaInhabil);
         await _context.SaveChangesAsync();
 
+        await RecalcularFechasLimiteEnSolicitudes();
+
         return NoContent();
     }
 
+    private async Task RecalcularFechasLimiteEnSolicitudes()
+    {
+        var diasInhabiles = await _context.DiaInhabilManual
+            .Select(d => d.Fecha.Date)
+            .ToListAsync();
+
+        var expedientes = await _context.Expedientes
+            .Where(e => e.FechaInicio != null)
+            .ToListAsync();
+
+        foreach (var expediente in expedientes)
+        {
+            int diasHabiles = expediente.TipoSolicitud == "DAI" ? 10 : 20;
+
+            if (expediente.Ampliacion != null && expediente.Ampliacion.ToUpper() == "SI")
+            {
+                diasHabiles *= 2; 
+            }
+
+            var fechaInicio =expediente.FechaInicio!.Value.Date;
+            var fechaCalculada = fechaInicio;
+            int contados = 0;
+
+            while (contados < diasHabiles)
+            {
+                fechaCalculada = fechaCalculada.AddDays(1);
+
+                if (fechaCalculada.DayOfWeek != DayOfWeek.Saturday &&
+                    fechaCalculada.DayOfWeek != DayOfWeek.Sunday &&
+                    !diasInhabiles.Contains(fechaCalculada))
+                {
+                    contados++;
+                }
+            }
+
+            if (expediente.TipoSolicitud == "DAI")
+            {
+                expediente.FechaLimiteRespuesta10dias = fechaCalculada; 
+            }
+            else
+            {
+                expediente.FechaLimiteRespuesta20dias = fechaCalculada;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+    }
 }

@@ -21,6 +21,7 @@
 @inject IJSRuntime JSRuntime
 @inject IExpedienteService ExpedienteService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ICalendarioService CalendarioService
 
 
 <PageTitle>Detalles</PageTitle>
@@ -86,7 +87,7 @@
                                 <th>Tipo de Derecho</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TipoDerecho"
-                                                 disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud) || EsSoloConsulta)">
+                                    disabled="@(string.IsNullOrEmpty(Expediente.TipoSolicitud) || EsSoloConsulta)">
                                         @if (Expediente.TipoSolicitud == "ARCO")
                                         {
 
@@ -176,7 +177,7 @@
                                 <th>Subsana Prevención y Reinicio del Trámite</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.SubsanaPrevencion"
-                                                 disabled="@(!Expediente.Prevencion  || EsSoloConsulta)">
+                                    disabled="@(!Expediente.Prevencion  || EsSoloConsulta)">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var subsanaPrevencion in Catalogos.SubsanaPrevencion)
@@ -195,7 +196,7 @@
                                 <th>Cómo fue Recibida/Registrada en la PNT</th>
                                 <td>
                                     <InputSelect class="form-control"
-                                                 @bind-Value="_RecibidaRegistradaBind" disabled="@EsSoloConsulta">
+                                    @bind-Value="_RecibidaRegistradaBind" disabled="@EsSoloConsulta">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
                                         @foreach (var recibida in Catalogos.ComoFueRecibida)
                                         {
@@ -208,7 +209,7 @@
                                 <th>Medio de Recepción en Solicitud Manual</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.MedioRecepcionSolicitudManual"
-                                                 disabled="@(!HabilitarMedioRecepcion  || EsSoloConsulta)">
+                                    disabled="@(!HabilitarMedioRecepcion  || EsSoloConsulta)">
                                         <option disabled selected value="">-- Seleccione una opción --</option>
 
                                         @foreach (var medioRecepcion in Catalogos.MedioRecepcionSolicitudManual)
@@ -320,7 +321,7 @@
                                 <th>Temática Específica</th>
                                 <td>
                                     <InputSelect class="form-control" @bind-Value="Expediente.TematicaEspecifica"
-                                                 disabled="@(string.IsNullOrEmpty(Expediente.Tematica) || EsSoloConsulta)">
+                                    disabled="@(string.IsNullOrEmpty(Expediente.Tematica) || EsSoloConsulta)">
                                         <option disabled selected value="">-- Seleccione una temática específica --</option>
                                         @foreach (var tematicaEspecifica in TematicasEspecificasActuales)
                                         {
@@ -427,7 +428,7 @@
 
     private ClaimsPrincipal Usuario;
     private bool EsSoloConsulta => Usuario?.IsInRole("CONSULTA") ?? false;
-     
+
     private Expediente Expediente { get; set; } = new Expediente();
 
     List<ExpedienteDTO>? listaExpedientes = null;
@@ -438,6 +439,8 @@
 
     // Lista para almacenar las temáticas específicas actuales
     private List<string> TematicasEspecificasActuales { get; set; } = new();
+
+    private List<DateTime> DiasInhabiles { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
@@ -450,6 +453,11 @@
 
         // Filtrar el expediente que corresponde con el ID de la URL
         var expedienteDTO = listaExpedientes.FirstOrDefault(e => e.Id == Id);
+
+        // cargar dias inhabiles desde el servicio
+        DiasInhabiles = (await CalendarioService.ObtenerDiasInhabiles())
+            .Select(d => d.Fecha.Date)
+            .ToList();
 
         // Si el expediente no se encuentra, puedes redirigir o mostrar un mensaje
         if (expedienteDTO != null)
@@ -517,6 +525,8 @@
         int diasAdicionales = tipoSolicitud == "DAI" ? 10 : 20;
         DateTime fechaLimite = fechaInicio;
 
+
+
         if (Expediente.Ampliacion == "SI")
         {
             diasAdicionales = diasAdicionales * 2;
@@ -534,8 +544,11 @@
         {
             fechaLimite = fechaLimite.AddDays(1);
 
+			bool esFinDeSemana = fechaLimite.DayOfWeek == DayOfWeek.Saturday || fechaLimite.DayOfWeek == DayOfWeek.Sunday;
+			bool esDiaInhabil = DiasInhabiles.Contains(fechaLimite.Date);
+
             // Si el día no es sábado ni domingo, cuenta como hábil
-            if (fechaLimite.DayOfWeek != DayOfWeek.Saturday && fechaLimite.DayOfWeek != DayOfWeek.Sunday)
+            if (!esFinDeSemana && !esDiaInhabil)
             {
                 diasAdicionales--;
             }
