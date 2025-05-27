@@ -3,16 +3,19 @@
 @attribute [Authorize]
 @*@attribute [Authorize(Roles = "ADMINISTRADOR,CAPTURISTA,OBSERVADOR")]*@
 
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using Sistema_de_Seguimiento_de_Solicitudes.Models
 @using Sistema_de_Seguimiento_de_Solicitudes.Services
 @using Radzen
 @using System.Text.Json
 @using SolicitudesShared
+@using System.Security.Claims
 
 @inject DialogService DialogService
 @inject IExpedienteService ExpedienteService
 @inject ICalendarioService CalendarioService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 <PageTitle>Calendario</PageTitle>
@@ -26,16 +29,22 @@
                       Click="@MostrarEventosPorVencimiento"
                       Icon="event" />
 
-        <RadzenDatePicker @bind-Value="@fechaSeleccionada" Style="width: 200px;" />
-        <RadzenButton Text="Activar/Desactivar día"
-                      Style="background-color: #198754; color: white;"
-                      Click="@ToggleDiaManual" />
+        @if (esAdminOSupervision)
+        {
+            <RadzenDatePicker @bind-Value="@fechaSeleccionada"
+                              DateFormat="dd/MM/yyyy"
+                              Placeholder="dd/mm/yyyy"
+                              Style="width: 200px; text-align-last: center;" />
 
+            <RadzenButton Text="Activar/Desactivar día"
+                          Style="background-color: #198754; color: white;"
+                          Click="@ToggleDiaManual" />
+        }
     </div>
 
     <RadzenScheduler @ref="@scheduler"
                      SlotRender="@OnSlotRender"
-                     style="height: 720px;"
+                     style="height: 100%; width: 100%;"
                      TItem="EventoSolicitud"
                      Data="@eventos"
                      StartProperty="Start"
@@ -66,6 +75,11 @@
     //     public DateTime End { get; set; }
     // }
 
+
+    // Rol
+    private ClaimsPrincipal usuarioActual;
+    private bool esAdminOSupervision;
+
     private List<EventoSolicitud> eventos = new List<EventoSolicitud>();
 
     // datepickker variables
@@ -74,6 +88,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Rol
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        usuarioActual = authState.User;
+
+        esAdminOSupervision = usuarioActual.IsInRole("ADMINISTRADOR") || usuarioActual.IsInRole("SUPERVISIÓN");
+
         var expedienteList = await ExpedienteService.Lista();
 
         diasApagadosManualmente = (await CalendarioService.ObtenerDiasInhabiles())
@@ -84,23 +104,24 @@
             .Where(expediente => expediente?.FechaInicio != null)
             .Select(expediente =>
             {
-                DateTime end = expediente.TipoSolicitud == "ARCO"
-                    ? (expediente.FechaLimiteRespuesta20dias ?? expediente.FechaInicio)
-                    : (expediente.FechaLimiteRespuesta10dias ?? expediente.FechaInicio);
+                int diasRequeridos = expediente.TipoSolicitud == "ARCO" ? 20 : 10;
+                DateTime inicio = expediente.FechaInicio;
+                DateTime end = CalcularFechaLimite(inicio, diasRequeridos);
 
                 return new EventoSolicitud
                     {
                         Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
-                        Start = expediente.FechaInicio,
+                        Start = inicio,
                         End = end,
                         TipoSolicitud = expediente.TipoSolicitud!,
-                        TienePrevencion = false, // Valor por defecto
-                        EsUrgente = false // Valor por defecto
+                        TienePrevencion = false,
+                        EsUrgente = false
                     };
             }).ToList();
     }
 
-    // Método para habilitar/deshabilitar un día específico
+
+    // Método para habilitar/deshabilitar un día específico    
     async Task ToggleDiaManual()
     {
         if (fechaSeleccionada.HasValue)
@@ -118,9 +139,32 @@
                 await CalendarioService.GuardarDiaInhabil(new DiaInhabilManualDTO { Fecha = fecha }); // guardar el día inhabil
             }
 
-			scheduler?.Reload(); // Recargar el calendario para reflejar los cambios
+            // 🔁 Recalcular eventos considerando los nuevos días inhabilitados
+            var expedienteList = await ExpedienteService.Lista();
+
+            eventos = expedienteList
+                .Where(expediente => expediente?.FechaInicio != null)
+                .Select(expediente =>
+                {
+                    int diasRequeridos = expediente.TipoSolicitud == "ARCO" ? 20 : 10;
+                    DateTime inicio = expediente.FechaInicio;
+                    DateTime end = CalcularFechaLimite(inicio, diasRequeridos);
+
+                    return new EventoSolicitud
+                        {
+                            Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
+                            Start = inicio,
+                            End = end,
+                            TipoSolicitud = expediente.TipoSolicitud!,
+                            TienePrevencion = false,
+                            EsUrgente = false
+                        };
+                }).ToList();
+
+            scheduler?.Reload(); // Recargar el calendario para reflejar los cambios
         }
     }
+
 
     // Mostrar Eventos por Vencimiento
     async Task MostrarEventosPorVencimiento()
@@ -160,10 +204,11 @@
     // Método para determinar si una fecha es laborable
     private bool EsDiaLaborable(DateTime fecha)
     {
-        // No es laborable si es fin de semana o día festivo
+        // No es laborable si es fin de semana, festivo o si se desactiva el dia
         return fecha.DayOfWeek != DayOfWeek.Saturday &&
                fecha.DayOfWeek != DayOfWeek.Sunday &&
-               !diasFestivos.Contains(fecha.Date);
+               !diasFestivos.Contains(fecha.Date) &&
+               !diasApagadosManualmente.Contains(fecha.Date);
     }
 
     // Método para calcular días hábiles entre dos fechas
