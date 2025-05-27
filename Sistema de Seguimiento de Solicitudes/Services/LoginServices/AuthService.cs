@@ -45,8 +45,6 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services.LoginServices
                 await _authStateProvider.SetToken(result.Token);
                 
             }
-
-
             //((CustomAuthenticationStateProvider)_authStateProvider).MarkUserAsAuthenticated(username);
             return result!;
 

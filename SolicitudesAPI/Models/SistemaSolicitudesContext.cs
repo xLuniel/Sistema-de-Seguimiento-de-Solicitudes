@@ -77,10 +77,6 @@ public partial class SistemaSolicitudesContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
 
-        // ignorar entidades a las que no se les necesita hacer migraciones
-        //modelBuilder.Ignore<Usuario>();
-        //modelBuilder.Ignore<Expediente>();
-        //modelBuilder.Ignore<Calendario>();
     }
 
 

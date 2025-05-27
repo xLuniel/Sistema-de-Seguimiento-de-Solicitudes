@@ -42,13 +42,6 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 throw new Exception($"Error al guardar día inhábil: {mensaje}");
             }
 
-
-            //if (response!.Exito)
-            //{
-            //    return response.Data!;
-            //}
-            //else
-            //    throw new Exception(response.Mensaje);
         }
 
         public async Task EliminarDiaInhabil(DateTime fecha)
@@ -62,12 +55,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
                 var error = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Error al eliminar día inhábil: {error}");
             }
-            //if (response!.Exito)
-            //{
-            //    return response.Exito!;
-            //}
-            //else
-            //    throw new Exception(response.Mensaje);
+
         }
     }
 }
