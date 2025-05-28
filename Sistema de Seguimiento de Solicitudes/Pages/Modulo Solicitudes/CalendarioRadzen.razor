@@ -163,36 +163,51 @@
         // No es laborable si es fin de semana o día festivo
         return fecha.DayOfWeek != DayOfWeek.Saturday &&
                fecha.DayOfWeek != DayOfWeek.Sunday &&
-               !diasFestivos.Contains(fecha.Date);
+               !diasFestivos.Contains(fecha.Date) &&
+               !diasApagadosManualmente.Contains(fecha.Date);
     }
 
     // Método para calcular días hábiles entre dos fechas
     private int CalcularDiasHabiles(DateTime inicio, DateTime fin)
     {
+        // int dias = 0;
+
+        // if (inicio <= fin)
+        // {
+        //     for (DateTime fecha = inicio; fecha <= fin; fecha = fecha.AddDays(1))
+        //     {
+        //         if (EsDiaLaborable(fecha))
+        //         {
+        //             dias++;
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     for (DateTime fecha = inicio; fecha >= fin; fecha = fecha.AddDays(-1))
+        //     {
+        //         if (EsDiaLaborable(fecha))
+        //         {
+        //             dias--;
+        //         }
+        //     }
+        // }
+
+        // return dias;
+
         int dias = 0;
+        DateTime fecha = inicio;
 
-        if (inicio <= fin)
+        int step = fin >= inicio ? 1 : -1;
+        DateTime endDate = fin.AddDays(step); // Incluir el día final
+
+        while (fecha != endDate)
         {
-            for (DateTime fecha = inicio; fecha <= fin; fecha = fecha.AddDays(1))
-            {
-                if (EsDiaLaborable(fecha))
-                {
-                    dias++;
-                }
-            }
-        }
-        else
-        {
-            for (DateTime fecha = inicio; fecha >= fin; fecha = fecha.AddDays(-1))
-            {
-                if (EsDiaLaborable(fecha))
-                {
-                    dias--;
-                }
-            }
+            if (EsDiaLaborable(fecha)) dias += step;
+            fecha = fecha.AddDays(step);
         }
 
-        return dias;
+        return Math.Abs(dias);
     }
 
     // Método para calcular la fecha límite considerando días hábiles
@@ -303,6 +318,12 @@
         {
             args.Attributes["class"] = (args.Attributes.ContainsKey("class") ? args.Attributes["class"] + " " : "") + clases.Trim();
         }
+
+        // if (diasApagadosManualmente.Contains(args.Start.Date))
+        // {
+        //     args.Attributes["class"] += " rz-scheduler-non-working-time-cell";
+        //     args.Attributes["style"] = "background-color: #ffe6e6;"; // Color personalizado
+        // }
     }
 
 
