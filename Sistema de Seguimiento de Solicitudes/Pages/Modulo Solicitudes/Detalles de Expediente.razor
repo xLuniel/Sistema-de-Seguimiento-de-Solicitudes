@@ -115,7 +115,7 @@
                                 <td>@Expediente.FechaInicioTramite.ToString("dd/MM/yyyy  -  HH:mm:ss")</td>
                             </tr>
                             <tr>
-                                <th>Fecha Límite de Respuesta (10 días hábiles)</th>
+                                <th>Fecha Límite de Respuesta para DAI (10 días hábiles)</th>
                                 <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta10" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
@@ -139,7 +139,7 @@
                                 <td><InputDate class="form-control" @bind-Value="Expediente.FechaSesionComiteAmpliacion" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
-                                <th>Fecha Límite de Respuesta (20 días hábiles)</th>
+                                <th>Fecha Límite de Respuesta para ARCO (20 días hábiles)</th>
                                 <td><InputDate class="form-control" @bind-Value="Expediente.FechaLimiteRespuesta20" disabled="@EsSoloConsulta" /></td>
                             </tr>
                             <tr>
@@ -522,8 +522,9 @@
     // Calculo de fechas limites
     private DateTime CalcularFechaLimite(DateTime fechaInicio, string tipoSolicitud)
     {
+
         int diasAdicionales = tipoSolicitud == "DAI" ? 10 : 20;
-        DateTime fechaLimite = fechaInicio;
+        DateTime fechaLimite = fechaInicio.Date;
 
 
 
@@ -582,14 +583,18 @@
     {
         if (!string.IsNullOrEmpty(Expediente.TipoSolicitud))
         {
+            DateTime fechaCalculada;
+
             if (Expediente.TipoSolicitud == "ARCO")
             {
-                Expediente.FechaLimiteRespuesta20 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                fechaCalculada = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                Expediente.FechaLimiteRespuesta20 = fechaCalculada.AddHours(23).AddMinutes(59).AddSeconds(59);
                 Expediente.FechaLimiteRespuesta10 = null;
             }
             else if (Expediente.TipoSolicitud == "DAI")
             {
-                Expediente.FechaLimiteRespuesta10 = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                fechaCalculada = CalcularFechaLimite(Expediente.FechaInicioTramite, Expediente.TipoSolicitud);
+                Expediente.FechaLimiteRespuesta10 = fechaCalculada.AddHours(23).AddMinutes(59).AddSeconds(59);
                 Expediente.FechaLimiteRespuesta20 = null;
             }
         }

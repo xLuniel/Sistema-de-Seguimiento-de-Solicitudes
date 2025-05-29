@@ -32,27 +32,27 @@
         @if (esAdminOSupervision)
         {
             <RadzenDatePicker @bind-Value="@fechaSeleccionada"
-                              DateFormat="dd/MM/yyyy"
-                              Placeholder="dd/mm/yyyy"
-                              Style="width: 200px; text-align-last: center;" />
+            DateFormat="dd/MM/yyyy"
+            Placeholder="dd/mm/yyyy"
+            Style="width: 200px; text-align-last: center;" />
 
             <RadzenButton Text="Activar/Desactivar día"
-                          Style="background-color: #198754; color: white;"
-                          Click="@ToggleDiaManual" />
+            Style="background-color: #198754; color: white;"
+            Click="@ToggleDiaManual" />
         }
     </div>
 
     <RadzenScheduler @ref="@scheduler"
-                     SlotRender="@OnSlotRender"
-                     style="height: 100%; width: 100%;"
-                     TItem="EventoSolicitud"
-                     Data="@eventos"
-                     StartProperty="Start"
-                     EndProperty="End"
-                     ShowHeader="@showHeader"
-                     TextProperty="Title"
-                     SelectedIndex="2"
-                     AppointmentRender="@OnAppointmentRender">
+    SlotRender="@OnSlotRender"
+    style="height: 100%; width: 100%;"
+    TItem="EventoSolicitud"
+    Data="@eventos"
+    StartProperty="Start"
+    EndProperty="End"
+    ShowHeader="@showHeader"
+    TextProperty="Title"
+    SelectedIndex="2"
+    AppointmentRender="@OnAppointmentRender">
         <RadzenDayView />
         <RadzenWeekView />
         <RadzenMonthView />
@@ -92,24 +92,62 @@
             .Select(d => d.Fecha.Date)
             .ToList();
 
+        // eventos = expedienteList
+        //     .Where(expediente => expediente?.FechaInicio != null)
+        //     .Select(expediente =>
+        //     {
+        //         int diasRequeridos = expediente.TipoSolicitud == "ARCO" ? 20 : 10;
+        //         DateTime inicio = expediente.FechaInicio;
+        //         DateTime end = CalcularFechaLimite(inicio, diasRequeridos);
+
+        //         return new EventoSolicitud
+        //             {
+        //                 Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
+        //                 Start = inicio,
+        //                 End = end,
+        //                 TipoSolicitud = expediente.TipoSolicitud!,
+        //                 TienePrevencion = false,
+        //                 EsUrgente = false
+        //             };
+        //     }).ToList();
+
         eventos = expedienteList
             .Where(expediente => expediente?.FechaInicio != null)
             .Select(expediente =>
-            {
-                int diasRequeridos = expediente.TipoSolicitud == "ARCO" ? 20 : 10;
-                DateTime inicio = expediente.FechaInicio;
-                DateTime end = CalcularFechaLimite(inicio, diasRequeridos);
+             {
+                 DateTime inicio = expediente.FechaInicio;
 
-                return new EventoSolicitud
+                 // Prioriza Prevención > Ampliación > Normal
+                 DateTime? fechaFin = null;
+
+                 if (expediente.Prevencion == true && expediente.FechaLimitePrevencion10dias.HasValue)
+                 {
+                     fechaFin = expediente.FechaLimitePrevencion10dias.Value;
+                 }
+                 else if (expediente.Ampliacion == "SI" && expediente.FechaLimiteRespuesta20dias.HasValue)
+                 {
+                     fechaFin = expediente.FechaLimiteRespuesta20dias.Value;
+                 }
+                 else if (expediente.FechaLimiteRespuesta10dias.HasValue)
+                 {
+                     fechaFin = expediente.FechaLimiteRespuesta10dias.Value;
+                 }
+                 else if (expediente.FechaLimiteRespuesta20dias.HasValue)
+                 {
+                     fechaFin = expediente.FechaLimiteRespuesta20dias.Value;
+                 }
+
+                 return new EventoSolicitud
                     {
                         Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
                         Start = inicio,
-                        End = end,
+                        End = fechaFin.Value/* .AddDays(1) */,
                         TipoSolicitud = expediente.TipoSolicitud!,
-                        TienePrevencion = false,
+                        TienePrevencion = expediente.Prevencion,
                         EsUrgente = false
                     };
-            }).ToList();
+             }).ToList();
+
     }
 
 
@@ -134,24 +172,48 @@
             // 🔁 Recalcular eventos considerando los nuevos días inhabilitados
             var expedienteList = await ExpedienteService.Lista();
 
+            diasApagadosManualmente = (await CalendarioService.ObtenerDiasInhabiles())
+            .Select(d => d.Fecha.Date)
+            .ToList();
+
             eventos = expedienteList
                 .Where(expediente => expediente?.FechaInicio != null)
                 .Select(expediente =>
                 {
-                    int diasRequeridos = expediente.TipoSolicitud == "ARCO" ? 20 : 10;
                     DateTime inicio = expediente.FechaInicio;
-                    DateTime end = CalcularFechaLimite(inicio, diasRequeridos);
+
+                    // Prioriza Prevención > Ampliación > Normal
+                    DateTime? fechaFin = null;
+
+                    if (expediente.Prevencion == true && expediente.FechaLimitePrevencion10dias.HasValue)
+                    {
+                        fechaFin = expediente.FechaLimitePrevencion10dias.Value;
+                    }
+                    else if (expediente.Ampliacion == "SI" && expediente.FechaLimiteRespuesta20dias.HasValue)
+                    {
+                        fechaFin = expediente.FechaLimiteRespuesta20dias.Value;
+                    }
+                    else if (expediente.FechaLimiteRespuesta10dias.HasValue)
+                    {
+                        fechaFin = expediente.FechaLimiteRespuesta10dias.Value;
+                    }
+                    else if (expediente.FechaLimiteRespuesta20dias.HasValue)
+                    {
+                        fechaFin = expediente.FechaLimiteRespuesta20dias.Value;
+                    }
 
                     return new EventoSolicitud
                         {
                             Title = $"{expediente.Folio} – {expediente.NombreSolicitante}",
                             Start = inicio,
-                            End = end,
+                            End = fechaFin.Value/* .AddDays(1) */,
                             TipoSolicitud = expediente.TipoSolicitud!,
-                            TienePrevencion = false,
+                            TienePrevencion = expediente.Prevencion,
                             EsUrgente = false
                         };
                 }).ToList();
+
+            
 
             scheduler?.Reload(); // Recargar el calendario para reflejar los cambios
         }
@@ -245,27 +307,28 @@
     }
 
     // Método para calcular la fecha límite considerando días hábiles
-    private DateTime CalcularFechaLimite(DateTime inicio, int diasHabilesRequeridos)
-    {
-        int diasContados = 0;
-        DateTime fecha = inicio;
+    // private DateTime CalcularFechaLimite(DateTime inicio, int diasHabilesRequeridos)
+    // {
+    //     int diasContados = 0;
+    //     DateTime fecha = inicio;
 
-        while (diasContados < diasHabilesRequeridos)
-        {
-            fecha = fecha.AddDays(1);
-            if (EsDiaLaborable(fecha))
-            {
-                diasContados++;
-            }
-        }
+    //     while (diasContados < diasHabilesRequeridos)
+    //     {
+    //         fecha = fecha.AddDays(1);
+    //         if (EsDiaLaborable(fecha))
+    //         {
+    //             diasContados++;
+    //         }
+    //     }
 
-        return fecha;
-    }
+    //     return fecha;
+    // }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EventoSolicitud> args)
     {
         // Calcular días hábiles restantes
-        var diasHabilesRestantes = CalcularDiasHabiles(DateTime.Now.Date, args.Data.End.Date);
+        var fechaLimiteReal = args.Data.End.Date.AddDays(-1);
+        var diasHabilesRestantes = CalcularDiasHabiles(DateTime.Now.Date, fechaLimiteReal);
 
         // Determinar clase según tipo de solicitud
         string tipo = args.Data.TipoSolicitud?.ToUpperInvariant()?.Trim() ?? "";

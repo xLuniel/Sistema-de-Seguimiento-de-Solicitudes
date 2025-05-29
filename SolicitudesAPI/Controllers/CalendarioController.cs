@@ -148,27 +148,32 @@ public class CalendarioController : ControllerBase
 
             var fechaInicio =expediente.FechaInicio!.Value.Date;
             var fechaCalculada = fechaInicio;
-            int contados = 0;
+            // int contados = 0;
 
-            while (contados < diasHabiles)
+            while (diasHabiles > 0)
             {
                 fechaCalculada = fechaCalculada.AddDays(1);
 
-                if (fechaCalculada.DayOfWeek != DayOfWeek.Saturday &&
-                    fechaCalculada.DayOfWeek != DayOfWeek.Sunday &&
-                    !diasInhabiles.Contains(fechaCalculada))
+                bool esFinDeSemana = fechaCalculada.DayOfWeek == DayOfWeek.Saturday || fechaCalculada.DayOfWeek == DayOfWeek.Sunday;
+                bool esDiaInhabil = diasInhabiles.Contains(fechaCalculada.Date);
+
+                if (!esFinDeSemana && !esDiaInhabil)
                 {
-                    contados++;
+                    diasHabiles--;
                 }
             }
 
+            var fechalimiteConHora = fechaCalculada.AddHours(23).AddMinutes(59).AddSeconds(59);
+
             if (expediente.TipoSolicitud == "DAI")
             {
-                expediente.FechaLimiteRespuesta10dias = fechaCalculada; 
+                expediente.FechaLimiteRespuesta10dias = fechalimiteConHora;
+                expediente.FechaLimiteRespuesta20dias = null;
             }
-            else
+            else if (expediente.TipoSolicitud == "ARCO")
             {
-                expediente.FechaLimiteRespuesta20dias = fechaCalculada;
+                expediente.FechaLimiteRespuesta20dias = fechalimiteConHora;
+                expediente.FechaLimiteRespuesta10dias = null;
             }
         }
 
