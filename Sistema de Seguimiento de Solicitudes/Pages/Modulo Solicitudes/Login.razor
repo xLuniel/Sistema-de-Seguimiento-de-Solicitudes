@@ -16,17 +16,17 @@
 <div class="login-container">
     <div class="login-content">
         <div class="login-form">
-            <h3>Login</h3>
+            <h3>Inicio de Sesion</h3>
             <EditForm Model="sessionLogin" OnValidSubmit="LoginClicked">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <InputText @bind-Value="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Enter username" />
+                    <label for="username">Nombre de Usuario</label>
+                    <InputText @bind-Value="sessionLogin.NombreUsuario" class="form-control" id="username" placeholder="Ingrese Nombre de Usuario" />
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Enter password" />
+                    <label for="password">Contraseña</label>
+                    <input type="password" @bind="sessionLogin.password" class="form-control" id="password" placeholder="Ingrese Contraseña" />
                 </div>
                 <div class="form-group mt-3">
                     <button type="submit" class="btn btn-primary" disabled="@IsLoading">
