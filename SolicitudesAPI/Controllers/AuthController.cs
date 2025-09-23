@@ -89,7 +89,7 @@ namespace SolicitudesAPI.Controllers
             if (user == null)
             {
                 //return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
-                return Unauthorized(new LoginResponse { Token = null, Flag = false, Message = "Usuario o contraseña incorrectos" });
+                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
             }
 
             var passwordHasher = new PasswordHasher<Usuario>();
@@ -112,7 +112,7 @@ namespace SolicitudesAPI.Controllers
             else
             {
                 //return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
-                return Unauthorized(new LoginResponse { Token = null, Flag = false, Message = "Usuario o contraseña incorrectos" });
+                return Unauthorized(new LoginResponse { Message = "Usuario o contraseña incorrectos" });
             }
         }
 

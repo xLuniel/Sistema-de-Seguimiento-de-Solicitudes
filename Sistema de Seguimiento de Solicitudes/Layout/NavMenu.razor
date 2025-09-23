@@ -22,6 +22,19 @@
         @if (EnModuloSolicitudes)
         {
             <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/indice-expedientes">
+                    <span class="bi bi-journal-text me-2"></span> Consulta de Solicitudes
+                </NavLink>
+
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/menu/modulo-solicitudes/Calendario">
+                    <span class="bi bi-calendar-event-fill me-2" aria-hidden="true"></span> Calendario
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/menu/modulo-solicitudes" Match="NavLinkMatch.All">
                     <span class="bi bi-folder-fill me-2" aria-hidden="true"></span> Módulo Solicitudes
                 </NavLink>
@@ -34,33 +47,13 @@
             </div>
 
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/menu/modulo-solicitudes/indice-expedientes">
-                    <span class="bi bi-journal-text me-2" aria-hidden="true"></span> Índice de Solicitudes
-                </NavLink>
-            </div>
-
-            <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/menu/modulo-solicitudes/historial-solicitudes">
                     <span class="bi bi-clock-history me-2" aria-hidden="true"></span> Historial de Solicitudes
                 </NavLink>
             </div>
 
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/menu/modulo-solicitudes/Calendario">
-                    <span class="bi bi-calendar-event-fill me-2" aria-hidden="true"></span> Calendario
-                </NavLink>
-            </div>
-
             @* Solo para ADMINISTRADOR o SUPERVISOR *@
             <AuthorizeView Roles="ADMINISTRADOR, Admin">
-                @* Opcion movida a dropdown del mainlayout *@
-                @* <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/menu/modulo-solicitudes/CreacionUsuarios">
-                        <span class="bi bi-person-plus-fill me-2" aria-hidden="true"></span> Crear Usuarios
-                    </NavLink>
-                </div> *@
-
-                @*Solo para ADMINISTRADOR *@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/{id?}">
                         <span class="bi bi-trash-fill me-2" aria-hidden="true"></span> Eliminar Solicitudes
@@ -68,6 +61,7 @@
                 </div>
             </AuthorizeView>
         }
+
 
         @* ---- Siguientes Modulos, usar la estructura de arriba, dependiendo la condicion se vera para 
         el modulo seleccionado, igual se ocupa poner la ruta para el modulo en @code *@
