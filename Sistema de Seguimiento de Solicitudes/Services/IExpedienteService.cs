@@ -4,11 +4,22 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
 {
     public interface IExpedienteService
     {
-        Task<ResponseAPI<int>> Actualizar(ExpedienteDTO expediente);
+        // ✅ Obtener todos los expedientes
         Task<List<ExpedienteDTO>> Lista();
-        Task<ExpedienteDTO> Obtener(int id);
-        Task<int> Editar(ExpedienteDTO Expediente);
-        Task<int> Crear(ExpedienteDTO NuevoExpediente);
+
+        // ✅ Buscar un expediente por ID
+        Task<ExpedienteDTO> Buscar(int id);
+
+        // ✅ Crear un expediente
+        Task<int> Crear(ExpedienteDTO expediente);
+
+        // ✅ Eliminar un expediente
         Task<bool> Eliminar(int id);
+
+        // ✅ Actualizar un expediente
+        Task<bool> Actualizar(ExpedienteDTO expediente);
+
+        // ✅ Buscar por folio o contenido de solicitud
+        Task<List<ExpedienteDTO>> BuscarPorTexto(string filtro);
     }
 }

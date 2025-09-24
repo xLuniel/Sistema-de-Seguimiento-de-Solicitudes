@@ -49,7 +49,7 @@
                         <tbody>
                             <tr>
                                 <th>ID</th>
-                                <td>@Expediente.Id</td>
+                                @* <td>@Expediente.Id</td>*@
                             </tr>
                             <tr>
                                 <th>Folio</th>
@@ -798,17 +798,18 @@
 
 
             // Llamar al servicio para actualizar el expediente
-            var response = await ExpedienteService.Actualizar(expedienteDTO);
+            var exito = await ExpedienteService.Actualizar(expedienteDTO);
 
-            if (response.Exito )
+            if (exito)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Cambios guardados correctamente.");
                 Navigation.NavigateTo("/menu/modulo-solicitudes/indice-expedientes");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {response.Mensaje}");
+                await JSRuntime.InvokeVoidAsync("alert", "Error: No se pudieron guardar los cambios.");
             }
+
         }
         catch (Exception ex)
         {

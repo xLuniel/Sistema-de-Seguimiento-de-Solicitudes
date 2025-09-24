@@ -166,7 +166,7 @@
     private int IdEliminar { get; set; }
     private string MensajeError { get; set; } = "";
     private bool MostrarMensajeError { get; set; } = false;
-    private string modalContenido = "";  // Variable para almacenar el contenido a mostrar de la solicitud
+    private string modalContenido = "";
 
     private string _filtro = string.Empty;
     private string Filtro
@@ -177,7 +177,7 @@
             if (_filtro != value)
             {
                 _filtro = value;
-                FiltrarExpedientes(); // Aquí ejecutamos el filtro
+                _ = Buscar(); // 👉 ahora consulta al backend
             }
         }
     }
@@ -185,16 +185,15 @@
     List<ExpedienteDTO>? listaExpedientes = null;
     private List<ExpedienteDTO> ExpedientesFiltrados { get; set; } = new();
     private ExpedienteDTO NuevoExpediente { get; set; } = new();
-    
+
     // Roles
     private bool PuedeCapturar = false;
 
-    //Paginacion
+    // Paginación
     private int currentPage = 1;
-    private int pageSize = 12; // Cantidad de solicitudes por pagina
+    private int pageSize = 12;
     private int totalPages => (ExpedientesFiltrados.Count + pageSize - 1) / pageSize;
 
-    // Lista paginada
     private IEnumerable<ExpedienteDTO> PagedExpedientes => ExpedientesFiltrados
         .OrderByDescending(e => e.Id)
         .Skip((currentPage - 1) * pageSize)
@@ -204,48 +203,46 @@
     {
         if (firstRender)
         {
-            // Invoca la función global definida en pagsize.js
             pageSize = await JSRuntime.InvokeAsync<int>("getPageSizeBasedOnResolution");
             StateHasChanged();
         }
     }
 
-
     protected override async Task OnInitializedAsync()
     {
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // Verifica si el usuario tiene uno de estos roles que permiten agregar expedientes
         PuedeCapturar = user.IsInRole("CAPTURA") || user.IsInRole("SUPERVISIÓN") || user.IsInRole("ADMINISTRADOR");
 
-        listaExpedientes = await ExpedienteService.Lista(); // Recuperar datos de la base de datos en forma de lista
+        listaExpedientes = await ExpedienteService.Lista();
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
-
     }
 
-    //Filtro de busqueda
-    private void FiltrarExpedientes()
+    // 🔎 Nueva búsqueda: folio + contenido + solicitante (API)
+    private async Task Buscar()
     {
-        ExpedientesFiltrados = listaExpedientes!
-            .Where(e =>
-                string.IsNullOrWhiteSpace(Filtro) ||
-                (e.Folio != null && e.Folio.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                (e.Estado != null && e.Estado.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                (e.NombreSolicitante != null && e.NombreSolicitante.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                (e.ContenidoSolicitud != null && e.ContenidoSolicitud.Contains(Filtro, StringComparison.OrdinalIgnoreCase)) ||
-                e.Id.ToString().Contains(Filtro) ||
-                (DateTime.TryParse(Filtro, out DateTime fechaFiltro) && e.FechaInicio.Date == fechaFiltro.Date) ||
-                (int.TryParse(Filtro, out int anoFiltro) && e.AnoAdmision == anoFiltro) ||
-                (int.TryParse(Filtro, out int anioFechaInicio) && e.FechaInicio.Year == anioFechaInicio) 
-            )
-            .ToList();
+        if (!string.IsNullOrWhiteSpace(Filtro))
+        {
+            ExpedientesFiltrados = await ExpedienteService.BuscarPorTexto(Filtro);
+        }
+        else
+        {
+            listaExpedientes = await ExpedienteService.Lista();
+            ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
+        }
 
+        currentPage = 1; // reinicia la paginación
         StateHasChanged();
     }
 
-
+    private async Task LimpiarBusqueda()
+    {
+        Filtro = string.Empty;
+        listaExpedientes = await ExpedienteService.Lista();
+        ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
+        currentPage = 1;
+    }
 
     private void VerDetalle(int id)
     {
@@ -256,30 +253,21 @@
         }
     }
 
-
     private List<string> ListaEstados = new()
     {
         "INICIO", "PROCESO", "EN PREVENCION", "EN AMPLIACION"
     };
 
-    private void MostrarFormulario()
-    {
-        MostrarFormularioModal = true;
-    }
-
-    private void CerrarFormulario()
-    {
-        MostrarFormularioModal = false;
-    }
+    private void MostrarFormulario() => MostrarFormularioModal = true;
+    private void CerrarFormulario() => MostrarFormularioModal = false;
 
     private async Task GuardarExpediente()
     {
-        // Asignar fecha seleccionada y hora actuales al crear el expediente
         NuevoExpediente.FechaInicio = NuevoExpediente.FechaInicio.Date.Add(DateTime.Now.TimeOfDay);
 
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
-            await MostrarAlerta("ERROR: EL FOLIO YA EXISTE."); 
+            await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
             return;
         }
 
@@ -289,58 +277,38 @@
             return;
         }
 
-        Console.WriteLine($"Nuevo expediente: {JsonSerializer.Serialize(NuevoExpediente)}");
-
-        // Guardar el nuevo expediente en la base de datos
         await ExpedienteService.Crear(NuevoExpediente);
 
-        // Actualizar la lista de expedientes con el nuevo agregado primero
         listaExpedientes = await ExpedienteService.Lista();
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
 
-        // Cerrar formulario
         MostrarFormularioModal = false;
     }
-
 
     private async Task MostrarAlerta(string mensaje)
     {
         MensajeError = mensaje;
         MostrarMensajeError = true;
-
         await Task.Delay(4000);
-
         MostrarMensajeError = false;
         StateHasChanged();
     }
 
-    // Función para abrir el modal con el contenido
     private async Task OpenModal(string contenido)
     {
         modalContenido = contenido;
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'block';");
     }
 
-    // Función para cerrar el modal
     private async Task CloseModal()
     {
         await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('myModal').style.display = 'none';");
     }
 
-    // Métodos para la paginación
-    private void PrevPage()
-    {
-        if (currentPage > 1)
-            currentPage--;
-    }
-
-    private void NextPage()
-    {
-        if (currentPage < totalPages)
-            currentPage++;
-    }
-
+    private void PrevPage() { if (currentPage > 1) currentPage--; }
+    private void NextPage() { if (currentPage < totalPages) currentPage++; }
 }
+
 
 @if (MostrarMensajeError)
      {

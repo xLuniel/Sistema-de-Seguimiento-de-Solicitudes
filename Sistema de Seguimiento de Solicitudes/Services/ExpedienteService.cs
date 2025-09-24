@@ -14,89 +14,55 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Services
             _http = http;
         }
 
+        // ✅ Obtener lista completa de expedientes
         public async Task<List<ExpedienteDTO>> Lista()
         {
-            var response = await _http.GetFromJsonAsync<ResponseAPI<List<ExpedienteDTO>>>("/api/Expedientes/Lista");
-
-            if (response!.Exito)
-            {
-                return response.Data!;
-            }
-            else
-                throw new Exception(response.Mensaje);
+            var response = await _http.GetFromJsonAsync<ResponseAPI<List<ExpedienteDTO>>>("api/Expedientes/Lista");
+            return response != null && response.Exito ? response.Data! : new List<ExpedienteDTO>();
         }
 
-        public async Task<ExpedienteDTO> Obtener(int id)
+        // ✅ Buscar un expediente por ID
+        public async Task<ExpedienteDTO> Buscar(int id)
         {
-            var response = await _http.GetFromJsonAsync<ResponseAPI<ExpedienteDTO>>($"api/Expedientes/Buscar/{id}​");
-
-            if (response!.Exito)
-            {
-                return response.Data!;
-            }
-            else
-                throw new Exception(response.Mensaje);
+            var response = await _http.GetFromJsonAsync<ResponseAPI<ExpedienteDTO>>($"api/Expedientes/Buscar/{id}");
+            return response != null && response.Exito ? response.Data! : new ExpedienteDTO();
         }
 
-        public async Task<int> Editar(ExpedienteDTO Expediente)
+        // ✅ Crear un expediente
+        public async Task<int> Crear(ExpedienteDTO expediente)
         {
-            var result = await _http.PutAsJsonAsync($"api/Expedientes/Editar/{Expediente.Id}", Expediente);
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+            var response = await _http.PostAsJsonAsync("api/Expedientes/Crear", expediente);
+            var result = await response.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
-            if (response!.Exito)
-            {
-                return response.Data;
-            }
-            else
-                throw new Exception(response.Mensaje);
+            return result != null && result.Exito ? result.Data : 0;
         }
 
-        public async Task<int> Crear(ExpedienteDTO NuevoExpediente)
-        {
-            var result = await _http.PostAsJsonAsync("api/Expedientes/Crear", NuevoExpediente);
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
-
-            if (response!.Exito)
-            {
-                return response.Data!;
-            }
-            else
-                throw new Exception(response.Mensaje);
-        }
-
+        // ✅ Eliminar un expediente
         public async Task<bool> Eliminar(int id)
         {
-            var result = await _http.DeleteAsync($"api/Expedientes/Eliminar/{id}");
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+            var response = await _http.DeleteAsync($"api/Expedientes/Eliminar/{id}");
+            var result = await response.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
-            if (response!.Exito)
-            {
-                return response.Exito!;
-            }
-            else
-                throw new Exception(response.Mensaje);
+            return result != null && result.Exito;
         }
 
-        public async Task<ResponseAPI<int>> Actualizar(ExpedienteDTO expediente)
+        // ✅ Actualizar un expediente
+        public async Task<bool> Actualizar(ExpedienteDTO expediente)
         {
-            var result = await _http.PutAsJsonAsync($"api/Expedientes/Actualizar/{expediente.Id}", expediente);
+            var response = await _http.PutAsJsonAsync($"api/Expedientes/Actualizar/{expediente.Id}", expediente);
+            var result = await response.Content.ReadFromJsonAsync<ResponseAPI<int>>();
 
-            // Verificar si la respuesta es exitosa
-            if (!result.IsSuccessStatusCode)
-            {
-                var error = await result.Content.ReadAsStringAsync();
-                throw new Exception($"Error en la API: {error}");
-            }
+            return result != null && result.Exito;
+        }
 
-            // Deserializar correctamente la respuesta
-            var response = await result.Content.ReadFromJsonAsync<ResponseAPI<int>>();
+        // ✅ Buscar por folio o contenido (nuevo)
+        public async Task<List<ExpedienteDTO>> BuscarPorTexto(string filtro)
+        {
+            var response = await _http.GetFromJsonAsync<ResponseAPI<List<ExpedienteDTO>>>(
+                $"api/Expedientes/BuscarPorTexto?filtro={filtro}"
+            );
 
-            if (response!.Exito)
-            {
-                return response;
-            }
-            else
-                throw new Exception(response.Mensaje);
+            return response != null && response.Exito ? response.Data! : new List<ExpedienteDTO>();
         }
     }
 }

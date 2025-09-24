@@ -92,85 +92,9 @@ namespace SolicitudesAPI.Controllers
             return Ok(responseApi);
         }
 
-        // Fixing the syntax errors and context issues in the Buscar method
+       
 
-        [HttpGet("Buscar/{id}")]
-        public async Task<ActionResult> Buscar(int id)
-        {
-            var responseApi = new ResponseAPI<ExpedienteDTO>();
-            var ExpedienteDTO = new ExpedienteDTO();
 
-            try
-            {
-                var dbExpediente = await _context.Expedientes.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (dbExpediente != null)
-                {
-                    ExpedienteDTO = new ExpedienteDTO
-                    {
-                        // Etapa inicial
-                        Id = dbExpediente.Id,
-                        Folio = dbExpediente.Folio,
-                        NombreSolicitante = dbExpediente.NombreSolicitante,
-                        FechaInicio = dbExpediente.FechaInicio ?? default(DateTime), // Manejar valores NULL
-                        Estado = dbExpediente.Estado,
-                        ContenidoSolicitud = dbExpediente.ContenidoSolicitud,
-                        MesAdmision = dbExpediente.MesAdmision,
-                        TipoSolicitud = dbExpediente.TipoSolicitud,
-                        TipoDerecho = dbExpediente.TipoDerecho,
-                        FechaLimiteRespuesta10dias = dbExpediente.FechaLimiteRespuesta10dias,
-                        Ampliacion = dbExpediente.Ampliacion,
-                        NumeroSesionComiteAmpliacion = dbExpediente.NumeroSesionComiteAmpliacion,
-                        FechaSesionComiteAmpliacion = dbExpediente.FechaSesionComiteAmpliacion,
-                        FechaLimiteRespuesta20dias = dbExpediente.FechaLimiteRespuesta20dias,
-                        FechaRespuesta = dbExpediente.FechaRespuesta,
-                        PromedioDiasRespuesta = dbExpediente.PromedioDiasRespuesta,
-
-                        Prevencion = dbExpediente.Prevencion,
-                        SubsanaPrevencionReinicoTramite = dbExpediente.SubsanaPrevencionReinicoTramite,
-                        FechaLimitePrevencion10dias = dbExpediente.FechaLimitePrevencion10dias,
-                        RecibidaRegistrada = dbExpediente.RecibidaRegistrada,
-                        MedioRecepcionSolicitudManual = dbExpediente.MedioRecepcionSolicitudManual,
-                        ComoDeseaRecibirRespuestaPersonaSolicitante = dbExpediente.ComoDeseaRecibirRespuestaPersonaSolicitante,
-                        CorreoElectronicoSolicitante = dbExpediente.CorreoElectronicoSolicitante,
-
-                        // Etapa de seguimiento
-                        AreaPoseedoraInformacion = dbExpediente.AreaPoseedoraInformacion,
-
-                        // Etapa Final
-                        Materia = dbExpediente.Materia,
-                        CiudadSolicitante = dbExpediente.CiudadSolicitante,
-                        Tematica = dbExpediente.Tematica,
-                        TematicaEspecifica = dbExpediente.TematicaEspecifica,
-                        SentidoRespuesta = dbExpediente.SentidoRespuesta,
-                        PrecisionSentidoRespuesta = dbExpediente.PrecisionSentidoRespuesta,
-                        ModalidadEntrega = dbExpediente.ModalidadEntrega,
-                        Cobro = dbExpediente.Cobro,
-                        RecursoRevision = dbExpediente.RecursoRevision,
-                        NumeroRecursoRevision = dbExpediente.NumeroRecursoRevision,
-                        DatosRecursoRevision = dbExpediente.DatosRecursoRevision,
-                        Nota = dbExpediente.Nota
-                    };
-
-                    responseApi.Exito = true;
-                    responseApi.Data = ExpedienteDTO;
-                }
-                else
-                {
-                    responseApi.Exito = false;
-                    responseApi.Mensaje = "No se encontró el expediente";
-                }
-            }
-            catch (Exception ex)
-            {
-                responseApi.Exito = false;
-                responseApi.Mensaje = ex.Message;
-            }
-
-            return Ok(responseApi);
-        }
-
-        
         // POST: api/Expedientes/add
         [HttpPost("Crear")]
         public async Task<ActionResult> Crear(ExpedienteDTO expediente)
@@ -311,5 +235,55 @@ namespace SolicitudesAPI.Controllers
         }
 
 
+      
+            // GET: api/Expedientes/BuscarPorTexto?filtro=algo
+        [HttpGet("BuscarPorTexto")]
+        public async Task<ActionResult> BuscarPorTexto([FromQuery] string filtro)
+        {
+            var responseApi = new ResponseAPI<List<ExpedienteDTO>>();
+            var listaExpedienteDTO = new List<ExpedienteDTO>();
+
+            try
+            {
+                var query = _context.Expedientes.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(filtro))
+                {
+                    filtro = filtro.ToLower();
+
+                    query = query.Where(e =>
+                        (e.Folio != null && e.Folio.ToLower().Contains(filtro)) ||
+                        (e.NombreSolicitante != null && e.NombreSolicitante.ToLower().Contains(filtro)) ||
+                        (e.Estado != null && e.Estado.ToLower().Contains(filtro)) ||
+                        (e.ContenidoSolicitud != null && e.ContenidoSolicitud.ToLower().Contains(filtro))
+                    );
+                }
+
+                var expedientes = await query.ToListAsync();
+
+                foreach (var expediente in expedientes)
+                {
+                    listaExpedienteDTO.Add(new ExpedienteDTO
+                    {
+                        Id = expediente.Id,
+                        Folio = expediente.Folio,
+                        NombreSolicitante = expediente.NombreSolicitante,
+                        FechaInicio = expediente.FechaInicio ?? default(DateTime),
+                        Estado = expediente.Estado,
+                        ContenidoSolicitud = expediente.ContenidoSolicitud
+                    });
+                }
+
+                responseApi.Exito = true;
+                responseApi.Data = listaExpedienteDTO;
+            }
+            catch (Exception ex)
+            {
+                responseApi.Exito = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+        }
     }
 }
