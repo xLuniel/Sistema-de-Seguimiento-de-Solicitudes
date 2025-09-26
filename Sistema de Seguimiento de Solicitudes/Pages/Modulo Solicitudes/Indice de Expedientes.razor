@@ -36,7 +36,7 @@
     @if (PuedeCapturar)
     {
         <!-- Botón para agregar nuevo expediente -->
-        <button class="btn-agregar" @onclick="MostrarFormulario"> Agregar Nueva Solicitud </button>
+        <button class="btn-agregar" @onclick="MostrarFormulario"> Registrar Nueva Solicitud </button>
     }
 </div>
 
@@ -219,7 +219,7 @@
         ExpedientesFiltrados = new List<ExpedienteDTO>(listaExpedientes.OrderByDescending(e => e.Id));
     }
 
-    // 🔎 Nueva búsqueda: folio + contenido + solicitante (API)
+    //  Nueva búsqueda: folio + contenido + solicitante (API)
     private async Task Buscar()
     {
         if (!string.IsNullOrWhiteSpace(Filtro))
@@ -255,27 +255,33 @@
 
     private List<string> ListaEstados = new()
     {
-        "INICIO", "PROCESO", "EN PREVENCION", "EN AMPLIACION"
+        "EN PROCESO", "TERMINADA"
     };
+
 
     private void MostrarFormulario() => MostrarFormularioModal = true;
     private void CerrarFormulario() => MostrarFormularioModal = false;
 
     private async Task GuardarExpediente()
     {
-        NuevoExpediente.FechaInicio = NuevoExpediente.FechaInicio.Date.Add(DateTime.Now.TimeOfDay);
+        // ✅ Validar que el folio no esté vacío
+        if (string.IsNullOrWhiteSpace(NuevoExpediente.Folio))
+        {
+            await MostrarAlerta("ERROR: EL FOLIO ES OBLIGATORIO.");
+            return;
+        }
 
+        // ✅ Validar que el folio no se repita
         if (listaExpedientes!.Any(e => e.Folio == NuevoExpediente.Folio))
         {
             await MostrarAlerta("ERROR: EL FOLIO YA EXISTE.");
             return;
         }
 
-        if (listaExpedientes!.Any(e => e.NombreSolicitante == NuevoExpediente.NombreSolicitante))
-        {
-            await MostrarAlerta("ERROR: EL NOMBRE YA EXISTE.");
-            return;
-        }
+        // ❌ El nombre ya no es obligatorio (se elimina esa validación)
+
+        // Asignar fecha y hora actuales
+        NuevoExpediente.FechaInicio = NuevoExpediente.FechaInicio.Date.Add(DateTime.Now.TimeOfDay);
 
         await ExpedienteService.Crear(NuevoExpediente);
 
@@ -284,6 +290,7 @@
 
         MostrarFormularioModal = false;
     }
+
 
     private async Task MostrarAlerta(string mensaje)
     {

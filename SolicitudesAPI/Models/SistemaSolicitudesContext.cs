@@ -44,7 +44,8 @@ public partial class SistemaSolicitudesContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Solicitu__3214EC27AA69A3A2");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.ContenidoSolicitud).HasMaxLength(4000);
+            entity.Property(e => e.ContenidoSolicitud)
+                  .HasColumnType("nvarchar(max)"); // ahora soporta texto muy largo
             entity.Property(e => e.Estado)
                 .HasMaxLength(50)
                 .IsUnicode(false);

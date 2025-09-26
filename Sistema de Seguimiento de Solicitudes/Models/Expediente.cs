@@ -76,7 +76,8 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         [EmailAddress(ErrorMessage = "Debes ingresar un correo electrónico válido.")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
-        // Contenido de la solicitud
+        // Contenido de la solicitud (puede ser muy largo)
+        [DataType(DataType.MultilineText)]
         public string ContenidoSolicitud { get; set; } = string.Empty;
 
 
