@@ -16,19 +16,19 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Mes de admisión
         public string MesAdmision { get; set; } = string.Empty;
 
-        // Tipo de solicitud
+        // Tipo de solicitud (DAI o ARCO)
         public string TipoSolicitud { get; set; } = string.Empty;
 
-        // Tipo de derecho
+        // Tipo de derecho (solo aplica si es ARCO)
         public string TipoDerecho { get; set; } = string.Empty;
 
         // Fecha de inicio del trámite
         public DateTime FechaInicioTramite { get; set; } = DateTime.Now;
 
-        // Fecha límite de respuesta (10 días hábiles)
-        public DateTime? FechaLimiteRespuesta10 { get; set; }
+        // Fecha límite de respuesta (automática: 10 días hábiles para DAI, 20 para ARCO)
+        public DateTime? FechaLimiteRespuesta { get; set; }
 
-        // Indica si hubo una ampliación
+        // Indica si hubo una ampliación (Si / No)
         public string Ampliacion { get; set; } = string.Empty;
 
         // Número de la sesión del Comité que confirma la ampliación
@@ -37,10 +37,7 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Fecha de la sesión del Comité que confirma la ampliación
         public DateTime? FechaSesionComiteAmpliacion { get; set; }
 
-        // Fecha límite de respuesta (20 días hábiles)
-        public DateTime? FechaLimiteRespuesta20 { get; set; }
-
-        // Estatus del expediente
+        // Estatus del expediente (En proceso / Terminada)
         public string? Estatus { get; set; }
 
         // Fecha de respuesta de la solicitud
@@ -49,19 +46,19 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Promedio de días de respuesta
         public int PromedioDiasRespuesta { get; set; }
 
-        // Indica si hubo prevención en la solicitud
-        public bool Prevencion { get; set; } = false;
+        // Prevención (Si / No)
+        public string Prevencion { get; set; } = string.Empty;
 
         // Información sobre la subsanación de la prevención y reinicio del trámite
         public string SubsanaPrevencion { get; set; } = string.Empty;
 
-        // Fecha límite para subsanar la prevención
+        // Fecha límite para subsanar la prevención (10 días hábiles)
         public DateTime? FechaLimitePrevencion { get; set; }
 
-        // Cómo fue recibida o registrada la solicitud en la PNT
+        // Cómo fue recibida o registrada la solicitud en la PNT (PNT / Manual)
         public string RecibidaRegistrada { get; set; } = string.Empty;
 
-        // Medio de recepción en solicitud manual
+        // Medio de recepción en solicitud manual (solo aplica si RecibidaRegistrada = Manual)
         public string MedioRecepcionSolicitudManual { get; set; } = string.Empty;
 
         // Cómo desea recibir la respuesta la persona solicitante
@@ -70,16 +67,14 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Nombre del peticionario
         public string? Nombre { get; set; }
 
-
         // Correo electrónico del peticionario
         [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
         [EmailAddress(ErrorMessage = "Debes ingresar un correo electrónico válido.")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
-        // Contenido de la solicitud (puede ser muy largo)
+        // Contenido de la solicitud
         [DataType(DataType.MultilineText)]
         public string ContenidoSolicitud { get; set; } = string.Empty;
-
 
         // Área que posee la información
         public string AreaInformacion { get; set; } = string.Empty;
@@ -124,12 +119,8 @@ namespace Sistema_de_Seguimiento_de_Solicitudes.Models
         // Constructor
         public Expediente()
         {
-            // Inicializar con la fecha y hora actual
             FechaInicioTramite = DateTime.Now;
-            //FechaLimiteRespuesta10 = DateTime.Now;
-            //FechaLimiteRespuesta20 = DateTime.Now;
-            FechaRespuesta = DateTime.Now;
-            //FechaLimitePrevencion = DateTime.Now;
+            FechaRespuesta = null; // ahora no se pone por omisión
         }
     }
 }

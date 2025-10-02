@@ -4,6 +4,12 @@
     {
         //Etapa Inicial  
 
+        public static List<string> Prevencion = new()
+        { 
+            "SI", "NO" 
+        };
+
+
         public static readonly List<string> MesesAdmision = new()
                    {
                        "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
